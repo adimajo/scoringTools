@@ -1,0 +1,11 @@
+Package: scoring
+Type: Package
+Title: Credit Scoring tools
+Version: 0.1.0
+Author: Adrien Ehrhardt
+Maintainer: Adrien Ehrhardt <aehrhardt@ca-cf.fr>
+Description: This package aims at regroupping essential tools for credit scoring. These statistical tools may be useful for other use-cases as well but were primarly designed for it.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1.9000
