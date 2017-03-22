@@ -1,15 +1,24 @@
-
-
-####### M??thode SEM ?? r??gression polytomique #######
-
-# predictors : matrix des "x" pr??dicteurs
-# labels : vector des "y" ??tiquettes
+#' Discretizing using the SEM-Gibbs algorithm
+#'
+#' This function determines the best discretization for a logistic regression model using an SEM-Gibbs algorithm which affects continuous variables to qualitative variables using multinomial regression.
+#' @param predictors The matrix or dataframe containing the .
+#' @param labels The numeric binary vector of the actual labels observed.
+#' @param test The numeric binary vector of the actual labels observed.
+#' @param validation The numeric binary vector of the actual labels observed.
+#' @param criterion The numeric binary vector of the actual labels observed.
+#' @param iter The numeric binary vector of the actual labels observed.
+#' @param m_depart The numeric binary vector of the actual labels observed.
+#' @param reg_type The numeric binary vector of the actual labels observed.
+#' @keywords discretization, index
+#' @import nnet
+#' @import speedglm
+#' @import mnlogit
+#' @export
+#' @examples
+#' sem_polytomique()
 
 
 sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gini',iter=1000,m_depart=20,reg_type='poly') {
-     require(nnet)
-     require(speedglm)
-     require(mnlogit)
      source("~/Documents/discretisation/R_discretisation/methods/bugfix_speedglm.R")
      if (criterion %in% c('gini','aic')) {
           if (length(labels)==length(predictors[,1])) {
