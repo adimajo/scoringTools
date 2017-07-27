@@ -13,11 +13,26 @@ parcelling(xf, xnf, yf)
 
 \item{yf}{The matrix of financed clients' labels}
 }
+\value{
+List containing the model using financed clients only and the model produced using the Parcelling method.
+}
 \description{
 This function performs Reject Inference using the Parcelling technique. Note that this technique is theoretically good in the MNAR framework although coefficients must be chosen a priori.
 }
 \examples{
-parcelling()
+# We simulate data from financed clients
+set.seed(1)
+xf = matrix(runif(100*2), nrow = 100, ncol = 2)
+theta = c(2,-2)
+log_odd = apply(xf, 1, function(row) theta\%*\%row)
+yf = rbinom(100,1,1/(1+exp(-log_odd)))
+# We simulate data from not financed clients (MCAR mechanism)
+xnf = matrix(runif(100*2), nrow = 100, ncol = 2)
+list_models <- parcelling(xf,xnf,yf)
+# This is the model constructed using the financed clients (xf,yf):
+list_models[1]
+# This is the model constructed using all the clients (xf,yf,xnf) and the parcelling technique:
+list_models[2]
 }
 \keyword{credit,}
 \keyword{inference,}

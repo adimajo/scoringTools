@@ -9,15 +9,30 @@ augmentation(xf, xnf, yf)
 \arguments{
 \item{xf}{The matrix of financed clients' characteristics to be used in the scorecard.}
 
-\item{xnf}{The matrix of not financed clients' characteristics to be used in the scorecard (must be the same in the same order as xf!).}
+\item{xnf}{The matrix of not financed clients' characteristics to be used in the scorecard (must be the same features in the same order as xf!).}
 
 \item{yf}{The matrix of financed clients' labels}
+}
+\value{
+List containing the model using financed clients only and the model produced using the Augmentation method.
 }
 \description{
 This function performs Reject Inference using the Augmentation technique. Note that this technique is theoretically better than using the financed clients scorecard in the MAR and misspecified model case.
 }
 \examples{
-augmentation()
+# We simulate data from financed clients
+set.seed(1)
+xf = matrix(runif(100*2), nrow = 100, ncol = 2)
+theta = c(2,-2)
+log_odd = apply(xf, 1, function(row) theta\%*\%row)
+yf = rbinom(100,1,1/(1+exp(-log_odd)))
+# We simulate data from not financed clients (MCAR mechanism)
+xnf = matrix(runif(100*2), nrow = 100, ncol = 2)
+list_models <- augmentation(xf,xnf,yf)
+# This is the model constructed using the financed clients (xf,yf):
+list_models[1]
+# This is the model constructed using all the clients (xf,yf,xnf) and the augmentation technique:
+list_models[2]
 }
 \keyword{credit,}
 \keyword{inference,}

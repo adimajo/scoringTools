@@ -1,18 +1,15 @@
-#' Discretizing using the SEM-Gibbs algorithm
+#' Model-based multivariate discretization for logistic regression (using the mnlogit package).
 #'
-#' This function determines the best discretization for a logistic regression model using an SEM-Gibbs algorithm which affects continuous variables to qualitative variables using multinomial regression.
-#' @param predictors The matrix or dataframe containing the .
-#' @param labels The numeric binary vector of the actual labels observed.
-#' @param test The numeric binary vector of the actual labels observed.
-#' @param validation The numeric binary vector of the actual labels observed.
-#' @param criterion The numeric binary vector of the actual labels observed.
-#' @param iter The numeric binary vector of the actual labels observed.
-#' @param m_depart The numeric binary vector of the actual labels observed.
-#' @param reg_type The numeric binary vector of the actual labels observed.
-#' @keywords discretization, index
-#' @import nnet
-#' @import speedglm
-#' @import mnlogit
+#' This function discretizes a training set using an SEM-Gibbs based method (see References section).
+#' @param predictors The matrix array containing the numeric attributes to discretize.
+#' @param labels The actual labels of the provided predictors (0/1).
+#' @param test Boolean : True if the algorithm should use predictors to construct a test set on which to search for the best discretization scheme using the provided criterion (default: TRUE).
+#' @param validation Boolean : True if the algorithm should use predictors to construct a validation set on which to calculate the provided criterion using the best discretization scheme (chosen thanks to the provided criterion on either the test set (if true) or the training set (otherwise)) (default: TRUE).
+#' @param criterion The criterion ('gini','aic','bic') to use to choose the best discretization scheme among the generated ones (default: 'gini'). Nota Bene: it is best to use 'gini' only when test is set to TRUE and 'aic' or 'bic' when it is not. When using 'aic' or 'bic' with a test set, the likelihood is returned as there is no need to penalize for generalization purposes.
+#' @param iter The number of iterations to do in the SEM protocole (default: 1000).
+#' @param m_depart The maximum number of resulting categories for each variable wanted (default: 20).
+#' @param reg_type The model to use between discretized and continuous features (currently, only multinomial logistic regression ('poly') and ordered logistic regression ('polr') are supported ; default: 'poly').
+#' @keywords SEM, Gibbs, discretization
 #' @export
 #' @examples
 #' sem_polytomique()
@@ -58,14 +55,14 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
 
                     # Entra??nement de y | e
                     # model_reglog[[i]] = step(glm(labels~.,family = "binomial", data=Filter(function(x)(length(unique(x))>1),data_logit)),trace = 0) # Ajout de stepwise
-                    model_reglog = tryCatch((speedglm(labels~.,family = binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE,start=model_reglog$coefficients,eigendec=FALSE)),error=function(cond) reduireGLM(speedglm(labels~.,family = binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE,eigendec=FALSE)))
+                    model_reglog = tryCatch((speedglm::speedglm(labels~.,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE,start=model_reglog$coefficients,eigendec=FALSE)),error=function(cond) reduireGLM(speedglm(labels~.,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE,eigendec=FALSE)))
                     # model_reglog = tryCatch(reduireGLM(speedglm(labels~.,family = binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE,start=model_reglog$coefficients, mustart=logit$weights)),error=function(cond) reduireGLM(speedglm(labels~.,family = binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE)))
 
-                    logit = tryCatch((speedglm(labels ~ .,family = binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data[ensemble[[1]],]), y=FALSE, model=FALSE,start=logit$coefficients,eigendec=FALSE)),error=function(cond) reduireGLM(speedglm(labels ~ .,family = binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data[ensemble[[1]],]), y=FALSE, model=FALSE,eigendec=FALSE)))
+                    logit = tryCatch((speedglm::speedglm(labels ~ .,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data[ensemble[[1]],]), y=FALSE, model=FALSE,start=logit$coefficients,eigendec=FALSE)),error=function(cond) reduireGLM(speedglm(labels ~ .,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data[ensemble[[1]],]), y=FALSE, model=FALSE,eigendec=FALSE)))
                     # logit = tryCatch(reduireGLM(glm(labels ~ .,family = binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data[ensemble[[1]],]), y=FALSE, model=FALSE,start=logit$coefficients, mustart=logit$weights)),error=function(cond) reduireGLM(glm(labels ~ .,family = binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data[ensemble[[1]],]), y=FALSE, model=FALSE)))
 
                     # Calcul du crit??re
-                    if (criterion=='gini') criterion_iter[[i]] = normalizedGini(labels[ensemble[[2]]],predict(model_reglog,data_logit[ensemble[[2]],],type='response')) else criterion_iter[[i]] = -model_reglog$aic
+                    if (criterion=='gini') criterion_iter[[i]] = normalizedGini(labels[ensemble[[2]]],speedglm:::predict.speedglm(model_reglog,data_logit[ensemble[[2]],],type='response')) else criterion_iter[[i]] = -model_reglog$aic
 
                     if (criterion_iter[[i]] >= criterion_iter[[current_best]]) {
                          best_reglog = model_reglog
@@ -85,9 +82,9 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
 
                               if (reg_type=='poly') {
                                    long_dataset <- data.frame(e = as.vector(sapply(e[ensemble[[1]],j],function(var) (lev_j[seq(1:m[j])]==var))),x = as.vector(sapply(predictors[ensemble[[1]],j], function(var) rep(var,m[j]))), names = as.character(as.vector(rep(lev_j[seq(1:m[j])],length(ensemble[[1]])))))
-                                   link[[j]] = tryCatch(mnlogit(e ~ 1 | x | 1, data=long_dataset, choiceVar = "names", start = link[[j]]$coefficients, returnData = FALSE, order = TRUE),error=function(cond) link[[j]] = mnlogit(e ~ 1 | x | 1, data=long_dataset, choiceVar = "names", returnData = FALSE, order = TRUE))
+                                   link[[j]] = tryCatch(mnlogit::mnlogit(e ~ 1 | x | 1, data=long_dataset, choiceVar = "names", start = link[[j]]$coefficients, returnData = FALSE, order = TRUE),error=function(cond) link[[j]] = mnlogit::mnlogit(e ~ 1 | x | 1, data=long_dataset, choiceVar = "names", returnData = FALSE, order = TRUE))
                               } else {
-                                   link[[j]] = tryCatch(polr(factor(as.numeric(ordered(e[ensemble[[1]],j],levels = names(sort(unlist(by(predictors[ensemble[[1]],j],e[ensemble[[1]],j],mean)))))), ordered=T) ~ predictors[ensemble[[1]],j], Hess = FALSE, model = FALSE, weights = link[[j]]$weights),error=function(cond) polr(factor(as.numeric(ordered(e[ensemble[[1]],j],levels = names(sort(unlist(by(predictors[ensemble[[1]],j],e[ensemble[[1]],j],mean)))))), ordered=T) ~ predictors[ensemble[[1]],j], Hess = FALSE, model = FALSE))
+                                   link[[j]] = tryCatch(MASS::polr(factor(as.numeric(ordered(e[ensemble[[1]],j],levels = names(sort(unlist(by(predictors[ensemble[[1]],j],e[ensemble[[1]],j],mean)))))), ordered=T) ~ predictors[ensemble[[1]],j], Hess = FALSE, model = FALSE, weights = link[[j]]$weights),error=function(cond) MASS::polr(factor(as.numeric(ordered(e[ensemble[[1]],j],levels = names(sort(unlist(by(predictors[ensemble[[1]],j],e[ensemble[[1]],j],mean)))))), ordered=T) ~ predictors[ensemble[[1]],j], Hess = FALSE, model = FALSE))
                               }
                          }
                          if (m[j]>1) {
@@ -104,20 +101,20 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                                         levels(modalites_k[,ncol(modalites_k)]) <- c("1","2")
                                    } else {
                                         levels(modalites_k[,ncol(modalites_k)]) <- c(lev_j[k],"1")
-                                        modalites_k[,ncol(modalites_k)] <- relevel(modalites_k[,ncol(modalites_k)],"1")
+                                        modalites_k[,ncol(modalites_k)] <- stats::relevel(modalites_k[,ncol(modalites_k)],"1")
                                    }
                                    # p = p(y_i=1|e^{-j},e^j = k)
                                    # t = p(y_i|e^{-j},e^j = k) p(e^j | x^j) prop. p(y_i,e_i|x_i)
-                                   p = predict(logit,newdata=modalites_k,type = "response")
+                                   p = speedglm:::predict.speedglm(logit,newdata=modalites_k,type = "response")
                                    #                                    if (link[[i]][[j]]$edf==2) t = prop.table(cbind(predict(link[[i]][[j]],predictors[,j],type="probs"),rep(1,n)-predict(link[[i]][[j]],predictors[,j],type="probs"))*(labels[ensemble[[1]]]*p+(1-labels[ensemble[[1]]])*(1-p)),1) else t = prop.table(predict(link[[i]][[j]],predictors[,j],type="probs")*(labels[ensemble[[1]]]*p+(1-labels[ensemble[[1]]])*(1-p)),1)
                                    #                                    t <- t[,order(as.numeric(colnames(t)))]
                                    y_p[,k] <- (labels*p+(1-labels)*(1-p))
                               }
                               if (reg_type=='poly') {
                                    long_dataset <- data.frame(e = as.vector(sapply(e[,j],function(var) (lev_j[seq(1:m[j])]==var))),x = as.vector(sapply(predictors[,j], function(var) rep(var,m[j]))), names = as.character(as.vector(rep(lev_j[seq(1:m[j])],n))))
-                                   t = predict(link[[j]], newdata = long_dataset,type="probs", choiceVar = "names")
+                                   t = mnlogit:::predict.mnlogit(link[[j]], newdata = long_dataset,type="probs", choiceVar = "names")
                               } else {
-                                   t = predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="probs")
+                                   t = mnlogit:::predict.mnlogit(link[[j]], newdata = data.frame(x = predictors[,j]),type="probs")
                               }
                               #                           t <- t[,order(as.numeric(colnames(t)))]
                               emap[,j] <- apply(t,1,function(p) names(which.max(p)))
@@ -145,7 +142,7 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                if (test==TRUE) {
                     if (criterion=="gini") {
                          best.disc = list(best_reglog,best_link)
-                         if (validation==TRUE) performance = normalizedGini(labels[ensemble[[3]]],predict(best.disc[[1]],as.data.frame(t(emap[,which.max(criterion_iter),ensemble[[3]]])),type="response")) else performance = normalizedGini(labels[ensemble[[2]]],predict(best.disc[[1]],as.data.frame(t(emap[,which.max(criterion_iter),ensemble[[2]]])),type="response"))
+                         if (validation==TRUE) performance = normalizedGini(labels[ensemble[[3]]],speedglm:::predict.speedglm(best.disc[[1]],as.data.frame(t(emap[,which.max(criterion_iter),ensemble[[3]]])),type="response")) else performance = normalizedGini(labels[ensemble[[2]]],speedglm:::predict.speedglm(best.disc[[1]],as.data.frame(t(emap[,which.max(criterion_iter),ensemble[[2]]])),type="response"))
                     } else {
                          best.disc = list(best_reglog,best_link)
                          if (validation==TRUE) performance = 0 else performance = 0
@@ -153,7 +150,7 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                } else {
                     if (criterion=="gini") {
                          best.disc = list(best_reglog,best_link)
-                         if (validation==TRUE) performance = normalizedGini(labels[ensemble[[3]]],predict(best.disc[[1]],as.data.frame(t(emap[,which.max(criterion_iter),ensemble[[3]]])),type="response")) else performance = normalizedGini(labels[ensemble[[1]]],best.disc[[1]]$fitted.values)
+                         if (validation==TRUE) performance = normalizedGini(labels[ensemble[[3]]],speedglm:::predict.speedglm(best.disc[[1]],as.data.frame(t(emap[,which.max(criterion_iter),ensemble[[3]]])),type="response")) else performance = normalizedGini(labels[ensemble[[1]]],best.disc[[1]]$fitted.values)
                     } else {
                          best.disc = list(best_reglog,best_link)
                          if (validation==TRUE) performance = 0 else performance = best.disc[[1]]$aic

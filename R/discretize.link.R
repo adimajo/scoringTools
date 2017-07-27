@@ -16,11 +16,11 @@ discretize.link <- function(link,df) {
      emap = array(0,c(n,d))
 
      for (j in sample(1:d)) {
-          m = length(link[[j]]$coefficients)-1
+          m = length(link[[j]]$coefficients)/2 + 1
           lev = c("1",sapply(names(link[[j]]$coefficients[seq(2,length(link[[j]]$coefficients),2)]), function(lev_name) substr(lev_name,start=3,stop=nchar(lev_name))))
           long_dataset <- data.frame(x = as.vector(sapply(df[,j], function(var) rep(var,m))), names = as.character(as.vector(rep(lev[seq(1:m)],n))))
-          t = predict(link[[j]], newdata = long_dataset, choiceVar = "names", type="probs")
-          emap[j,] <- apply(t,1,function(p) names(which.max(p)))
+          t = mnlogit:::predict.mnlogit(link[[j]], newdata = long_dataset, choiceVar = "names", type="probs")
+          emap[,j] <- apply(t,1,function(p) names(which.max(p)))
      }
 
      return(emap)

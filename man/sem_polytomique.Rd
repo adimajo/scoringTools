@@ -2,33 +2,34 @@
 % Please edit documentation in R/semDiscretization.R
 \name{sem_polytomique}
 \alias{sem_polytomique}
-\title{Discretizing using the SEM-Gibbs algorithm}
+\title{Model-based multivariate discretization for logistic regression (using the mnlogit package).}
 \usage{
 sem_polytomique(predictors, labels, test = TRUE, validation = TRUE,
   criterion = "gini", iter = 1000, m_depart = 20, reg_type = "poly")
 }
 \arguments{
-\item{predictors}{The matrix or dataframe containing the .}
+\item{predictors}{The matrix array containing the numeric attributes to discretize.}
 
-\item{labels}{The numeric binary vector of the actual labels observed.}
+\item{labels}{The actual labels of the provided predictors (0/1).}
 
-\item{test}{The numeric binary vector of the actual labels observed.}
+\item{test}{Boolean : True if the algorithm should use predictors to construct a test set on which to search for the best discretization scheme using the provided criterion (default: TRUE).}
 
-\item{validation}{The numeric binary vector of the actual labels observed.}
+\item{validation}{Boolean : True if the algorithm should use predictors to construct a validation set on which to calculate the provided criterion using the best discretization scheme (chosen thanks to the provided criterion on either the test set (if true) or the training set (otherwise)) (default: TRUE).}
 
-\item{criterion}{The numeric binary vector of the actual labels observed.}
+\item{criterion}{The criterion ('gini','aic','bic') to use to choose the best discretization scheme among the generated ones (default: 'gini'). Nota Bene: it is best to use 'gini' only when test is set to TRUE and 'aic' or 'bic' when it is not. When using 'aic' or 'bic' with a test set, the likelihood is returned as there is no need to penalize for generalization purposes.}
 
-\item{iter}{The numeric binary vector of the actual labels observed.}
+\item{iter}{The number of iterations to do in the SEM protocole (default: 1000).}
 
-\item{m_depart}{The numeric binary vector of the actual labels observed.}
+\item{m_depart}{The maximum number of resulting categories for each variable wanted (default: 20).}
 
-\item{reg_type}{The numeric binary vector of the actual labels observed.}
+\item{reg_type}{The model to use between discretized and continuous features (currently, only multinomial logistic regression ('poly') and ordered logistic regression ('polr') are supported ; default: 'poly').}
 }
 \description{
-This function determines the best discretization for a logistic regression model using an SEM-Gibbs algorithm which affects continuous variables to qualitative variables using multinomial regression.
+This function discretizes a training set using an SEM-Gibbs based method (see References section).
 }
 \examples{
 sem_polytomique()
 }
-\keyword{discretization,}
-\keyword{index}
+\keyword{Gibbs,}
+\keyword{SEM,}
+\keyword{discretization}

@@ -1,11 +1,23 @@
 Package: scoring
 Type: Package
 Title: Credit Scoring tools
-Version: 0.1.0
-Author: Adrien Ehrhardt
-Maintainer: Adrien Ehrhardt <aehrhardt@ca-cf.fr>
-Description: This package aims at regroupping essential tools for credit scoring. These statistical tools may be useful for other use-cases as well but were primarly designed for it.
-License: What license is it under?
+Version: 0.1
+Author@R: person("Adrien", "Ehrhardt", email = "adrien.ehrhardt@inria.fr",
+                  role = c("aut", "cre"))
+Author: Adrien Ehrhardt [aut, cre]
+Maintainer: Adrien Ehrhardt <adrien.ehrhardt@inria.fr>
+Description: This package aims at regroupping essential tools for credit scoring. These statistical tools may be useful for other use-cases as well but were primarly designed for it. First, there are Reject Inference methods' functions,
+     although it was shown they do not convey any good asymptotical properties. Second, we build upon the already CRAN-available package "discretization" to and add our own discretization method. Third, we provide a way.
+License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1.9000
+Imports:
+    discretization,
+    speedglm,
+    mnlogit,
+    nnet,
+    sqldf
+URL: https://adimajo.github.io
+BugReports: https://github.com/adimajo/scoring/issues
+

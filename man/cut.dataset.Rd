@@ -5,7 +5,7 @@
 \title{Randoming and sampling a dataset by its row numbers}
 \usage{
 \method{cut}{dataset}(n, test = TRUE, validation = TRUE,
-  proportions = c(), seed = 1)
+  proportions = c(0.2, 0.2), seed = 1)
 }
 \arguments{
 \item{n}{The total number of rows to sample from.}
@@ -14,7 +14,7 @@
 
 \item{validation}{TRUE if a test dataset is wanted, FALSE otherwise (default=TRUE).}
 
-\item{proportions}{The list of the proportions.}
+\item{proportions}{The list of the (2) proportions wanted for test and validation set. Only the first is used when there is only one of either test or validation that is set to TRUE. Produces an error when the sum is greater to one. Useless if both test and validation are set to FALSE. Default: list(0.2,0.2).}
 
 \item{seed}{The seed for the random number generator (optional).}
 }
@@ -22,7 +22,11 @@
 This function chooses the rows of a dataset to be included in the train, test (optional) and validation (optional) datasets according to proportions specified by the user.
 }
 \examples{
-cut.dataset()
+# We randomly separate 30 observations in 40\\\% of training, 30\\\% of test and 30\\\% of validation.
+list_indices <- cut.dataset(n=30,test=TRUE,
+validation=TRUE,proportions=c(0.3,0.3),seed=1)
+
+print(list_indices)
 }
 \keyword{sample,}
 \keyword{test,}

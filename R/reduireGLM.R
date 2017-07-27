@@ -3,7 +3,6 @@
 #' This function suppresses attributes of glm models that depend on the size of the input dataset.
 #' @param modele The glm model to compress.
 #' @keywords glm, size
-#' @export
 #' @examples
 #' reduireGLM()
 

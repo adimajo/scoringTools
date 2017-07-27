@@ -13,11 +13,28 @@ twins(xf, xnf, yf)
 
 \item{yf}{The matrix of financed clients' labels}
 }
+\value{
+List containing the model using financed clients only, the model of acceptance and the model produced using the Twins method.
+}
 \description{
 This function performs Reject Inference using the Twins technique. Note that this technique has no theoretical foundation.
 }
 \examples{
-twins()
+# We simulate data from financed clients
+set.seed(1)
+xf = matrix(runif(100*2), nrow = 100, ncol = 2)
+theta = c(2,-2)
+log_odd = apply(xf, 1, function(row) theta\%*\%row)
+yf = rbinom(100,1,1/(1+exp(-log_odd)))
+# We simulate data from not financed clients (MCAR mechanism)
+xnf = matrix(runif(100*2), nrow = 100, ncol = 2)
+list_models <- twins(xf,xnf,yf)
+# This is the model constructed using the financed clients (xf,yf):
+list_models[1]
+# This is the model on the acceptance process:
+list_models[2]
+# This is the model constructed using the twins method:
+list_models[3]
 }
 \keyword{credit,}
 \keyword{inference,}
