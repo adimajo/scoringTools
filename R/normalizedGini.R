@@ -6,7 +6,7 @@
 #' @keywords gini, index
 #' @export
 #' @examples
-#' normalizedGini()
+#' normalizedGini(c(1,1,1,0,0),c(0.7,0.9,0.5,0.6,0.3))
 
 
 normalizedGini <- function(actual, predicted) {

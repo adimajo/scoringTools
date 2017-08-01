@@ -6,7 +6,7 @@
 #' @param yf The matrix of financed clients' labels
 #' @return List containing the model using financed clients only and the model produced using the Fuzzy Augmentation method.
 #' @keywords reject, inference, r?int?gration, scorecard, credit, scoring
-#' @import speedglm
+#' @importFrom stats predict
 #' @export
 #' @examples
 #' # We simulate data from financed clients
@@ -26,15 +26,23 @@
 
 fuzzy_augmentation <- function(xf,xnf,yf) {
      df_f <- data.frame(labels = yf, x = xf)
-     model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
+     if (!requireNamespace("speedglm", quietly = TRUE)) {
+          warning("Speedglm not installed, using glm instead (slower).",call. = FALSE)
+          model_f <- stats::glm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
+     } else {
+          model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
+     }
 
      df <- rbind(df_f, data.frame(labels = rep(NA,nrow(xnf)), x = xnf))
      df$acc[1:nrow(df_f)] <- 1
      df$acc[(nrow(df_f)+1):nrow(df)] <- 0
 
-     df[df$acc==0,"labels"] <- speedglm:::predict.speedglm(model_f,df[df$acc==0,],type="response")
+     df[df$acc==0,"labels"] <- predict(model_f,df[df$acc==0,],type="response")
 
-     model_fuzzy = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df[,-which(names(df) %in% c("acc"))])
-
+     if (!requireNamespace("speedglm", quietly = TRUE)) {
+          model_fuzzy = stats::glm(labels ~ ., family = stats::binomial(link='logit'), df[,-which(names(df) %in% c("acc"))])
+     } else {
+          model_fuzzy = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df[,-which(names(df) %in% c("acc"))])
+     }
      return(list(financed.model = model_f, fuzzy_augmentation.model = model_fuzzy))
 }

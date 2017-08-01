@@ -6,7 +6,7 @@
 #' @param yf The matrix of financed clients' labels
 #' @return List containing the model using financed clients only, the model of acceptance and the model produced using the Twins method.
 #' @keywords reject, inference, r?int?gration, scorecard, credit, scoring
-#' @import speedglm
+#' @importFrom stats predict
 #' @export
 #' @examples
 #' # We simulate data from financed clients
@@ -27,18 +27,27 @@
 
 twins <- function(xf,xnf,yf) {
      df_f <- data.frame(labels = yf, x = xf)
-     model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
-
+     if (!requireNamespace("speedglm", quietly = TRUE)) {
+          warning("Speedglm not installed, using glm instead (slower).",call. = FALSE)
+          model_f <- stats::glm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
+     } else {
+          model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
+     }
      df <- rbind(df_f, data.frame(labels = rep(NA,nrow(xnf)), x = xnf))
      df$acc[1:nrow(df_f)] <- 1
      df$acc[(nrow(df_f)+1):nrow(df)] <- 0
 
-     model_acc <- speedglm::speedglm(acc ~ ., family = stats::binomial(link='logit'), df[,-which(names(df) %in% c("labels"))])
-
-     df$score_acc <- speedglm:::predict.speedglm(model_acc,df)
-     df$score_def <- speedglm:::predict.speedglm(model_f,df)
-
-     model_twins = speedglm::speedglm(labels ~ score_acc + score_def, family = stats::binomial(link='logit'), df[df$acc==1,-which(names(df) %in% c("acc"))])
-
+     if (!requireNamespace("speedglm", quietly = TRUE)) {
+          model_acc <- stats::glm(acc ~ ., family = stats::binomial(link='logit'), df[,-which(names(df) %in% c("labels"))])
+     } else {
+          model_acc <- speedglm::speedglm(acc ~ ., family = stats::binomial(link='logit'), df[,-which(names(df) %in% c("labels"))])
+     }
+     df$score_acc <- predict(model_acc,df)
+     df$score_def <- predict(model_f,df)
+     if (!requireNamespace("speedglm", quietly = TRUE)) {
+          model_twins = stats::glm(labels ~ score_acc + score_def, family = stats::binomial(link='logit'), df[df$acc==1,-which(names(df) %in% c("acc"))])
+     } else {
+          model_twins = speedglm::speedglm(labels ~ score_acc + score_def, family = stats::binomial(link='logit'), df[df$acc==1,-which(names(df) %in% c("acc"))])
+     }
      return(list(financed.model = model_f, acceptation.model = model_acc, twins.model = model_twins))
 }

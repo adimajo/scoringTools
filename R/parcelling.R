@@ -6,7 +6,7 @@
 #' @param yf The matrix of financed clients' labels
 #' @return List containing the model using financed clients only and the model produced using the Parcelling method.
 #' @keywords reject, inference, r?int?gration, scorecard, credit, scoring
-#' @import speedglm
+#' @importFrom stats predict
 #' @export
 #' @examples
 #' # We simulate data from financed clients
@@ -26,11 +26,17 @@
 
 parcelling <- function(xf,xnf,yf) {
      df_f <- data.frame(labels = yf, x = xf)
-     model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
+
+     if (!requireNamespace("speedglm", quietly = TRUE)) {
+          warning("Speedglm not installed, using glm instead (slower).",call. = FALSE)
+          model_f <- stats::glm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
+     } else {
+          model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
+     }
 
      df <- rbind(df_f, data.frame(labels = rep(NA,nrow(xnf)), x = xnf))
-     df_f$classe_SCORE <- round(speedglm:::predict.speedglm(model_f,df_f,type="response"), digits=1)
-     df$classe_SCORE <- round(speedglm:::predict.speedglm(model_f,df,type="response"), digits=1)
+     df_f$classe_SCORE <- round(predict(model_f,df_f,type="response"), digits=1)
+     df$classe_SCORE <- round(predict(model_f,df,type="response"), digits=1)
      df$acc[1:nrow(df_f)] <- 1
      df$acc[(nrow(df_f)+1):nrow(df)] <- 0
 
@@ -55,7 +61,10 @@ parcelling <- function(xf,xnf,yf) {
 
      df_parceling[df_parceling$acc==0,"labels"] <- sapply(df_parceling[df_parceling$acc==0,"poids_final"],function(x) (stats::rbinom(1,1,1-x)))
 
-     model_parcelling = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df_parceling[,-which(names(df_parceling) %in% c("poids_final","classe_SCORE","acc"))])
-
+     if (!requireNamespace("speedglm", quietly = TRUE)) {
+          model_parcelling = stats::glm(labels ~ ., family = stats::binomial(link='logit'), df_parceling[,-which(names(df_parceling) %in% c("poids_final","classe_SCORE","acc"))])
+     } else {
+          model_parcelling = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df_parceling[,-which(names(df_parceling) %in% c("poids_final","classe_SCORE","acc"))])
+     }
      return(list(financed.model = model_f, parcelling.model = model_parcelling))
 }

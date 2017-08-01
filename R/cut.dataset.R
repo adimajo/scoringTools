@@ -7,15 +7,17 @@
 #' @param proportions The list of the (2) proportions wanted for test and validation set. Only the first is used when there is only one of either test or validation that is set to TRUE. Produces an error when the sum is greater to one. Useless if both test and validation are set to FALSE. Default: list(0.2,0.2).
 #' @param seed The seed for the random number generator (optional).
 #' @keywords sample, test, train, validation
-#' @examples
-#' # We randomly separate 30 observations in 40\% of training, 30\% of test and 30\% of validation.
-#' list_indices <- cut.dataset(n=30,test=TRUE,
-#' validation=TRUE,proportions=c(0.3,0.3),seed=1)
-#'
-#' print(list_indices)
+
+# #' @examples
+
+# #' # We randomly separate 30 observations in 40\% of training, 30\% of test and 30\% of validation.
+# #' list_indices <- cut_dataset(n=30,test=TRUE,
+# #' validation=TRUE,proportions=c(0.3,0.3),seed=1)
+# #'
+# #' print(list_indices)
 
 
-cut.dataset <- function(n,test=TRUE,validation=TRUE,proportions=c(0.2,0.2),seed=1) {
+cut_dataset <- function(n,test=TRUE,validation=TRUE,proportions=c(0.2,0.2),seed=1) {
      set.seed(seed)
      if (test==TRUE) {
           if (validation==TRUE) {

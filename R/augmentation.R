@@ -6,6 +6,7 @@
 #' @param yf The matrix of financed clients' labels
 #' @return List containing the model using financed clients only and the model produced using the Augmentation method.
 #' @keywords reject, inference, r?int?gration, scorecard, credit, scoring
+#' @importFrom stats predict
 #' @export
 #' @examples
 #' # We simulate data from financed clients
@@ -24,11 +25,16 @@
 
 augmentation <- function(xf, xnf, yf) {
      df_f <- data.frame(labels = yf, x = xf)
-     model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
+     if (!requireNamespace("speedglm", quietly = TRUE)) {
+          warning("Speedglm not installed, using glm instead (slower).",call. = FALSE)
+          model_f <- stats::glm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
+     } else {
+          model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
+     }
 
      df <- rbind(df_f, data.frame(labels = rep(NA,nrow(xnf)), x = xnf))
-     df_f$classe_SCORE <- round(speedglm:::predict.speedglm(model_f,df_f,type="response"), digits=1)
-     df$classe_SCORE <- round(speedglm:::predict.speedglm(model_f,df,type="response"), digits=1)
+     df_f$classe_SCORE <- round(predict(model_f,df_f,type="response"), digits=1)
+     df$classe_SCORE <- round(predict(model_f,df,type="response"), digits=1)
      df$acc[1:nrow(df_f)] <- 1
      df$acc[(nrow(df_f)+1):nrow(df)] <- 0
 
@@ -55,7 +61,11 @@ augmentation <- function(xf, xnf, yf) {
      poids_tot$count_rej <- NULL
 
      df_augmente <- merge(df_f, poids_tot, by="classe_SCORE", all.x=TRUE, all.y=TRUE)
-     model_augmente = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df_augmente[,-which(names(df_augmente) %in% c("poidsfinal","classe_SCORE"))], weights = df_augmente$poidsfinal)
+     if (!requireNamespace("speedglm", quietly = TRUE)) {
+          model_augmente = stats::glm(labels ~ ., family = stats::binomial(link='logit'), df_augmente[,-which(names(df_augmente) %in% c("poidsfinal","classe_SCORE"))], weights = df_augmente$poidsfinal)
+     } else {
+          model_augmente = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df_augmente[,-which(names(df_augmente) %in% c("poidsfinal","classe_SCORE"))], weights = df_augmente$poidsfinal)
+     }
 
      return(list(financed.model = model_f, augmented.model = model_augmente))
 }

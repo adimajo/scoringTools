@@ -7,7 +7,7 @@
 #' @param thresh The threshold to use in the Classification step, i.e. the probability above which a not financed client is considered to have a label equal to 1.
 #' @return List containing the model using financed clients only and the model produced using the Reclassification method.
 #' @keywords reject, inference, r?int?gration, scorecard, credit, scoring
-#' @import speedglm
+#' @importFrom stats predict
 #' @export
 #' @examples
 #' # We simulate data from financed clients
@@ -27,15 +27,23 @@
 
 reclassification <- function(xf,xnf,yf,thresh=0.5) {
      df_f <- data.frame(labels = yf, x = xf)
-     model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
+     if (!requireNamespace("speedglm", quietly = TRUE)) {
+          warning("Speedglm not installed, using glm instead (slower).",call. = FALSE)
+          model_f <- stats::glm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
+     } else {
+          model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
+     }
 
      df <- rbind(df_f, data.frame(labels = rep(NA,nrow(xnf)), x = xnf))
      df$acc[1:nrow(df_f)] <- 1
      df$acc[(nrow(df_f)+1):nrow(df)] <- 0
 
-     df[df$acc==0,"labels"] <- (speedglm:::predict.speedglm(model_f,df[df$acc==0,],type="response") > thresh)*1
+     df[df$acc==0,"labels"] <- (predict(model_f,df[df$acc==0,],type="response") > thresh)*1
 
-     model_reclassification = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df[,-which(names(df) %in% c("acc"))])
-
+     if (!requireNamespace("speedglm", quietly = TRUE)) {
+          model_reclassification = stats::glm(labels ~ ., family = stats::binomial(link='logit'), df[,-which(names(df) %in% c("acc"))])
+     } else {
+          model_reclassification = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df[,-which(names(df) %in% c("acc"))])
+     }
      return(list(financed.model = model_f, reclassification.model = model_reclassification))
 }

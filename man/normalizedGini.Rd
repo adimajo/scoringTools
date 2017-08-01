@@ -15,7 +15,7 @@ normalizedGini(actual, predicted)
 This function calculates the Gini index of a classification rule outputting probabilities.
 }
 \examples{
-normalizedGini()
+normalizedGini(c(1,1,1,0,0),c(0.7,0.9,0.5,0.6,0.3))
 }
 \keyword{gini,}
 \keyword{index}

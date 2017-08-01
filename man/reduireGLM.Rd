@@ -12,8 +12,5 @@ reduireGLM(modele)
 \description{
 This function suppresses attributes of glm models that depend on the size of the input dataset.
 }
-\examples{
-reduireGLM()
-}
 \keyword{glm,}
 \keyword{size}

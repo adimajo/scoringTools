@@ -24,7 +24,17 @@ modchi2_iter(predictors, labels, test = TRUE, validation = TRUE,
 This function discretizes a training set using the modified Chi2 method and the user-provided parameters and chooses the best discretization scheme among them based on a user-provided criterion and eventually a test set.
 }
 \examples{
-modchi2_iter()
+# Simulation of a discretized logit model
+set.seed(1)
+x = matrix(runif(300), nrow = 100, ncol = 3)
+cuts = seq(0,1,length.out= 4)
+xd = apply(x,2, function(col) as.numeric(cut(col,cuts)))
+theta = t(matrix(c(0,0,0,2,2,2,-2,-2,-2),ncol=3,nrow=3))
+log_odd = rowSums(t(sapply(seq_along(xd[,1]), function(row_id) sapply(seq_along(xd[row_id,]),
+function(element) theta[xd[row_id,element],element]))))
+y = stats::rbinom(100,1,1/(1+exp(-log_odd)))
+
+modchi2_iter(x,y)
 }
 \keyword{Chi2,}
 \keyword{discretization}

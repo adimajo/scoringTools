@@ -14,10 +14,11 @@ LazyData: true
 RoxygenNote: 6.0.1.9000
 Imports:
     discretization,
-    speedglm,
     mnlogit,
-    nnet,
-    sqldf
+    sqldf,
+    MASS
+Suggests:
+    speedglm
 URL: https://adimajo.github.io
 BugReports: https://github.com/adimajo/scoring/issues
 

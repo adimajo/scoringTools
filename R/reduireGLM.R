@@ -3,8 +3,8 @@
 #' This function suppresses attributes of glm models that depend on the size of the input dataset.
 #' @param modele The glm model to compress.
 #' @keywords glm, size
-#' @examples
-#' reduireGLM()
+# #' @examples
+# #' reduireGLM()
 
 reduireGLM <- function(modele) {
      modele$y = c()

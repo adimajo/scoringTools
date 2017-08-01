@@ -15,7 +15,7 @@ discretize.link(link, df)
 This function discretizes a user-specified dataset using a pre-trained SEM discretization scheme.
 }
 \examples{
-discretize.link()
+# discretize.link()
 }
 \keyword{discretization,}
 \keyword{predict}
