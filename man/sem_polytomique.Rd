@@ -38,7 +38,8 @@ log_odd = rowSums(t(sapply(seq_along(xd[,1]), function(row_id) sapply(seq_along(
 function(element) theta[xd[row_id,element],element]))))
 y = rbinom(100,1,1/(1+exp(-log_odd)))
 
-sem_polytomique(x,y,iter=10,m_depart=4)
+sem_polytomique(x,y,iter=100,m_depart=4,test=FALSE,validation=FALSE,criterion="aic")
+sem_polytomique(x,y,iter=10,m_depart=4,reg_type="polr",test=FALSE,validation=FALSE,criterion="aic")
 }
 \keyword{Gibbs,}
 \keyword{SEM,}
