@@ -31,7 +31,7 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
 #     source("~/Documents/discretisation/R_discretisation/methods/bugfix_speedglm.R")
 
      # requireNamespace("mnlogit")
-     if (criterion %in% c('gini','aic')) {
+     if (criterion %in% c('gini','aic','bic')) {
           if (length(labels)==length(predictors[,1])) {
 
                # requireNamespace("MASS")
@@ -61,6 +61,15 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                current_best = 1
                best_reglog = 0
                best_link = 0
+
+               if ((criterion=='gini') & (test==FALSE)) {
+                    warning("Using Gini index on training set might yield an overfitted model.")
+               }
+
+               if ((criterion %in% c('aic','bic')) & (test==TRUE)) {
+                    warning("No need to penalize the log-likelihood when a test set is used. Using log-likelihood instead of AIC/BIC.")
+               }
+
 
                # if (reg_type=='poly') {
                #      if (!requireNamespace("mnlogit", quietly = TRUE)) {
@@ -93,7 +102,18 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
 
 
                     # Calcul du crit??re
-                    if (criterion=='gini') criterion_iter[[i]] = normalizedGini(labels[ensemble[[2]]],predict(model_reglog,data_logit[ensemble[[2]],],type='response')) else criterion_iter[[i]] = -model_reglog$aic
+                    if ((criterion=='gini')&&(test==FALSE)) {
+                         criterion_iter[[i]] = normalizedGini(labels[ensemble[[1]]],predict(model_reglog,data_logit[ensemble[[1]],],type='response'))
+                    } else if ((criterion=='gini')&&(test==TRUE)) {
+                         criterion_iter[[i]] = normalizedGini(labels[ensemble[[2]]],predict(model_reglog,data_logit[ensemble[[2]],],type='response'))
+                    } else if ((criterion=='aic')&&(test==FALSE)) {
+                         criterion_iter[[i]] = -model_reglog$aic
+                    } else if ((criterion=='bic')&&(test==FALSE)) {
+                         criterion_iter[[i]] = -model_reglog$deviance + 2*log(length(ensemble[[1]]))*length(model_reglog$coefficients)
+                    } else if ((criterion %in% c('aic','bic'))&&(test==TRUE)) {
+                         criterion_iter[[i]] = rowSums(log(labels[ensemble[[2]]]*predict(model_reglog,data_logit[ensemble[[2]],],type='response') + (1-labels)*(1-labels[ensemble[[2]]]*predict(model_reglog,data_logit[ensemble[[2]],],type='response'))))
+                    } else stop("test must be boolean!")
+
 
                     if (criterion_iter[[i]] >= criterion_iter[[current_best]]) {
                          best_reglog = model_reglog
@@ -153,6 +173,7 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                                    } else {
                                         long_dataset <- data.frame(e = as.vector(sapply(e[,j],function(var) (lev_j[seq(1:m[j])]==var))),x = as.vector(sapply(predictors[,j], function(var) rep(var,m[j]))), names = as.character(as.vector(rep(lev_j[seq(1:m[j])],n))))
                                         t = predict(link[[j]], newdata = long_dataset,type="probs", choiceVar = "names")
+                                        t[which(is.nan(t),arr.ind = TRUE)[,"row"],which(is.nan(t),arr.ind = TRUE)[,"col"]] = 1
                                    }
                               } else {
                                    t = tryCatch(predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="probs"), error = function(cond) matrix(c(1-predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="response"),predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="response")),ncol=2,dimnames = list(seq(1:n),c(min(levels(factor(e[ensemble[[1]],j]))),max(levels(factor(e[ensemble[[1]],j])))))))
@@ -161,6 +182,83 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                               t <- prop.table(t*y_p,1)
                               # mise ?? jour de e^j
                               e[,j] <- apply(t,1,function(p) sample(lev_j,1,prob = p))
+
+                              # Controler que dans test et validation on n'a pas de e ou de emap qui ne sont pas dans train
+                              # Test
+
+                              if (test==TRUE) {
+
+                                   # E
+
+                                   ind_diff_train_test <- which(e[ensemble[[2]],j]==setdiff(factor(e[ensemble[[2]],j]),factor(e[ensemble[[1]],j])))
+                                   while (!length(ind_diff_train_test)==0) {
+                                        t[ind_diff_train_test,e[ensemble[[2]],j][ind_diff_train_test]] <- 0
+                                        t <- prop.table(t,1)
+                                        e[ensemble[[2]],j][ind_diff_train_test] <- apply(t[ind_diff_train_test,,drop=FALSE],1,function(p) sample(lev_j,1,prob = p))
+                                        ind_diff_train_test <- which(e[ensemble[[2]],j]==setdiff(factor(e[ensemble[[2]],j]),factor(e[ensemble[[1]],j])))
+                                   }
+
+                                   # E_MAP
+
+                                   ind_diff_train_test <- which(emap[ensemble[[2]],j]==setdiff(factor(emap[ensemble[[2]],j]),factor(emap[ensemble[[1]],j])))
+                                   while (!length(ind_diff_train_test)==0) {
+                                        if (reg_type=='poly') {
+                                             if (!requireNamespace("mnlogit", quietly = TRUE)) {
+                                                  t = predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="probs")
+                                             } else {
+                                                  long_dataset <- data.frame(e = as.vector(sapply(e[,j],function(var) (lev_j[seq(1:m[j])]==var))),x = as.vector(sapply(predictors[,j], function(var) rep(var,m[j]))), names = as.character(as.vector(rep(lev_j[seq(1:m[j])],n))))
+                                                  t = predict(link[[j]], newdata = long_dataset,type="probs", choiceVar = "names")
+                                                  t[which(is.nan(t),arr.ind = TRUE)[,"row"],which(is.nan(t),arr.ind = TRUE)[,"col"]] = 1
+                                             }
+                                        } else {
+                                             t = tryCatch(predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="probs"), error = function(cond) matrix(c(1-predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="response"),predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="response")),ncol=2,dimnames = list(seq(1:n),c(min(levels(factor(e[ensemble[[1]],j]))),max(levels(factor(e[ensemble[[1]],j])))))))
+                                        }
+                                        t[ind_diff_train_test,emap[ensemble[[2]],j][ind_diff_train_test]] <- 0
+                                        t <- prop.table(t,1)
+                                        emap[ensemble[[2]],j][ind_diff_train_test] <- apply(t[ind_diff_train_test,,drop=FALSE],1,function(p) names(which.max(p)))
+                                        ind_diff_train_test <- which(emap[ensemble[[2]],j]==setdiff(factor(emap[ensemble[[2]],j]),factor(emap[ensemble[[1]],j])))
+                                   }
+                              }
+
+
+                              # Validation
+
+                              if (validation==TRUE) {
+
+                                   # E
+
+                                   ind_diff_train_test <- which(e[ensemble[[3]],j]==setdiff(factor(e[ensemble[[3]],j]),factor(e[ensemble[[1]],j])))
+                                   while (!length(ind_diff_train_test)==0) {
+                                        t[ind_diff_train_test,e[ensemble[[3]],j][ind_diff_train_test]] <- 0
+                                        t <- prop.table(t,1)
+                                        e[ensemble[[3]],j][ind_diff_train_test] <- apply(t[ind_diff_train_test,,drop=FALSE],1,function(p) sample(lev_j,1,prob = p))
+                                        ind_diff_train_test <- which(e[ensemble[[3]],j]==setdiff(factor(e[ensemble[[3]],j]),factor(e[ensemble[[1]],j])))
+                                   }
+
+                                   # E_MAP
+
+                                   ind_diff_train_test <- which(emap[ensemble[[3]],j]==setdiff(factor(emap[ensemble[[3]],j]),factor(emap[ensemble[[1]],j])))
+                                   while (!length(ind_diff_train_test)==0) {
+                                        if (reg_type=='poly') {
+                                             if (!requireNamespace("mnlogit", quietly = TRUE)) {
+                                                  t = predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="probs")
+                                             } else {
+                                                  long_dataset <- data.frame(e = as.vector(sapply(e[,j],function(var) (lev_j[seq(1:m[j])]==var))),x = as.vector(sapply(predictors[,j], function(var) rep(var,m[j]))), names = as.character(as.vector(rep(lev_j[seq(1:m[j])],n))))
+                                                  t = predict(link[[j]], newdata = long_dataset,type="probs", choiceVar = "names")
+                                                  t[which(is.nan(t),arr.ind = TRUE)[,"row"],which(is.nan(t),arr.ind = TRUE)[,"col"]] = 1
+                                             }
+                                        } else {
+                                             t = tryCatch(predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="probs"), error = function(cond) matrix(c(1-predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="response"),predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="response")),ncol=2,dimnames = list(seq(1:n),c(min(levels(factor(e[ensemble[[1]],j]))),max(levels(factor(e[ensemble[[1]],j])))))))
+                                        }
+                                        t[ind_diff_train_test,emap[ensemble[[3]],j][ind_diff_train_test]] <- 0
+                                        t <- prop.table(t,1)
+                                        emap[ensemble[[3]],j][ind_diff_train_test] <- apply(t[ind_diff_train_test,,drop=FALSE],1,function(p) names(which.max(p)))
+                                        ind_diff_train_test <- which(e[ensemble[[3]],j]==setdiff(factor(e[ensemble[[3]],j]),factor(e[ensemble[[1]],j])))
+                                   }
+                              }
+
+                              # Controler le cas ou la modalite de remplacement est elle meme absente du train
+
 
                          } else {
                               # mise ?? jour de e^j
@@ -173,26 +271,21 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                # setClass("sem", representation(method.name = "character", parameters = "list", best.disc = "list", performance = "list"))
 
                best.disc = list(best_reglog,best_link)
-               performance = max(unlist(criterion_iter))
 
-               # if (test==TRUE) {
-               #      if (criterion=="gini") {
-               #           best.disc = list(best_reglog,best_link)
-               #           if (validation==TRUE) performance = normalizedGini(labels[ensemble[[3]]],predict(best.disc[[1]],as.data.frame(t(emap[,which.max(criterion_iter)],ensemble[[3]])),type="response")) else performance = normalizedGini(labels[ensemble[[2]]],predict(best.disc[[1]],as.data.frame(t(emap[,which.max(criterion_iter),ensemble[[2]]])),type="response"))
-               #      } else {
-               #           best.disc = list(best_reglog,best_link)
-               #           if (validation==TRUE) performance = 0 else performance = 0
-               #      }
-               # } else {
-               #      if (criterion=="gini") {
-               #           best.disc = list(best_reglog,best_link)
-               #           if (validation==TRUE) performance = normalizedGini(labels[ensemble[[3]]],predict(best.disc[[1]],as.data.frame(t(emap[,which.max(criterion_iter),ensemble[[3]]])),type="response")) else performance = normalizedGini(labels[ensemble[[1]]],best.disc[[1]]$fitted.values)
-               #      } else {
-               #           best.disc = list(best_reglog,best_link)
-               #           if (validation==TRUE) performance = 0 else performance = best.disc[[1]]$aic
-               #      }
-               #
-               # }
+               if (test==TRUE) {
+                    if (criterion=="gini") {
+                         if (validation==TRUE) performance = normalizedGini(labels[ensemble[[3]]],predict(best.disc[[1]],as.data.frame(t(emap[,which.max(criterion_iter)],ensemble[[3]])),type="response")) else performance = normalizedGini(labels[ensemble[[2]]],predict(best.disc[[1]],as.data.frame(t(emap[,which.max(criterion_iter),ensemble[[2]]])),type="response"))
+                    } else {
+                         if (validation==TRUE) performance = 0 else performance = 0
+                    }
+               } else {
+                    if (criterion=="gini") {
+                         if (validation==TRUE) performance = normalizedGini(labels[ensemble[[3]]],predict(best.disc[[1]],as.data.frame(t(emap[,which.max(criterion_iter),ensemble[[3]]])),type="response")) else performance = normalizedGini(labels[ensemble[[1]]],best.disc[[1]]$fitted.values)
+                    } else {
+                         if (validation==TRUE) performance = 0 else performance = best.disc[[1]]$aic
+                    }
+
+               }
 
                # return(new(Class = "sem", method.name = paste("sem",reg_type,sep="_"), parameters = list(test,validation,criterion,iter,m_depart,reg_type), best.disc = best.disc, performance = list(performance,criterion_iter,time_measure)))
                return(list(method.name = paste("sem",reg_type,sep="_"), parameters = list(test,validation,criterion,iter,m_depart,reg_type), best.disc = best.disc, performance = list(performance,criterion_iter)))
