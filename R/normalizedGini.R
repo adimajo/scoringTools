@@ -5,6 +5,7 @@
 #' @param predicted The vector of the probabilities predicted by the classification rule.
 #' @keywords gini, index
 #' @export
+#' @author Adrien Ehrhardt
 #' @examples
 #' normalizedGini(c(1,1,1,0,0),c(0.7,0.9,0.5,0.6,0.3))
 

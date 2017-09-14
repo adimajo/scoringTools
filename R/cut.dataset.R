@@ -11,10 +11,8 @@
 # #' @examples
 
 # #' # We randomly separate 30 observations in 40\% of training, 30\% of test and 30\% of validation.
-# #' list_indices <- cut_dataset(n=30,test=TRUE,
+# #' cut_dataset(n=30,test=TRUE,
 # #' validation=TRUE,proportions=c(0.3,0.3),seed=1)
-# #'
-# #' print(list_indices)
 
 
 cut_dataset <- function(n,test=TRUE,validation=TRUE,proportions=c(0.2,0.2),seed=1) {

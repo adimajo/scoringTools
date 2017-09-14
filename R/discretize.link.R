@@ -6,22 +6,39 @@
 #' @keywords discretization, predict
 #' @importFrom stats predict
 #' @export
+#' @references
+#' Asad Hasan, Wang Zhiyu and Alireza S. Mahani (2015). mnlogit: Multinomial Logit Model. R package version 1.2.4. \url{https://CRAN.R-project.org/package=mnlogit}
 #' @examples
-#' # discretize.link()
+#' set.seed(1)
+#' x = matrix(runif(100), nrow = 100, ncol = 1)
+#' cuts = seq(0,1,length.out = 4)
+#' xd = as.numeric(cut(x,cuts))
+#'
+#' long_dataset <- data.frame(e = as.vector(sapply(xd,function(var) (seq(1:3)[seq(1:3)]==var))),x = as.vector(sapply(x[,1], function(var) rep(var,3))), names = as.character(as.vector(rep(seq(1:3)[seq(1:3)],length(x)))),stringsAsFactors=FALSE)
+#' link <- mnlogit::mnlogit(e ~ 1 | x | 1, data=long_dataset, choiceVar = "names")
+#' discretize_link(link,as.data.frame(x))
 
 
-discretize.link <- function(link,df) {
+discretize_link <- function(link,df) {
 
      n = nrow(df)
      d = ncol(df)
      emap = array(0,c(n,d))
 
-     for (j in sample(1:d)) {
-          m = length(link[[j]]$coefficients)/2 + 1
-          lev = c("1",sapply(names(link[[j]]$coefficients[seq(2,length(link[[j]]$coefficients),2)]), function(lev_name) substr(lev_name,start=3,stop=nchar(lev_name))))
-          long_dataset <- data.frame(x = as.vector(sapply(df[,j], function(var) rep(var,m))), names = as.character(as.vector(rep(lev[seq(1:m)],n))))
-          t = predict(link[[j]], newdata = long_dataset, choiceVar = "names", type="probs")
-          emap[,j] <- apply(t,1,function(p) names(which.max(p)))
+     if (d>1) {
+          for (j in sample(1:d)) {
+               m = length(link[[j]]$coefficients)/2 + 1
+               lev = c("1",sapply(names(link[[j]]$coefficients[seq(2,length(link[[j]]$coefficients),2)]), function(lev_name) substr(lev_name,start=3,stop=nchar(lev_name))))
+               long_dataset <- data.frame(x = as.vector(sapply(df[,j], function(var) rep(var,m))), names = as.character(as.vector(rep(lev[seq(1:m)],n))))
+               t = predict(link[[j]], newdata = long_dataset, choiceVar = "names", type="probs")
+               emap[,j] <- apply(t,1,function(p) names(which.max(p)))
+          }
+     } else {
+          m = length(link$coefficients)/2 + 1
+          lev = c("1",sapply(names(link$coefficients[seq(2,length(link$coefficients),2)]), function(lev_name) substr(lev_name,start=3,stop=nchar(lev_name))))
+          long_dataset <- data.frame(x = as.vector(sapply(df, function(var) rep(var,m))), names = as.character(as.vector(rep(lev[seq(1:m)],n))))
+          t = predict(link, newdata = long_dataset, choiceVar = "names", type="probs")
+          emap[,1] <- apply(t,1,function(p) names(which.max(p)))
      }
 
      return(emap)

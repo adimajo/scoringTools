@@ -9,6 +9,16 @@
 #' @keywords mdlp, discretization
 #' @importFrom stats predict
 #' @export
+#' @author Adrien Ehrhardt
+#' @seealso \code{glm}, \code{speedglm}, \code{discretization}
+#' @details
+#' This function discretizes a dataset containing continuous features \eqn{X} in a supervised way, i.e. knowing observations of a binomial random variable \eqn{Y} which we would like to predict based on the discretization of \eqn{X}.
+#' To do so, the \code{MDLP} alorithm dichotomizes \eqn{X} and puts the subsequent two values in the ‘‘discretized'' categorical feature \eqn{E}. It chooses the cut-off point so as to minimize the resulting entropy and goes on in the subsequent two sub-spaces it just created.
+#' In the context of Credit Scoring, a logistic regression is fitted between the ‘‘discretized'' features \eqn{E} and the response feature \eqn{Y}. As a consequence, the output of this function is the discretized features \eqn{E}, the logistic regression model of \eqn{E} on \eqn{Y} and the parameters used to get this fit.
+#' @references
+#' Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, \url{https://CRAN.R-project.org/package=speedglm}
+#' HyunJi Kim (2012). discretization: Data preprocessing, discretization for classification. R package version 1.0-1. \url{https://CRAN.R-project.org/package=discretization}
+#' Fayyad, U. M. and Irani, K. B.(1993). Multi-interval discretization of continuous-valued attributes for classification learning, \emph{Artificial intelligence}, \strong{13}, 1022–1027.
 #' @examples
 #' # Simulation of a discretized logit model
 #' set.seed(1)

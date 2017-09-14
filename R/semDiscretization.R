@@ -9,9 +9,25 @@
 #' @param iter The number of iterations to do in the SEM protocole (default: 1000).
 #' @param m_depart The maximum number of resulting categories for each variable wanted (default: 20).
 #' @param reg_type The model to use between discretized and continuous features (currently, only multinomial logistic regression ('poly') and ordered logistic regression ('polr') are supported ; default: 'poly').
+#' @param contrainte The vector of the user-defined rounding precisions. If 10 features are to be discretized, \code{contrainte} must be a numeric vector with 10 entries. If the requested precision is the hundred, set all slots to -2. Default: 10 digits.
 #' @keywords SEM, Gibbs, discretization
+#' @author Adrien Ehrhardt
+#' @seealso \code{glm}, \code{mnlogit}, \code{polr}
+#' @details
+#' This function finds the most appropriate discretization scheme for logistic regression. When provided with a continuous variable \eqn{X}, it tries to convert it to a categorical variable \eqn{E} which values uniquely correspond to intervals of the continuous variable \eqn{X}.
+#' When provided with a categorical variable \eqn{X}, it tries to find the best regroupement of its values and subsequently creates categorical variable \eqn{E}. The goal is to perform supervised learning with logistic regression so that you have to specify a target variable \eqn{Y} denoted by \code{labels}.
+#' The ‘‘discretization'' process, i.e. the transformation of \eqn{X} to \eqn{E} is done so as to achieve the best logistic regression model \eqn{p_\theta(y|e)}. It can be interpreted as a special case feature engineering algorithm.
+#' Subsequently, its outputs are: the optimal discretization scheme and the logistic regression model associated with it. We also provide the parameters that were provided to the function and the evolution of the criterion with respect to the algorithm's iterations.
 #' @importFrom stats predict
 #' @export
+#' @references
+#' Ehrhardt, A., Biernacki, C., Vandewalle, V., Heinrich, P. (2018), Model-based multivariate discretization for logistic regression,
+#'
+#' Celeux, G., Chauveau, D., Diebolt, J. (1995), On Stochastic Versions of the EM Algorithm. [Research Report] RR-2514, INRIA. 1995. <inria-00074164>
+#'
+#' Asad Hasan, Wang Zhiyu and Alireza S. Mahani (2015). mnlogit: Multinomial Logit Model. R package version 1.2.4. \url{https://CRAN.R-project.org/package=mnlogit}
+#'
+#' Agresti, A. (2002) \emph{Categorical Data}. Second edition. Wiley.
 #' @examples
 #' # Simulation of a discretized logit model
 #' set.seed(1)
@@ -24,10 +40,9 @@
 #' y = rbinom(100,1,1/(1+exp(-log_odd)))
 #'
 #' sem_polytomique(x,y,iter=100,m_depart=4,test=FALSE,validation=FALSE,criterion="aic")
-#' sem_polytomique(x,y,iter=10,m_depart=4,reg_type="polr",test=FALSE,validation=FALSE,criterion="aic")
 
 
-sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gini',iter=1000,m_depart=20,reg_type='poly') {
+sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gini',iter=1000,m_depart=20,reg_type='poly',contrainte=rep(10,length(predictors[1,]))) {
 #     source("~/Documents/discretisation/R_discretisation/methods/bugfix_speedglm.R")
 
      # requireNamespace("mnlogit")
@@ -70,20 +85,6 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                     warning("No need to penalize the log-likelihood when a test set is used. Using log-likelihood instead of AIC/BIC.")
                }
 
-
-               # if (reg_type=='poly') {
-               #      if (!requireNamespace("mnlogit", quietly = TRUE)) {
-               #           if (!requireNamespace("nnet", quietly = TRUE)) {
-               #                stop("mnlogit and nnet not installed. Please install either mnlogit or nnet with install.packages('mnlogit') or install.packages('nnet') if you want to use the multinomial logistic regression as a link function.")
-               #           } else {
-               #                warning("mnlogit not installed, using multinom instead (slower).",call. = FALSE)
-               #           }
-               #      }
-               # }
-               #
-               # if (!requireNamespace("biglm", quietly = TRUE)) {
-               #      warning("Biglm not installed, using glm instead (slower).",call. = FALSE)
-               # }
 
                # Algo SEM
                for (i in 1:iter){
@@ -153,16 +154,6 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                                    modalites_k <- modalites_k[,-j]
                                    colnames(modalites_k)[ncol(modalites_k)] <- paste("V",j,sep="")
                                    modalites_k <- as.data.frame(modalites_k)
-                                   # if (as.numeric(lev_j[k])==1) {
-                                   #      levels(modalites_k[,ncol(modalites_k)]) <- c("1","2")
-                                   # } else if (k==1) {
-                                   #      levels(modalites_k[,ncol(modalites_k)]) <- c(lev_j[k],lev_j[k+1])
-                                   #      modalites_k[,ncol(modalites_k)] <- stats::relevel(modalites_k[,ncol(modalites_k)],lev_j[k+1])
-                                   # } else {
-                                   #      levels(modalites_k[,ncol(modalites_k)]) <- c(lev_j[k],lev_j[1])
-                                   #      modalites_k[,ncol(modalites_k)] <- stats::relevel(modalites_k[,ncol(modalites_k)],lev_j[1])
-                                   # }
-
                                    p = predict(logit,newdata=modalites_k,type = "response")
 
                                    y_p[,k] <- (labels*p+(1-labels)*(1-p))
@@ -178,7 +169,27 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                               } else {
                                    t = tryCatch(predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="probs"), error = function(cond) matrix(c(1-predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="response"),predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="response")),ncol=2,dimnames = list(seq(1:n),c(min(levels(factor(e[ensemble[[1]],j]))),max(levels(factor(e[ensemble[[1]],j])))))))
                               }
-                              emap[,j] <- apply(t,1,function(p) names(which.max(p)))
+
+                              # Sans contrainte
+                              # emap[,j] <- apply(t,1,function(p) names(which.max(p)))
+
+                              # Avec contrainte - parcours des données
+                              # cutofff <- round(unlist(get_cutp(matrix(apply(t,1,function(p) names(which.max(p)))),x[,j,drop=FALSE])),digits = contrainte[j])
+                              # emap[,j] <- cut(x[,j],cutofff, include.lowest = FALSE, labels = seq(1:(length(cutofff)-1)))
+
+                              # Avec contrainte - sans parcours des données
+                              cutofff <- rep(0,m[j]-1)
+
+                              for (l in 1:(m[j]-1)) {
+                                   temporaire <- (link[[j]]$ordered.coeff[seq(l,length(link[[j]]$ordered.coeff),m[j]-1)])
+                                   cutofff[l] <- -temporaire[1]/temporaire[2]
+                              }
+
+                              cutofff[length(cutofff)+1] <- -Inf
+                              cutofff[length(cutofff)+1] <- Inf
+
+                              emap[,j] <- cut(predictors[,j],cutofff, include.lowest = FALSE)
+
                               t <- prop.table(t*y_p,1)
                               # mise ?? jour de e^j
                               e[,j] <- apply(t,1,function(p) sample(lev_j,1,prob = p))
@@ -274,15 +285,15 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
 
                if (test==TRUE) {
                     if (criterion=="gini") {
-                         if (validation==TRUE) performance = normalizedGini(labels[ensemble[[3]]],predict(best.disc[[1]],as.data.frame(t(emap[,which.max(criterion_iter)],ensemble[[3]])),type="response")) else performance = normalizedGini(labels[ensemble[[2]]],predict(best.disc[[1]],as.data.frame(t(emap[,which.max(criterion_iter),ensemble[[2]]])),type="response"))
+                         if (validation==TRUE) performance = normalizedGini(labels[ensemble[[3]]],predict(best.disc[[1]],discretize_link(best.disc[[2]],predictors[ensemble[[3]],]),type="response")) else performance = normalizedGini(labels[ensemble[[2]]],predict(best.disc[[1]],discretize_link(best.disc[[2]],predictors[ensemble[[3]],]),type="response"))
                     } else {
-                         if (validation==TRUE) performance = 0 else performance = 0
+                         if (validation==TRUE) performance = -2*rowSums(labels[ensemble[[3]]]*predict(best.disc[[1]],discretize_link(best.disc[[2]],predictors[ensemble[[3]],]),type="response")+(1-labels[ensemble[[3]]])*(1-predict(best.disc[[1]],discretize_link(best.disc[[2]],predictors[ensemble[[3]],]),type="response"))) else performance = criterion_iter[[current_best]]
                     }
                } else {
                     if (criterion=="gini") {
-                         if (validation==TRUE) performance = normalizedGini(labels[ensemble[[3]]],predict(best.disc[[1]],as.data.frame(t(emap[,which.max(criterion_iter),ensemble[[3]]])),type="response")) else performance = normalizedGini(labels[ensemble[[1]]],best.disc[[1]]$fitted.values)
+                         if (validation==TRUE) performance = normalizedGini(labels[ensemble[[2]]],predict(best.disc[[1]],as.data.frame(t(emap[,which.max(criterion_iter),ensemble[[2]]])),type="response")) else performance = normalizedGini(labels[ensemble[[1]]],best.disc[[1]]$fitted.values)
                     } else {
-                         if (validation==TRUE) performance = 0 else performance = best.disc[[1]]$aic
+                         if (validation==TRUE) performance = -2*rowSums(labels[ensemble[[2]]]*predict(best.disc[[1]],discretize_link(best.disc[[2]],predictors[ensemble[[2]],]),type="response")+(1-labels[ensemble[[2]]])*(1-predict(best.disc[[1]],discretize_link(best.disc[[2]],predictors[ensemble[[2]],]),type="response"))) else performance = criterion_iter[[current_best]]
                     }
 
                }

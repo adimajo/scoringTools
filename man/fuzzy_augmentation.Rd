@@ -19,6 +19,11 @@ List containing the model using financed clients only and the model produced usi
 \description{
 This function performs Reject Inference using the Fuzzy Augmentation technique. Note that this technique has no theoretical foundation and should produce (under the identifiability assumption) the same parameters' estimates than the financed clients scorecard.
 }
+\details{
+This function performs the Fuzzy Augmentation method on the data. When provided with labeled observations \eqn{(x^\ell,y)}, it first fits the logistic regression model \eqn{p_\theta} of
+\eqn{x^\ell} on \eqn{y}, then labels the unlabelled samples \eqn{x^{u}} with the predicted probabilities of \eqn{p_\theta}, i.e. \eqn{\hat{y}^{u} = p_\theta(y|x^{u})}
+then refits a logistic regression model \eqn{p_\eta} on the whole sample.
+}
 \examples{
 # We simulate data from financed clients
 set.seed(1)
@@ -30,10 +35,20 @@ yf = rbinom(100,1,1/(1+exp(-log_odd)))
 xnf = matrix(runif(100*2), nrow = 100, ncol = 2)
 list_models <- fuzzy_augmentation(xf,xnf,yf)
 # This is the model constructed using the financed clients (xf,yf):
-list_models[1]
+list_models[[1]]
 # This is the model constructed using all the clients (xf,yf,xnf)
 # and the fuzzy augmentation technique:
-list_models[2]
+list_models[[2]]
+}
+\references{
+Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, \url{https://CRAN.R-project.org/package=speedglm}
+Ehrhardt, A., Biernacki, C., Vandewalle, V., Heinrich, P. and Beben, S. (2018), Reject Inference Methods in Credit Scoring: a rational review,
+}
+\seealso{
+\code{glm}, \code{speedglm}
+}
+\author{
+Adrien Ehrhardt
 }
 \keyword{credit,}
 \keyword{inference,}

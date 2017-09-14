@@ -9,7 +9,17 @@
 #' @param param List providing the parameters to test (see ?discretization::chiM, default=list(alpha = 0.05)).
 #' @keywords chiMerge, discretization
 #' @importFrom stats predict
+#' @author Adrien Ehrhardt
+#' @seealso \code{glm}, \code{speedglm}, \code{discretization}
+#' @details
+#' This function discretizes a dataset containing continuous features \eqn{X} in a supervised way, i.e. knowing observations of a binomial random variable \eqn{Y} which we would like to predict based on the discretization of \eqn{X}.
+#' To do so, the \code{ChiMerge} alorithm starts by putting each unique values of \eqn{X} in a separate value of the ‘‘discretized'' categorical feature \eqn{E}. It then tests if two adjacent values of \eqn{E} are significantly different using the \eqn{\chi^2}-test.
+#' In the context of Credit Scoring, a logistic regression is fitted between the ‘‘discretized'' features \eqn{E} and the response feature \eqn{Y}. As a consequence, the output of this function is the discretized features \eqn{E}, the logistic regression model of \eqn{E} on \eqn{Y} and the parameters used to get this fit.
 #' @export
+#' @references
+#' Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, \url{https://CRAN.R-project.org/package=speedglm}
+#' HyunJi Kim (2012). discretization: Data preprocessing, discretization for classification. R package version 1.0-1. \url{https://CRAN.R-project.org/package=discretization}
+#' Kerber, R. (1992). ChiMerge : Discretization of numeric attributes, \emph{In Proceedings of the Tenth National Conference on Artificial Intelligence}, 123–128.
 #' @examples
 #' # Simulation of a discretized logit model
 #' set.seed(1)

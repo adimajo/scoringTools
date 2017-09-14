@@ -23,6 +23,11 @@ topdown_iter(predictors, labels, test = TRUE, validation = TRUE,
 \description{
 This function discretizes a training set using the user provided method(s) among the three topdown methods from the discretization package. Depending on the user providing a test and/or a validation set, the function returns the best discretization for logistic regression.
 }
+\details{
+This function discretizes a dataset containing continuous features \eqn{X} in a supervised way, i.e. knowing observations of a binomial random variable \eqn{Y} which we would like to predict based on the discretization of \eqn{X}.
+To do so, the \code{Topdown} alorithms ...
+In the context of Credit Scoring, a logistic regression is fitted between the ‘‘discretized'' features \eqn{E} and the response feature \eqn{Y}. As a consequence, the output of this function is the discretized features \eqn{E}, the logistic regression model of \eqn{E} on \eqn{Y} and the parameters used to get this fit.
+}
 \examples{
 # Simulation of a discretized logit model
 set.seed(1)
@@ -35,6 +40,19 @@ function(element) theta[xd[row_id,element],element]))))
 y = stats::rbinom(100,1,1/(1+exp(-log_odd)))
 
 topdown_iter(x,y)
+}
+\references{
+Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, \url{https://CRAN.R-project.org/package=speedglm}
+HyunJi Kim (2012). discretization: Data preprocessing, discretization for classification. R package version 1.0-1. \url{https://CRAN.R-project.org/package=discretization}
+Gonzalez-Abril, L., Cuberos, F. J., Velasco, F. and Ortega, J. A. (2009) Ameva: An autonomous discretization algorithm, \emph{Expert Systems with Applications}, \strong{36}, 5327–5332.
+Kurgan, L. A. and Cios, K. J. (2004). CAIM Discretization Algorithm, \emph{IEEE Transactions on knowledge and data engineering}, \strong{16}, 145–153.
+Tsai, C. J., Lee, C. I. and Yang, W. P. (2008). A discretization algorithm based on Class-Attribute Contingency Coefficient, \emph{Information Sciences}, \strong{178}, 714–731.
+}
+\seealso{
+\code{glm}, \code{speedglm}, \code{discretization}
+}
+\author{
+Adrien Ehrhardt
 }
 \keyword{discretization}
 \keyword{topdown,}

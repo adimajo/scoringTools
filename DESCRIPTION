@@ -18,7 +18,9 @@ Imports:
     mnlogit
 Suggests:
     MASS,
-    speedglm
+    speedglm,
+    knitr,
+    rmarkdown
 URL: https://adimajo.github.io
 BugReports: https://github.com/adimajo/scoring/issues
-
+VignetteBuilder: knitr

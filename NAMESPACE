@@ -3,7 +3,7 @@
 export(augmentation)
 export(chi2_iter)
 export(chiM_iter)
-export(discretize.link)
+export(discretize_link)
 export(echi2_iter)
 export(fuzzy_augmentation)
 export(mdlp_iter)

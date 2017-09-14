@@ -19,6 +19,11 @@ List containing the model using financed clients only and the model produced usi
 \description{
 This function performs Reject Inference using the Parcelling technique. Note that this technique is theoretically good in the MNAR framework although coefficients must be chosen a priori.
 }
+\details{
+This function performs the Parcelling method on the data. When provided with labeled observations \eqn{(x^\ell,y)}, it first fits the logistic regression model \eqn{p_\theta} of
+\eqn{x^\ell} on \eqn{y}, then labels the unlabelled samples \eqn{x^{u}} with the observed bad rate in user-defined classes of predicted probabilities of \eqn{p_\theta} reweighted using user-supplied weights, i.e. \eqn{\hat{y}^{u} = \alpha_k T(k)} where \eqn{k} denotes the group (which depends on \eqn{p_\theta}) and T(k) the observed bad rate of labeled observations in this group.
+It then refits a logistic regression model \eqn{p_\eta} on the whole sample.
+}
 \examples{
 # We simulate data from financed clients
 set.seed(1)
@@ -33,6 +38,16 @@ list_models <- parcelling(xf,xnf,yf)
 list_models[1]
 # This is the model constructed using all the clients (xf,yf,xnf) and the parcelling technique:
 list_models[2]
+}
+\references{
+Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, \url{https://CRAN.R-project.org/package=speedglm}
+Ehrhardt, A., Biernacki, C., Vandewalle, V., Heinrich, P. and Beben, S. (2018), Reject Inference Methods in Credit Scoring: a rational review,
+}
+\seealso{
+\code{glm}, \code{speedglm}
+}
+\author{
+Adrien Ehrhardt
 }
 \keyword{credit,}
 \keyword{inference,}

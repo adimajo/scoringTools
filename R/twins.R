@@ -8,6 +8,15 @@
 #' @keywords reject, inference, r?int?gration, scorecard, credit, scoring
 #' @importFrom stats predict
 #' @export
+#' @author Adrien Ehrhardt
+#' @seealso \code{glm}, \code{speedglm}
+#' @details
+#' This function performs the Twins method on the data. When provided with labeled observations \eqn{(x^\ell,y)}, it first fits the logistic regression model \eqn{p_\theta} of
+#' \eqn{x^\ell} on \eqn{y}, then fits the logistic regression model \eqn{p_\omega} of \eqn{X} on the binomial random variable denoting the observation of the data \eqn{Z}.
+#' We use predictions of both models on the labeled observations to construct a "meta"-score based on logistic regression which predicted probabilities are used to reweight samples and construct the final score \eqn{p_\eta}.
+#' @references
+#' Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, \url{https://CRAN.R-project.org/package=speedglm}
+#' Ehrhardt, A., Biernacki, C., Vandewalle, V., Heinrich, P. and Beben, S. (2018), Reject Inference Methods in Credit Scoring: a rational review,
 #' @examples
 #' # We simulate data from financed clients
 #' set.seed(1)

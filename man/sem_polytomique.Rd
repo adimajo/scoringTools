@@ -5,7 +5,8 @@
 \title{Model-based multivariate discretization for logistic regression (using the mnlogit package).}
 \usage{
 sem_polytomique(predictors, labels, test = TRUE, validation = TRUE,
-  criterion = "gini", iter = 1000, m_depart = 20, reg_type = "poly")
+  criterion = "gini", iter = 1000, m_depart = 20, reg_type = "poly",
+  contrainte = rep(10, length(predictors[1, ])))
 }
 \arguments{
 \item{predictors}{The matrix array containing the numeric attributes to discretize.}
@@ -23,9 +24,17 @@ sem_polytomique(predictors, labels, test = TRUE, validation = TRUE,
 \item{m_depart}{The maximum number of resulting categories for each variable wanted (default: 20).}
 
 \item{reg_type}{The model to use between discretized and continuous features (currently, only multinomial logistic regression ('poly') and ordered logistic regression ('polr') are supported ; default: 'poly').}
+
+\item{contrainte}{The vector of the user-defined rounding precisions. If 10 features are to be discretized, \code{contrainte} must be a numeric vector with 10 entries. If the requested precision is the hundred, set all slots to -2. Default: 10 digits.}
 }
 \description{
 This function discretizes a training set using an SEM-Gibbs based method (see References section).
+}
+\details{
+This function finds the most appropriate discretization scheme for logistic regression. When provided with a continuous variable \eqn{X}, it tries to convert it to a categorical variable \eqn{E} which values uniquely correspond to intervals of the continuous variable \eqn{X}.
+When provided with a categorical variable \eqn{X}, it tries to find the best regroupement of its values and subsequently creates categorical variable \eqn{E}. The goal is to perform supervised learning with logistic regression so that you have to specify a target variable \eqn{Y} denoted by \code{labels}.
+The ‘‘discretization'' process, i.e. the transformation of \eqn{X} to \eqn{E} is done so as to achieve the best logistic regression model \eqn{p_\theta(y|e)}. It can be interpreted as a special case feature engineering algorithm.
+Subsequently, its outputs are: the optimal discretization scheme and the logistic regression model associated with it. We also provide the parameters that were provided to the function and the evolution of the criterion with respect to the algorithm's iterations.
 }
 \examples{
 # Simulation of a discretized logit model
@@ -39,7 +48,21 @@ function(element) theta[xd[row_id,element],element]))))
 y = rbinom(100,1,1/(1+exp(-log_odd)))
 
 sem_polytomique(x,y,iter=100,m_depart=4,test=FALSE,validation=FALSE,criterion="aic")
-sem_polytomique(x,y,iter=10,m_depart=4,reg_type="polr",test=FALSE,validation=FALSE,criterion="aic")
+}
+\references{
+Ehrhardt, A., Biernacki, C., Vandewalle, V., Heinrich, P. (2018), Model-based multivariate discretization for logistic regression,
+
+Celeux, G., Chauveau, D., Diebolt, J. (1995), On Stochastic Versions of the EM Algorithm. [Research Report] RR-2514, INRIA. 1995. <inria-00074164>
+
+Asad Hasan, Wang Zhiyu and Alireza S. Mahani (2015). mnlogit: Multinomial Logit Model. R package version 1.2.4. \url{https://CRAN.R-project.org/package=mnlogit}
+
+Agresti, A. (2002) \emph{Categorical Data}. Second edition. Wiley.
+}
+\seealso{
+\code{glm}, \code{mnlogit}, \code{polr}
+}
+\author{
+Adrien Ehrhardt
 }
 \keyword{Gibbs,}
 \keyword{SEM,}

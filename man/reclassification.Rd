@@ -21,6 +21,11 @@ List containing the model using financed clients only and the model produced usi
 \description{
 This function performs Reject Inference using the Reclassification technique. Note that this technique has no theoretical foundation as it performs a one-step CEM algorithm.
 }
+\details{
+This function performs the Reclassification method on the data. When provided with labeled observations \eqn{(x^\ell,y)}, it first fits the logistic regression model \eqn{p_\theta} of
+\eqn{x^\ell} on \eqn{y}, then considers that unlabeled observations are of the expected class given by the model \eqn{p_\theta} (this is equivalent to a CEM algorithm).
+It then refits a logistic regression model \eqn{p_\eta} on the whole sample.
+}
 \examples{
 # We simulate data from financed clients
 set.seed(1)
@@ -36,6 +41,16 @@ list_models[1]
 # This is the model constructed using all the clients (xf,yf,xnf)
 # and the reclassification technique:
 list_models[2]
+}
+\references{
+Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, \url{https://CRAN.R-project.org/package=speedglm}
+Ehrhardt, A., Biernacki, C., Vandewalle, V., Heinrich, P. and Beben, S. (2018), Reject Inference Methods in Credit Scoring: a rational review,
+}
+\seealso{
+\code{glm}, \code{speedglm}
+}
+\author{
+Adrien Ehrhardt
 }
 \keyword{credit,}
 \keyword{inference,}
