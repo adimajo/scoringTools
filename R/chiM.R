@@ -73,8 +73,6 @@ chiM_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gin
                }
 
 
-               # setClass("chiM_disc", representation(method.name = "character", parameters = "list", reglog = "list", best.disc = "list", performance = "numeric"))
-
                if (test==TRUE) {
                     if (criterion=="gini") {
                          best.disc = list(logit[[which.min(ginidisc)]],disc[[which.min(ginidisc)]],which.min(ginidisc))
@@ -99,8 +97,8 @@ chiM_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gin
                     }
                }
 
-               # return(new(Class = "chiM_disc", method.name = "chiM", parameters = list(test,validation,criterion,param), reglog = logit, best.disc = best.disc, performance = performance))
-               return(list(method.name = "chiM", parameters = list(test,validation,criterion,param), reglog = logit, best.disc = best.disc, performance = performance))
+               return(methods::new(Class = "discretization", method.name = "chiM", parameters = list(test,validation,criterion,param), best.disc = best.disc, performance = list(performance)))
+
 
           }
           else {

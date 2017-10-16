@@ -66,9 +66,6 @@ mdlp_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gin
                }
 
 
-
-               # setClass("mdlp_disc", representation(method.name = "character", parameters = "list", best.disc = "list", performance = "numeric"))
-
                if (test==TRUE) {
                     if (criterion=="gini") {
                          best.disc = list(logit,disc)
@@ -94,8 +91,8 @@ mdlp_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gin
 
                }
 
-               # return(new(Class = "mdlp_disc", method.name = "mdlp", parameters = list(test,validation,criterion), best.disc = best.disc, performance = performance))
-               return(list(method.name = "mdlp", parameters = list(test,validation,criterion), best.disc = best.disc, performance = performance))
+               return(methods::new(Class = "discretization", method.name = "mdlp", parameters = list(test,validation,criterion), best.disc = best.disc, performance = list(performance)))
+
 
           }
           else {

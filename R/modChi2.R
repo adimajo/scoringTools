@@ -72,8 +72,6 @@ modchi2_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='
                }
 
 
-               # setClass("modChi2_disc", representation(method.name = "character", parameters = "list", reglog = "list", best.disc = "list", performance = "numeric"))
-
                if (test==TRUE) {
                     if (criterion=="gini") {
                          best.disc = list(logit[[which.min(ginidisc)]],disc[[which.min(ginidisc)]],which.min(ginidisc))
@@ -100,8 +98,8 @@ modchi2_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='
 
                }
 
-               # return(new(Class = "modChi2_disc", method.name = "modchi2", parameters = list(test,validation,criterion,param), reglog = logit, best.disc = best.disc, performance = performance))
-               return(list(method.name = "modchi2", parameters = list(test,validation,criterion,param), reglog = logit, best.disc = best.disc, performance = performance))
+               return(methods::new(Class = "discretization", method.name = "modchi2", parameters = list(test,validation,criterion,param), best.disc = best.disc, performance = list(performance)))
+
 
           }
           else {

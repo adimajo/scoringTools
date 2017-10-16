@@ -72,8 +72,6 @@ topdown_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='
                }
 
 
-               # setClass("topdown_disc", representation(method.name = "character", parameters = "list", reglog = "list", best.disc = "list", performance = "numeric"))
-
                if (test==TRUE) {
                     if (criterion=="gini") {
                          best.disc = list(logit[[which.min(ginidisc)]],disc[[which.min(ginidisc)]],which.min(ginidisc))
@@ -99,8 +97,8 @@ topdown_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='
 
                }
 
-               # return(new(Class = "topdown_disc", method.name = "topdown", parameters = list(test,validation,criterion,param), reglog = logit, best.disc = best.disc, performance = performance))
-               return(list(method.name = "topdown", parameters = list(test,validation,criterion,param), reglog = logit, best.disc = best.disc, performance = performance))
+               return(methods::new(Class = "discretization", method.name = "topdown", parameters = list(test,validation,criterion,param), best.disc = best.disc, performance = list(performance)))
+
 
           }
           else {

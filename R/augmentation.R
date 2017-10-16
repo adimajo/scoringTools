@@ -26,11 +26,7 @@
 #' yf = rbinom(100,1,1/(1+exp(-log_odd)))
 #' # We simulate data from not financed clients (MCAR mechanism)
 #' xnf = matrix(runif(100*2), nrow = 100, ncol = 2)
-#' list_models <- augmentation(xf,xnf,yf)
-#' # This is the model constructed using the financed clients (xf,yf):
-#' list_models[1]
-#' # This is the model constructed using all the clients (xf,yf,xnf) and the augmentation technique:
-#' list_models[2]
+#' augmentation(xf,xnf,yf)
 
 augmentation <- function(xf, xnf, yf) {
      df_f <- data.frame(labels = yf, x = xf)
@@ -76,5 +72,7 @@ augmentation <- function(xf, xnf, yf) {
           model_augmente = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df_augmente[,-which(names(df_augmente) %in% c("poidsfinal","classe_SCORE"))], weights = df_augmente$poidsfinal)
      }
 
-     return(list(financed.model = model_f, augmented.model = model_augmente))
+
+     return(methods::new(Class = "reject_infered", method_name = "augmentation", financed_model = model_f, acceptance_model = NA, infered_model = model_augmente))
+
 }

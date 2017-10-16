@@ -4,7 +4,8 @@
 \alias{parcelling}
 \title{Parcelling}
 \usage{
-parcelling(xf, xnf, yf)
+parcelling(xf, xnf, yf, probs = seq(0, 1, 0.25), alpha = rep(1,
+  length(probs) - 1))
 }
 \arguments{
 \item{xf}{The matrix of financed clients' characteristics to be used in the scorecard.}
@@ -12,6 +13,10 @@ parcelling(xf, xnf, yf)
 \item{xnf}{The matrix of not financed clients' characteristics to be used in the scorecard (must be the same in the same order as xf!).}
 
 \item{yf}{The matrix of financed clients' labels}
+
+\item{probs}{The sequence of quantiles to use to make scorebands (see the vignette).}
+
+\item{alpha}{The user-defined coefficients to use with Parcelling (see the vignette).}
 }
 \value{
 List containing the model using financed clients only and the model produced using the Parcelling method.
@@ -33,11 +38,7 @@ log_odd = apply(xf, 1, function(row) theta\%*\%row)
 yf = rbinom(100,1,1/(1+exp(-log_odd)))
 # We simulate data from not financed clients (MCAR mechanism)
 xnf = matrix(runif(100*2), nrow = 100, ncol = 2)
-list_models <- parcelling(xf,xnf,yf)
-# This is the model constructed using the financed clients (xf,yf):
-list_models[1]
-# This is the model constructed using all the clients (xf,yf,xnf) and the parcelling technique:
-list_models[2]
+parcelling(xf,xnf,yf)
 }
 \references{
 Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, \url{https://CRAN.R-project.org/package=speedglm}

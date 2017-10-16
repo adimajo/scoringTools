@@ -58,5 +58,7 @@ twins <- function(xf,xnf,yf) {
      } else {
           model_twins = speedglm::speedglm(labels ~ score_acc + score_def, family = stats::binomial(link='logit'), df[df$acc==1,-which(names(df) %in% c("acc"))])
      }
-     return(list(financed.model = model_f, acceptation.model = model_acc, twins.model = model_twins))
+     # return(list(financed.model = model_f, acceptation.model = model_acc, twins.model = model_twins))
+     return(methods::new(Class = "reject_infered", method_name = "twins", financed_model = model_f, acceptance_model = model_acc, infered_model = model_twins))
+
 }

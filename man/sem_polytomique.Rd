@@ -5,8 +5,7 @@
 \title{Model-based multivariate discretization for logistic regression (using the mnlogit package).}
 \usage{
 sem_polytomique(predictors, labels, test = TRUE, validation = TRUE,
-  criterion = "gini", iter = 1000, m_depart = 20, reg_type = "poly",
-  contrainte = rep(10, length(predictors[1, ])))
+  criterion = "gini", iter = 1000, m_depart = 20, reg_type = "poly")
 }
 \arguments{
 \item{predictors}{The matrix array containing the numeric attributes to discretize.}
@@ -24,8 +23,6 @@ sem_polytomique(predictors, labels, test = TRUE, validation = TRUE,
 \item{m_depart}{The maximum number of resulting categories for each variable wanted (default: 20).}
 
 \item{reg_type}{The model to use between discretized and continuous features (currently, only multinomial logistic regression ('poly') and ordered logistic regression ('polr') are supported ; default: 'poly').}
-
-\item{contrainte}{The vector of the user-defined rounding precisions. If 10 features are to be discretized, \code{contrainte} must be a numeric vector with 10 entries. If the requested precision is the hundred, set all slots to -2. Default: 10 digits.}
 }
 \description{
 This function discretizes a training set using an SEM-Gibbs based method (see References section).

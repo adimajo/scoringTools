@@ -74,8 +74,6 @@ echi2_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gi
                }
 
 
-               # setClass("echi2_disc", representation(method.name = "character", parameters = "list", reglog = "list", best.disc = "list", performance = "numeric"))
-
                if (test==TRUE) {
                     if (criterion=="gini") {
                          best.disc = list(logit[[which.min(ginidisc)]],disc[[which.min(ginidisc)]],which.min(ginidisc))
@@ -101,8 +99,8 @@ echi2_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gi
                }
 
 
-               # return(new(Class = "echi2_disc", method.name = "echi2", parameters = list(test,validation,criterion,param), reglog = logit, best.disc = best.disc, performance = performance))
-               return(list(method.name = "echi2", parameters = list(test,validation,criterion,param), reglog = logit, best.disc = best.disc, performance = performance))
+               return(methods::new(Class = "discretization", method.name = "echi2", parameters = list(test,validation,criterion,param), best.disc = best.disc, performance = list(performance)))
+
 
           }
           else {

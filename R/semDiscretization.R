@@ -9,7 +9,6 @@
 #' @param iter The number of iterations to do in the SEM protocole (default: 1000).
 #' @param m_depart The maximum number of resulting categories for each variable wanted (default: 20).
 #' @param reg_type The model to use between discretized and continuous features (currently, only multinomial logistic regression ('poly') and ordered logistic regression ('polr') are supported ; default: 'poly').
-#' @param contrainte The vector of the user-defined rounding precisions. If 10 features are to be discretized, \code{contrainte} must be a numeric vector with 10 entries. If the requested precision is the hundred, set all slots to -2. Default: 10 digits.
 #' @keywords SEM, Gibbs, discretization
 #' @author Adrien Ehrhardt
 #' @seealso \code{glm}, \code{mnlogit}, \code{polr}
@@ -42,7 +41,7 @@
 #' sem_polytomique(x,y,iter=100,m_depart=4,test=FALSE,validation=FALSE,criterion="aic")
 
 
-sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gini',iter=1000,m_depart=20,reg_type='poly',contrainte=rep(10,length(predictors[1,]))) {
+sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gini',iter=1000,m_depart=20,reg_type='poly') {
 #     source("~/Documents/discretisation/R_discretisation/methods/bugfix_speedglm.R")
 
      # requireNamespace("mnlogit")
@@ -53,6 +52,11 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                # Calcul des longueurs pour r??utilisation ult??rieure
                n = length(labels)
                d = length(predictors[1,])
+               types_data <- sapply(predictors,class)
+
+               if (sum(!(types_data %in% c("numeric","factor")))>0) {
+                    stop("Unsupported data types. Columns of predictors must be numeric or factor.")
+               }
 
                # Initialisation du crit??re de performance
                criterion_iter=list()
@@ -61,16 +65,16 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                ensemble <- cut_dataset(n,test=test,validation=validation)
 
                # Initialisation al??atoire de e dans 1:m_depart pour l'ensemble d'apprentissage
-               e=array(0,c(n,d))
-               emap=array(0,c(n,d))
-               e = sapply(1:d,function(i) as.factor(sample(1:m_depart,n,replace = TRUE)))
-               emap = sapply(1:d,function(i) as.factor(sample(1:m_depart,n,replace = TRUE)))
-               #                for (j in 1:d) {
-               #                e[j,1,] = (as.character(as.numeric(cut(predictors[,j],seq(0,1,length.out=m_depart)))))
-               #                emap[j,1,] = e[j,1,]
-               #                }
+               e = emap = array(0,c(n,d))
+               if (sum(types_data=="numeric")>0) {
+                    e[,which(types_data=="numeric")] = emap[,which(types_data=="numeric")] = sapply(which(types_data=="numeric"),function(i) as.factor(sample(1:m_depart,n,replace = TRUE)))
+               }
+               if (sum(types_data=="factor")>0) {
+                    e[,which(types_data=="factor")] = emap[,which(types_data=="factor")] = sapply(which(types_data=="factor"),function(i) as.factor(sample(1:nlevels(predictors[,i]),n,replace = TRUE)))
+               }
 
                m = rep(m_depart,d)
+               m[which(types_data=="factor")] = as.vector(sapply(predictors[,which(types_data=="factor")],nlevels))
                names(m) <- paste("V", 1:length(m), sep = "")
 
                current_best = 1
@@ -93,14 +97,10 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                     data_logit = as.data.frame(cbind(emap,labels))
 
                     # Entra??nement de y | e
-                    # if (!requireNamespace("biglm", quietly = TRUE)) {
-                         model_reglog = tryCatch((stats::glm(labels~.,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE,start=model_reglog$coefficients)),error=function(cond) reduireGLM(stats::glm(labels~.,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE)))
-                         logit = tryCatch((stats::glm(labels ~ .,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data[ensemble[[1]],]), y=FALSE, model=FALSE,start=logit$coefficients)),error=function(cond) reduireGLM(stats::glm(labels ~ .,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data[ensemble[[1]],]), y=FALSE, model=FALSE)))
-                    # } else {
-                    #      model_reglog = tryCatch((biglm::bigglm(labels~.,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE,start=model_reglog$coefficients,eigendec=FALSE)),error=function(cond) reduireGLM(speedglm::speedglm(labels~.,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE,eigendec=FALSE)))
-                    #      logit = tryCatch((biglm::bigglm(labels ~ .,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data[ensemble[[1]],]), y=FALSE, model=FALSE,start=logit$coefficients,eigendec=FALSE)),error=function(cond) reduireGLM(speedglm::speedglm(labels ~ .,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data[ensemble[[1]],]), y=FALSE, model=FALSE,eigendec=FALSE)))
-                    # }
 
+                    model_reglog = tryCatch((stats::glm(labels~.,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE,start=model_reglog$coefficients)),error=function(cond) (stats::glm(labels~.,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE)))
+
+                    logit = tryCatch((stats::glm(labels ~ .,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data[ensemble[[1]],]), y=FALSE, model=FALSE,start=logit$coefficients)),error=function(cond) (stats::glm(labels ~ .,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data[ensemble[[1]],]), y=FALSE, model=FALSE)))
 
                     # Calcul du crit??re
                     if ((criterion=='gini')&&(test==FALSE)) {
@@ -112,7 +112,7 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                     } else if ((criterion=='bic')&&(test==FALSE)) {
                          criterion_iter[[i]] = -model_reglog$deviance + 2*log(length(ensemble[[1]]))*length(model_reglog$coefficients)
                     } else if ((criterion %in% c('aic','bic'))&&(test==TRUE)) {
-                         criterion_iter[[i]] = rowSums(log(labels[ensemble[[2]]]*predict(model_reglog,data_logit[ensemble[[2]],],type='response') + (1-labels)*(1-labels[ensemble[[2]]]*predict(model_reglog,data_logit[ensemble[[2]],],type='response'))))
+                         criterion_iter[[i]] = sum(log(labels[ensemble[[2]]]*predict(model_reglog,data_logit[ensemble[[2]],],type='response') + (1-labels[ensemble[[2]]])*(1-labels[ensemble[[2]]]*predict(model_reglog,data_logit[ensemble[[2]],],type='response'))))
                     } else stop("test must be boolean!")
 
 
@@ -126,28 +126,24 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                     link=list()
 
                     for (j in sample(1:d)) {
+
                          # Entra??nement de e^j | x^j
                          if (length(unique(e[ensemble[[1]],j]))>1) {
+
                               # Autorisation de suppression de modalit??s
                               m[j] = nlevels(as.factor(e[,j]))
                               lev_j <- levels(as.factor(e[,j]))
 
-                              if (reg_type=='poly') {
-                                   # if (!requireNamespace("mnlogit", quietly = TRUE)) {
-                                   #      link[[j]] = nnet::multinom(e ~., data=data.frame(e = e[ensemble[[1]],j],x = predictors[ensemble[[1]],j]))
-                                   # } else {
-                                        long_dataset <- data.frame(e = as.vector(sapply(e[ensemble[[1]],j],function(var) (lev_j[seq(1:m[j])]==var))),x = as.vector(sapply(predictors[ensemble[[1]],j], function(var) rep(var,m[j]))), names = as.character(as.vector(rep(lev_j[seq(1:m[j])],length(ensemble[[1]])))),stringsAsFactors=FALSE)
-                                        link[[j]] = tryCatch(mnlogit::mnlogit(e ~ 1 | x | 1, data=long_dataset, choiceVar = "names", start = link[[j]]$coefficients, returnData = FALSE, order = TRUE),error=function(cond) link[[j]] = mnlogit::mnlogit(e ~ 1 | x | 1, data=long_dataset, choiceVar = "names", returnData = FALSE, order = TRUE))
-                                   # }
-                              } else {
-                                   # if (!requireNamespace("MASS", quietly = TRUE)) { stop("MASS not installed. Please install it with install.packages('MASS') if you want to use the ordered logistic regression as a link function.")}
+                              if ((reg_type=='poly')&(types_data[j]=="numeric")) {
+                                        long_dataset <- data.frame(e = as.vector(sapply(e[ensemble[[1]],j],function(var) (lev_j[seq(1:as.numeric(m[j]))]==var))),x = as.vector(sapply(predictors[ensemble[[1]],j], function(var) rep(var,as.numeric(m[j])))), names = as.character(as.vector(rep(lev_j[seq(1:as.numeric(m[j]))],length(ensemble[[1]])))),stringsAsFactors=FALSE)
+                                        link[[j]] = tryCatch(mnlogit::mnlogit(e ~ 1 | x | 1, data=long_dataset, choiceVar = "names", start = link[[j]]$coefficients, returnData = TRUE, order = TRUE),error=function(cond) link[[j]] = mnlogit::mnlogit(e ~ 1 | x | 1, data=long_dataset, choiceVar = "names", returnData = TRUE, order = TRUE))
+                              } else if (types_data[j]=="numeric") {
                                    link[[j]] = tryCatch(MASS::polr(e ~ x, data=data.frame(e = factor(as.numeric(ordered(e[ensemble[[1]],j],levels = names(sort(unlist(by(predictors[ensemble[[1]],j],e[ensemble[[1]],j],mean)))))), ordered=T), x = predictors[ensemble[[1]],j]), Hess = FALSE, model = FALSE, weights = link[[j]]$weights),error=function(cond) tryCatch(MASS::polr(e ~ x, data=data.frame(e = factor(as.numeric(ordered(e[ensemble[[1]],j],levels = names(sort(unlist(by(predictors[ensemble[[1]],j],e[ensemble[[1]],j],mean)))))), ordered=T), x = predictors[ensemble[[1]],j]), Hess = FALSE, model = FALSE), error=function(cond) stats::glm(e ~ x, data=data.frame(e = factor(e[ensemble[[1]],j]), x = predictors[ensemble[[1]],j]), family = stats::binomial(link="logit"), model = FALSE)))
                               }
                          }
-                         if (m[j]>1) {
-                              y_p = array(0,c(n,m[j]))
-
-                              for (k in 1:m[j]) {
+                         if (as.numeric(m[j])>1) {
+                              y_p = array(0,c(n,as.numeric(m[j])))
+                              for (k in 1:as.numeric(m[j])) {
                                    # Dataset e^{-j} et e^j = k
                                    modalites_k <- cbind(e,rep(lev_j[k],n))
                                    colnames(modalites_k) <- paste("V", 1:(d+1), sep = "")
@@ -158,39 +154,28 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
 
                                    y_p[,k] <- (labels*p+(1-labels)*(1-p))
                               }
-                              if (reg_type=='poly') {
-                                   if (!requireNamespace("mnlogit", quietly = TRUE)) {
-                                        t = predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="probs")
+                              if ((types_data[j]=="numeric")) {
+                                   if (reg_type=='poly') {
+                                        if (!requireNamespace("mnlogit", quietly = TRUE)) {
+                                             t = predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="probs")
+                                        } else {
+                                             long_dataset <- data.frame(e = as.vector(sapply(e[,j],function(var) (lev_j[seq(1:as.numeric(m[j]))]==var))),x = as.vector(sapply(predictors[,j], function(var) rep(var,as.numeric(m[j])))), names = as.character(as.vector(rep(lev_j[seq(1:as.numeric(m[j]))],n))))
+                                             t = predict(link[[j]], newdata = long_dataset,type="probs", choiceVar = "names")
+                                             t[which(is.nan(t),arr.ind = TRUE)[,"row"],which(is.nan(t),arr.ind = TRUE)[,"col"]] = 1
+                                        }
                                    } else {
-                                        long_dataset <- data.frame(e = as.vector(sapply(e[,j],function(var) (lev_j[seq(1:m[j])]==var))),x = as.vector(sapply(predictors[,j], function(var) rep(var,m[j]))), names = as.character(as.vector(rep(lev_j[seq(1:m[j])],n))))
-                                        t = predict(link[[j]], newdata = long_dataset,type="probs", choiceVar = "names")
-                                        t[which(is.nan(t),arr.ind = TRUE)[,"row"],which(is.nan(t),arr.ind = TRUE)[,"col"]] = 1
+                                        t = tryCatch(predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="probs"), error = function(cond) matrix(c(1-predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="response"),predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="response")),ncol=2,dimnames = list(seq(1:n),c(min(levels(factor(e[ensemble[[1]],j]))),max(levels(factor(e[ensemble[[1]],j])))))))
                                    }
                               } else {
-                                   t = tryCatch(predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="probs"), error = function(cond) matrix(c(1-predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="response"),predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="response")),ncol=2,dimnames = list(seq(1:n),c(min(levels(factor(e[ensemble[[1]],j]))),max(levels(factor(e[ensemble[[1]],j])))))))
+                                   link[[j]] = table(e[ensemble[[1]],j],predictors[ensemble[[1]],j])
+                                   t = prop.table(t(sapply(predictors[,j],function(row) link[[j]][,row])),1)
                               }
 
                               # Sans contrainte
-                              # emap[,j] <- apply(t,1,function(p) names(which.max(p)))
-
-                              # Avec contrainte - parcours des données
-                              # cutofff <- round(unlist(get_cutp(matrix(apply(t,1,function(p) names(which.max(p)))),x[,j,drop=FALSE])),digits = contrainte[j])
-                              # emap[,j] <- cut(x[,j],cutofff, include.lowest = FALSE, labels = seq(1:(length(cutofff)-1)))
-
-                              # Avec contrainte - sans parcours des données
-                              cutofff <- rep(0,m[j]-1)
-
-                              for (l in 1:(m[j]-1)) {
-                                   temporaire <- (link[[j]]$ordered.coeff[seq(l,length(link[[j]]$ordered.coeff),m[j]-1)])
-                                   cutofff[l] <- -temporaire[1]/temporaire[2]
-                              }
-
-                              cutofff[length(cutofff)+1] <- -Inf
-                              cutofff[length(cutofff)+1] <- Inf
-
-                              emap[,j] <- cut(predictors[,j],cutofff, include.lowest = FALSE)
+                              emap[,j] <- apply(t,1,function(p) names(which.max(p)))
 
                               t <- prop.table(t*y_p,1)
+
                               # mise ?? jour de e^j
                               e[,j] <- apply(t,1,function(p) sample(lev_j,1,prob = p))
 
@@ -217,7 +202,7 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                                              if (!requireNamespace("mnlogit", quietly = TRUE)) {
                                                   t = predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="probs")
                                              } else {
-                                                  long_dataset <- data.frame(e = as.vector(sapply(e[,j],function(var) (lev_j[seq(1:m[j])]==var))),x = as.vector(sapply(predictors[,j], function(var) rep(var,m[j]))), names = as.character(as.vector(rep(lev_j[seq(1:m[j])],n))))
+                                                  long_dataset <- data.frame(e = as.vector(sapply(e[,j],function(var) (lev_j[seq(1:as.numeric(m[j]))]==var))),x = as.vector(sapply(predictors[,j], function(var) rep(var,as.numeric(m[j])))), names = as.character(as.vector(rep(lev_j[seq(1:as.numeric(m[j]))],n))))
                                                   t = predict(link[[j]], newdata = long_dataset,type="probs", choiceVar = "names")
                                                   t[which(is.nan(t),arr.ind = TRUE)[,"row"],which(is.nan(t),arr.ind = TRUE)[,"col"]] = 1
                                              }
@@ -254,7 +239,7 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                                              if (!requireNamespace("mnlogit", quietly = TRUE)) {
                                                   t = predict(link[[j]], newdata = data.frame(x = predictors[,j]),type="probs")
                                              } else {
-                                                  long_dataset <- data.frame(e = as.vector(sapply(e[,j],function(var) (lev_j[seq(1:m[j])]==var))),x = as.vector(sapply(predictors[,j], function(var) rep(var,m[j]))), names = as.character(as.vector(rep(lev_j[seq(1:m[j])],n))))
+                                                  long_dataset <- data.frame(e = as.vector(sapply(e[,j],function(var) (lev_j[seq(1:as.numeric(m[j]))]==var))),x = as.vector(sapply(predictors[,j], function(var) rep(var,as.numeric(m[j])))), names = as.character(as.vector(rep(lev_j[seq(1:as.numeric(m[j]))],n))))
                                                   t = predict(link[[j]], newdata = long_dataset,type="probs", choiceVar = "names")
                                                   t[which(is.nan(t),arr.ind = TRUE)[,"row"],which(is.nan(t),arr.ind = TRUE)[,"col"]] = 1
                                              }
@@ -279,7 +264,6 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                     }
                }
 
-               # setClass("sem", representation(method.name = "character", parameters = "list", best.disc = "list", performance = "list"))
 
                best.disc = list(best_reglog,best_link)
 
@@ -287,7 +271,7 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
                     if (criterion=="gini") {
                          if (validation==TRUE) performance = normalizedGini(labels[ensemble[[3]]],predict(best.disc[[1]],discretize_link(best.disc[[2]],predictors[ensemble[[3]],]),type="response")) else performance = normalizedGini(labels[ensemble[[2]]],predict(best.disc[[1]],discretize_link(best.disc[[2]],predictors[ensemble[[3]],]),type="response"))
                     } else {
-                         if (validation==TRUE) performance = -2*rowSums(labels[ensemble[[3]]]*predict(best.disc[[1]],discretize_link(best.disc[[2]],predictors[ensemble[[3]],]),type="response")+(1-labels[ensemble[[3]]])*(1-predict(best.disc[[1]],discretize_link(best.disc[[2]],predictors[ensemble[[3]],]),type="response"))) else performance = criterion_iter[[current_best]]
+                         if (validation==TRUE) performance = -2*sum(labels[ensemble[[3]]]*predict(best.disc[[1]],as.data.frame(discretize_link(best.disc[[2]],predictors[ensemble[[3]],])),type="response")+(1-labels[ensemble[[3]]])*(1-predict(best.disc[[1]],as.data.frame(discretize_link(best.disc[[2]],predictors[ensemble[[3]],])),type="response"))) else performance = criterion_iter[[current_best]]
                     }
                } else {
                     if (criterion=="gini") {
@@ -298,14 +282,14 @@ sem_polytomique <- function(predictors,labels,test=TRUE,validation=TRUE,criterio
 
                }
 
-               # return(new(Class = "sem", method.name = paste("sem",reg_type,sep="_"), parameters = list(test,validation,criterion,iter,m_depart,reg_type), best.disc = best.disc, performance = list(performance,criterion_iter,time_measure)))
-               return(list(method.name = paste("sem",reg_type,sep="_"), parameters = list(test,validation,criterion,iter,m_depart,reg_type), best.disc = best.disc, performance = list(performance,criterion_iter)))
+               return(methods::new(Class = "discretization", method.name = paste("sem",reg_type,sep="_"), parameters = list(test,validation,criterion,iter,m_depart,reg_type), best.disc = best.disc, performance = list(performance,criterion_iter)))
+
           }
           else {
-               print("Les labels et les pr??dicteurs doivent avoir la m??me longueur")
+               print("labels and predictors must be of same length")
           }
      }
      else {
-          print("Le crit??re doit ??tre 'gini' ou 'aic'")
+          print("criterion must be gini, aic or bic")
      }
 }

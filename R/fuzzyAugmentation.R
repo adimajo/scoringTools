@@ -26,12 +26,7 @@
 #' yf = rbinom(100,1,1/(1+exp(-log_odd)))
 #' # We simulate data from not financed clients (MCAR mechanism)
 #' xnf = matrix(runif(100*2), nrow = 100, ncol = 2)
-#' list_models <- fuzzy_augmentation(xf,xnf,yf)
-#' # This is the model constructed using the financed clients (xf,yf):
-#' list_models[[1]]
-#' # This is the model constructed using all the clients (xf,yf,xnf)
-#' # and the fuzzy augmentation technique:
-#' list_models[[2]]
+#' fuzzy_augmentation(xf,xnf,yf)
 
 fuzzy_augmentation <- function(xf,xnf,yf) {
      df_f <- data.frame(labels = yf, x = xf)
@@ -53,5 +48,6 @@ fuzzy_augmentation <- function(xf,xnf,yf) {
      } else {
           model_fuzzy = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df[,-which(names(df) %in% c("acc"))])
      }
-     return(list(financed.model = model_f, fuzzy_augmentation.model = model_fuzzy))
+
+     return(methods::new(Class = "reject_infered", method_name = "fuzzy_augmentation", financed_model = model_f, acceptance_model = NA, infered_model = model_fuzzy))
 }

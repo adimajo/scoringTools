@@ -4,6 +4,8 @@
 #' @param xf The matrix of financed clients' characteristics to be used in the scorecard.
 #' @param xnf The matrix of not financed clients' characteristics to be used in the scorecard (must be the same in the same order as xf!).
 #' @param yf The matrix of financed clients' labels
+#' @param probs The sequence of quantiles to use to make scorebands (see the vignette).
+#' @param alpha The user-defined coefficients to use with Parcelling (see the vignette).
 #' @return List containing the model using financed clients only and the model produced using the Parcelling method.
 #' @keywords reject, inference, r?int?gration, scorecard, credit, scoring
 #' @importFrom stats predict
@@ -26,14 +28,9 @@
 #' yf = rbinom(100,1,1/(1+exp(-log_odd)))
 #' # We simulate data from not financed clients (MCAR mechanism)
 #' xnf = matrix(runif(100*2), nrow = 100, ncol = 2)
-#' list_models <- parcelling(xf,xnf,yf)
-#' # This is the model constructed using the financed clients (xf,yf):
-#' list_models[1]
-#' # This is the model constructed using all the clients (xf,yf,xnf) and the parcelling technique:
-#' list_models[2]
+#' parcelling(xf,xnf,yf)
 
-
-parcelling <- function(xf,xnf,yf) {
+parcelling <- function(xf,xnf,yf, probs = seq(0, 1, 0.25), alpha = rep(1,length(probs)-1)) {
      df_f <- data.frame(labels = yf, x = xf)
 
      if (!requireNamespace("speedglm", quietly = TRUE)) {
@@ -44,8 +41,9 @@ parcelling <- function(xf,xnf,yf) {
      }
 
      df <- rbind(df_f, data.frame(labels = rep(NA,nrow(xnf)), x = xnf))
-     df_f$classe_SCORE <- round(predict(model_f,df_f,type="response"), digits=1)
-     df$classe_SCORE <- round(predict(model_f,df,type="response"), digits=1)
+     classe_SCORE <- stats::quantile(predict(model_f,df_f,type="response"), probs = probs)
+     df_f$classe_SCORE <- cut(predict(model_f,df_f,type="response"), breaks = c(classe_SCORE[2:(length(classe_SCORE)-1)],Inf,-Inf), labels = names(classe_SCORE[-1]))
+     df$classe_SCORE <- cut(predict(model_f,df,type="response"), breaks = c(classe_SCORE[2:(length(classe_SCORE)-1)],Inf,-Inf), labels = names(classe_SCORE[-1]))
      df$acc[1:nrow(df_f)] <- 1
      df$acc[(nrow(df_f)+1):nrow(df)] <- 0
 
@@ -62,6 +60,7 @@ parcelling <- function(xf,xnf,yf) {
      poids_mauvais$labels <- NULL
      poids <- merge(poids_bon, poids_mauvais, by="classe_SCORE", all.x=TRUE, all.y=TRUE)
      poids$poids_final <- poids$count.y/(poids$count.x+poids$count.y)
+     poids$poids_final <- poids$poids_final*alpha
      poids$count.x <- NULL
      poids$count.y <- NULL
 
@@ -75,5 +74,7 @@ parcelling <- function(xf,xnf,yf) {
      } else {
           model_parcelling = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df_parceling[,-which(names(df_parceling) %in% c("poids_final","classe_SCORE","acc"))])
      }
-     return(list(financed.model = model_f, parcelling.model = model_parcelling))
+
+     return(methods::new(Class = "reject_infered", method_name = "parceling", financed_model = model_f, acceptance_model = NA, infered_model = model_parcelling))
+
 }
