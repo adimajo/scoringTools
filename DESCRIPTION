@@ -20,7 +20,11 @@ Suggests:
     MASS,
     speedglm,
     knitr,
-    rmarkdown
+    rmarkdown,
+    plotly,
+    pROC,
+    magrittr,
+    Rmixmod
 URL: https://adimajo.github.io
 BugReports: https://github.com/adimajo/scoring/issues
 VignetteBuilder: knitr

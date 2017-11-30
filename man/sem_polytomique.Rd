@@ -4,17 +4,18 @@
 \alias{sem_polytomique}
 \title{Model-based multivariate discretization for logistic regression (using the mnlogit package).}
 \usage{
-sem_polytomique(predictors, labels, test = TRUE, validation = TRUE,
-  criterion = "gini", iter = 1000, m_depart = 20, reg_type = "poly")
+sem_polytomique(predictors, labels, interact = TRUE, validation = TRUE,
+  test = TRUE, criterion = "gini", iter = 1000, m_depart = 20,
+  reg_type = "poly")
 }
 \arguments{
 \item{predictors}{The matrix array containing the numeric attributes to discretize.}
 
 \item{labels}{The actual labels of the provided predictors (0/1).}
 
-\item{test}{Boolean : True if the algorithm should use predictors to construct a test set on which to search for the best discretization scheme using the provided criterion (default: TRUE).}
+\item{validation}{Boolean : True if the algorithm should use predictors to construct a validation set on which to search for the best discretization scheme using the provided criterion (default: TRUE).}
 
-\item{validation}{Boolean : True if the algorithm should use predictors to construct a validation set on which to calculate the provided criterion using the best discretization scheme (chosen thanks to the provided criterion on either the test set (if true) or the training set (otherwise)) (default: TRUE).}
+\item{test}{Boolean : True if the algorithm should use predictors to construct a test set on which to calculate the provided criterion using the best discretization scheme (chosen thanks to the provided criterion on either the test set (if true) or the training set (otherwise)) (default: TRUE).}
 
 \item{criterion}{The criterion ('gini','aic','bic') to use to choose the best discretization scheme among the generated ones (default: 'gini'). Nota Bene: it is best to use 'gini' only when test is set to TRUE and 'aic' or 'bic' when it is not. When using 'aic' or 'bic' with a test set, the likelihood is returned as there is no need to penalize for generalization purposes.}
 
@@ -44,7 +45,8 @@ log_odd = rowSums(t(sapply(seq_along(xd[,1]), function(row_id) sapply(seq_along(
 function(element) theta[xd[row_id,element],element]))))
 y = rbinom(100,1,1/(1+exp(-log_odd)))
 
-sem_polytomique(x,y,iter=100,m_depart=4,test=FALSE,validation=FALSE,criterion="aic")
+sem_disc <- sem_polytomique(x,y,iter=100,m_depart=4,test=FALSE,validation=FALSE,criterion="aic")
+discretize(sem_disc,data.frame(x))
 }
 \references{
 Ehrhardt, A., Biernacki, C., Vandewalle, V., Heinrich, P. (2018), Model-based multivariate discretization for logistic regression,

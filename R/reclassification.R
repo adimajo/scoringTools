@@ -27,12 +27,7 @@
 #' yf = rbinom(100,1,1/(1+exp(-log_odd)))
 #' # We simulate data from not financed clients (MCAR mechanism)
 #' xnf = matrix(runif(100*2), nrow = 100, ncol = 2)
-#' list_models <- reclassification(xf,xnf,yf)
-#' # This is the model constructed using the financed clients (xf,yf):
-#' list_models[1]
-#' # This is the model constructed using all the clients (xf,yf,xnf)
-#' # and the reclassification technique:
-#' list_models[2]
+#' reclassification(xf,xnf,yf)
 
 reclassification <- function(xf,xnf,yf,thresh=0.5) {
      df_f <- data.frame(labels = yf, x = xf)
