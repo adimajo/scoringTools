@@ -7,11 +7,11 @@
 \method{plot}{discretization}(object, type, ...)
 }
 \arguments{
+\item{object}{The S4 discretization object.}
+
 \item{type}{The test dataframe to discretize and for which we wish to have predictions.}
 
 \item{...}{See additional parameters of plotly (if installed) or the standard plot function (from the graphics package).}
-
-\item{discretization}{The S4 discretization object.}
 }
 \description{
 This function aims at producing useful graphs in the context of credit scoring in order to simplify the validation process

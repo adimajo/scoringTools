@@ -13,6 +13,8 @@ sem_polytomique(predictors, labels, interact = TRUE, validation = TRUE,
 
 \item{labels}{The actual labels of the provided predictors (0/1).}
 
+\item{interact}{Boolean : True (default) if interaction detection is wanted (Warning: may be very memory/time-consuming).}
+
 \item{validation}{Boolean : True if the algorithm should use predictors to construct a validation set on which to search for the best discretization scheme using the provided criterion (default: TRUE).}
 
 \item{test}{Boolean : True if the algorithm should use predictors to construct a test set on which to calculate the provided criterion using the best discretization scheme (chosen thanks to the provided criterion on either the test set (if true) or the training set (otherwise)) (default: TRUE).}

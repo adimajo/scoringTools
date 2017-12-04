@@ -15,7 +15,8 @@ RoxygenNote: 6.0.1.9000
 Imports:
     discretization,
     sqldf,
-    mnlogit
+    mnlogit,
+    magrittr
 Suggests:
     MASS,
     speedglm,
@@ -23,7 +24,6 @@ Suggests:
     rmarkdown,
     plotly,
     pROC,
-    magrittr,
     Rmixmod
 URL: https://adimajo.github.io
 BugReports: https://github.com/adimajo/scoring/issues

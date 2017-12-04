@@ -9,6 +9,7 @@
 #' @param iter The number of iterations to do in the SEM protocole (default: 1000).
 #' @param m_depart The maximum number of resulting categories for each variable wanted (default: 20).
 #' @param reg_type The model to use between discretized and continuous features (currently, only multinomial logistic regression ('poly') and ordered logistic regression ('polr') are supported ; default: 'poly').
+#' @param interact Boolean : True (default) if interaction detection is wanted (Warning: may be very memory/time-consuming).
 #' @keywords SEM, Gibbs, discretization
 #' @author Adrien Ehrhardt
 #' @seealso \code{glm}, \code{mnlogit}, \code{polr}
@@ -63,7 +64,7 @@ sem_polytomique <- function(predictors,labels,interact=TRUE,validation=TRUE,test
                criterion_iter=list()
 
                # D??coupage de l'ensemble
-               ensemble <- scoring:::cut_dataset(n,test=test,validation=validation)
+               ensemble <- cut_dataset(n,test=test,validation=validation)
 
                # Initialisation al??atoire de e dans 1:m_depart pour l'ensemble d'apprentissage
                e = emap = array(0,c(n,d))
@@ -91,19 +92,19 @@ sem_polytomique <- function(predictors,labels,interact=TRUE,validation=TRUE,test
                }
 
                if (interact==TRUE) {
-                    delta <- matrix(as.logical(sample(0:1,d^2,replace=TRUE,prob=c(0.5,0.5))),nrow=d,ncol=d)
-                    delta[lower.tri(delta)] = FALSE
-                    diag(delta) <- FALSE
+                    delta <- matrix(sample(0:1,d^2,replace=TRUE,prob=c(0.5,0.5)),nrow=d,ncol=d)
+                    delta[lower.tri(delta)] = 0
+                    diag(delta) <- 0
                     xPrincipal <- paste0("X", 1:d)
 
                     p_delta = matrix(0,nrow=d,ncol=d)
-                    delta[lower.tri(delta)] = 0
-                    diag(delta) <- 0
+                    p_delta[lower.tri(p_delta)] = 0
+                    diag(p_delta) <- 0
 
                     for (j in 1:(d-1)) {
                          for (k in (j+1):d) {
-                              sans_inter <- stats::glm(labels ~ X1 + X2, family=binomial(link="logit"), data=data.frame(labels = labels[ensemble[[1]]],X1 = predictors[ensemble[[1]],j],X2 = predictors[ensemble[[1]],k]))
-                              avec_inter <- stats::glm(labels ~ X1 + X2 + X1:X2, family=binomial(link="logit"), data=data.frame(labels = labels[ensemble[[1]]],X1 = predictors[ensemble[[1]],j],X2 = predictors[ensemble[[1]],k]))
+                              sans_inter <- stats::glm(labels ~ X1 + X2, family=stats::binomial(link="logit"), data=data.frame(labels = labels[ensemble[[1]]],X1 = predictors[ensemble[[1]],j],X2 = predictors[ensemble[[1]],k]))
+                              avec_inter <- stats::glm(labels ~ X1 + X2 + X1:X2, family=stats::binomial(link="logit"), data=data.frame(labels = labels[ensemble[[1]]],X1 = predictors[ensemble[[1]],j],X2 = predictors[ensemble[[1]],k]))
                               p_delta[j,k] <- 1/(1+exp(sans_inter$deviance - 2*log(length(ensemble[[1]]))*length(sans_inter$coefficients))/exp(avec_inter$deviance - 2*log(length(ensemble[[1]]))*length(avec_inter$coefficients)))
                          }
                     }
@@ -118,35 +119,35 @@ sem_polytomique <- function(predictors,labels,interact=TRUE,validation=TRUE,test
                     # Entra??nement de y | e
                     ## Create a formula for a model with a large number of variables:
                     if (interact==TRUE) {
-                         tab_vrai <- which(delta,arr.ind=TRUE)
+                         tab_vrai <- which(delta==1,arr.ind=TRUE)
+                         ejecter_logit <- sapply(1:(ncol(data_logit)-1), function(col) length(unique(data_logit[,col]))==1)
+                         ejecter <- sapply(1:(ncol(data)-1), function(col) length(unique(data[,col]))==1)
 
                          if (sum(tab_vrai)>0) {
                               xInter <- xInter_logit <- sapply(1:nrow(tab_vrai), function(row) paste0("X",tab_vrai[row,"row"],":X",tab_vrai[row,"col"]))
-                              ejecter_logit <- sapply(1:(ncol(data_logit)-1), function(col) length(unique(data_logit[,col]))==1)
-                              ejecter <- sapply(1:(ncol(data)-1), function(col) length(unique(data[,col]))==1)
 
                               if (length(xPrincipal[ejecter])>0) {
-                                   if (length(grep(xPrincipal[ejecter],xInter_logit,value=TRUE))>0) {
-                                        xInter <- xInter[!(xInter==grep(xPrincipal[ejecter],xInter,value=TRUE))]
+                                   while (length(grep(xPrincipal[ejecter],xInter_logit,value=TRUE))>0) {
+                                        xInter <- xInter[!(xInter==(grep(xPrincipal[ejecter],xInter,value=TRUE)[1]))]
                                    }
                               }
 
                               if (length(xPrincipal[ejecter_logit])>0) {
-                                   if (length(grep(xPrincipal[ejecter_logit],xInter_logit,value=TRUE))>0) {
-                                        xInter_logit <- xInter_logit[!(xInter_logit==grep(xPrincipal[ejecter_logit],xInter_logit,value=TRUE))]
+                                   while (length(grep(xPrincipal[ejecter_logit],xInter_logit,value=TRUE))>0) {
+                                        xInter_logit <- xInter_logit[!(xInter_logit==(grep(xPrincipal[ejecter_logit],xInter_logit,value=TRUE)[1]))]
                                    }
                               }
 
                               if (length(xInter)>0) {
-                                   fmla <- as.formula(paste("labels ~ ", paste(xPrincipal[!ejecter], collapse= "+"), "+", paste(xInter, collapse= "+")))
+                                   fmla <- stats::as.formula(paste("labels ~ ", paste(xPrincipal[!ejecter], collapse= "+"), "+", paste(xInter, collapse= "+")))
                               } else {
-                                   fmla <- as.formula(paste("labels ~ ", paste(xPrincipal[!ejecter], collapse= "+")))
+                                   fmla <- stats::as.formula(paste("labels ~ ", paste(xPrincipal[!ejecter], collapse= "+")))
                               }
 
                               if (length(xInter_logit)>0) {
-                                   fmla_logit <- as.formula(paste("labels ~ ", paste(xPrincipal[!ejecter_logit], collapse= "+"), "+", paste(xInter_logit, collapse= "+")))
+                                   fmla_logit <- stats::as.formula(paste("labels ~ ", paste(xPrincipal[!ejecter_logit], collapse= "+"), "+", paste(xInter_logit, collapse= "+")))
                               } else {
-                                   fmla_logit <- as.formula(paste("labels ~ ", paste(xPrincipal[!ejecter_logit], collapse= "+")))
+                                   fmla_logit <- stats::as.formula(paste("labels ~ ", paste(xPrincipal[!ejecter_logit], collapse= "+")))
                               }
                               model_reglog = tryCatch((stats::glm(fmla_logit,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE,start=model_reglog$coefficients)),error=function(cond) (stats::glm(fmla_logit,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE)))
 
@@ -170,7 +171,7 @@ sem_polytomique <- function(predictors,labels,interact=TRUE,validation=TRUE,test
                     } else if ((criterion=='aic')&&(validation==FALSE)) {
                          criterion_iter[[i]] = -model_reglog$aic
                     } else if ((criterion=='bic')&&(validation==FALSE)) {
-                         criterion_iter[[i]] = -model_reglog$deviance + 2*log(length(ensemble[[1]]))*length(model_reglog$coefficients)
+                         criterion_iter[[i]] = -model_reglog$deviance - 2*log(length(ensemble[[1]]))*length(model_reglog$coefficients)
                     } else if ((criterion %in% c('aic','bic'))&&(validation==TRUE)) {
                          criterion_iter[[i]] = sum(log(labels[ensemble[[2]]]*predict(model_reglog,data_logit[ensemble[[2]],],type='response') + (1-labels[ensemble[[2]]])*(1-labels[ensemble[[2]]]*predict(model_reglog,data_logit[ensemble[[2]],],type='response'))))
                     } else stop("validation must be boolean!")
@@ -184,39 +185,43 @@ sem_polytomique <- function(predictors,labels,interact=TRUE,validation=TRUE,test
 
                     # Interactions
                     if (interact==TRUE) {
-                         for (j in 1:(d-1)) {
-                              for (k in (j+1):d) {
-                                   if (delta[j,k]) {
-                                        delta_new = delta
-                                        delta_new[j,k] = FALSE
-
-                                        if (sum(delta_new)>0) {
-                                             xInter_new <- sapply(1:nrow(which(delta_new,arr.ind=TRUE)), function(row) paste0("X",which(delta_new,arr.ind=TRUE)[row,"row"],":X",which(delta_new,arr.ind=TRUE)[row,"col"]))
-                                             fmla_new <- as.formula(paste("labels ~ ", paste(xPrincipal, collapse= "+"), "+", paste(xInter_new, collapse= "+")))
-                                        } else {
-                                             fmla_new <- as.formula(paste("labels ~ ", paste(xPrincipal, collapse= "+")))
+                         p_delta_transition = abs(delta-p_delta)
+                         pq <- sample(1:d^2,prob=prop.table(t(as.matrix(as.vector(p_delta_transition))),1),size=1)
+                         delta_new = delta
+                         delta_new[pq] = 1-delta_new[pq]
+                         if (sum(delta_new==1)>0) {
+                              xInter_new <- sapply(1:nrow(which(delta_new==1,arr.ind=TRUE)), function(row) paste0("X",which(delta_new==1,arr.ind=TRUE)[row,"row"],":X",which(delta_new==1,arr.ind=TRUE)[row,"col"]))
+                              if (exists("ejecter_logit")) {
+                                   if (length(xPrincipal[ejecter_logit])>0) {
+                                        if (length(grep(xPrincipal[ejecter_logit],xInter_new,value=TRUE))>0) {
+                                             xInter_new <- xInter_new[!(xInter_new==grep(xPrincipal[ejecter_logit],xInter_new,value=TRUE))]
                                         }
-                                        new_aic = stats::glm(fmla_new,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE)$aic
-                                   } else {
-                                        delta_new = delta
-                                        delta_new[j,k] = TRUE
-
-                                        if (sum(delta_new)>0) {
-                                             xInter_new <- sapply(1:nrow(which(delta_new,arr.ind=TRUE)), function(row) paste0("X",which(delta_new,arr.ind=TRUE)[row,"row"],":X",which(delta_new,arr.ind=TRUE)[row,"col"]))
-                                             fmla_new <- as.formula(paste("labels ~ ", paste(xPrincipal, collapse= "+"), "+", paste(xInter_new, collapse= "+")))
-                                        } else {
-                                             fmla_new <- as.formula(paste("labels ~ ", paste(xPrincipal, collapse= "+")))
-                                        }
-
-                                        new_aic = stats::glm(fmla_new,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE)$aic
                                    }
-                                   alpha = exp(model_reglog$aic-new_aic)
-                                   print(alpha)
-                                   delta[j,k] <- sample(c(delta_new[j,k],delta[j,k]),1,prob = c(max(0,min(alpha,1)),1-max(0,min(alpha,1))))
+                                   if (length(xInter_new)>0) {
+                                        fmla_new <- stats::as.formula(paste("labels ~ ", paste(xPrincipal[!ejecter_logit], collapse= "+"), "+", paste(xInter_new, collapse= "+")))
+                                   } else {
+                                        fmla_new <- stats::as.formula(paste("labels ~ ", paste(xPrincipal[!ejecter_logit], collapse= "+")))
+                                   }
+                              } else {
+                                   fmla_new <- stats::as.formula(paste("labels ~ ", paste(xPrincipal, collapse= "+"), "+", paste(xInter_new, collapse= "+")))
                               }
+                         } else {
+                              if (exists("ejecter_logit")) {
+                                   fmla_new <- stats::as.formula(paste("labels ~ ", paste(xPrincipal[!ejecter_logit], collapse= "+")))
+                              } else {
+                                   fmla_new <- stats::as.formula(paste("labels ~ ", paste(xPrincipal, collapse= "+")))
+                              }
+
+                         }
+
+                         new_logit <- stats::glm(fmla_new,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE)
+                         alpha = exp(-new_logit$deviance + 2*log(length(ensemble[[1]]))*length(new_logit$coefficients) - (-model_reglog$deviance + 2*log(length(ensemble[[1]]))*length(model_reglog$coefficients)))*(p_delta_transition[pq])/(1-p_delta_transition[pq])
+
+                         print(alpha)
+                         if (sample(c(TRUE,FALSE),size=1,prob = c(min(alpha,1),1-min(alpha,1)))) {
+                              delta <- delta_new
                          }
                     }
-
 
                     # Initialisation link function
                     link=list()

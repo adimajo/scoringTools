@@ -61,7 +61,7 @@ modchi2_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='
 
                     } else {
                          logit[[i]] = speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x)(length(unique(x))>1),as.data.frame(sapply(disc[[i]]$Disc.data,as.factor))))
-                         setIs(class(logit[[i]]), "glmORlogicalORspeedglm")
+                         methods::setIs(class(logit[[i]]), "glmORlogicalORspeedglm")
 
                     }
 

@@ -7,9 +7,9 @@
 \method{predict}{discretization}(object, predictors)
 }
 \arguments{
-\item{discretization}{The S4 discretization object.}
+\item{object}{The S4 discretization object.}
 
-\item{cont_test_set}{The test dataframe to discretize and for which we wish to have predictions.}
+\item{predictors}{The test dataframe to discretize and for which we wish to have predictions.}
 }
 \description{
 This function discretizes a user-provided test dataset given a discretization scheme provided by an S4 "discretization" object.

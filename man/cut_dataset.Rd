@@ -4,8 +4,7 @@
 \alias{cut_dataset}
 \title{Randoming and sampling a dataset by its row numbers}
 \usage{
-cut_dataset(n, test = TRUE, validation = TRUE, proportions = c(0.2, 0.2),
-  seed = 1)
+cut_dataset(n, test = TRUE, validation = TRUE, proportions = c(0.2, 0.2))
 }
 \arguments{
 \item{n}{The total number of rows to sample from.}
