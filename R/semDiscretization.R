@@ -105,7 +105,7 @@ sem_polytomique <- function(predictors,labels,interact=TRUE,validation=TRUE,test
                          for (k in (j+1):d) {
                               sans_inter <- stats::glm(labels ~ X1 + X2, family=stats::binomial(link="logit"), data=data.frame(labels = labels[ensemble[[1]]],X1 = predictors[ensemble[[1]],j],X2 = predictors[ensemble[[1]],k]))
                               avec_inter <- stats::glm(labels ~ X1 + X2 + X1:X2, family=stats::binomial(link="logit"), data=data.frame(labels = labels[ensemble[[1]]],X1 = predictors[ensemble[[1]],j],X2 = predictors[ensemble[[1]],k]))
-                              p_delta[j,k] <- 1/(1+exp(sans_inter$deviance - 2*log(length(ensemble[[1]]))*length(sans_inter$coefficients))/exp(avec_inter$deviance - 2*log(length(ensemble[[1]]))*length(avec_inter$coefficients)))
+                              p_delta[j,k] <- 1/(1+exp(-sans_inter$deviance - log(length(ensemble[[1]]))*length(sans_inter$coefficients) + avec_inter$deviance + log(length(ensemble[[1]]))*length(avec_inter$coefficients)))
                          }
                     }
                }
@@ -171,7 +171,7 @@ sem_polytomique <- function(predictors,labels,interact=TRUE,validation=TRUE,test
                     } else if ((criterion=='aic')&&(validation==FALSE)) {
                          criterion_iter[[i]] = -model_reglog$aic
                     } else if ((criterion=='bic')&&(validation==FALSE)) {
-                         criterion_iter[[i]] = -model_reglog$deviance - 2*log(length(ensemble[[1]]))*length(model_reglog$coefficients)
+                         criterion_iter[[i]] = -model_reglog$deviance - log(length(ensemble[[1]]))*length(model_reglog$coefficients)
                     } else if ((criterion %in% c('aic','bic'))&&(validation==TRUE)) {
                          criterion_iter[[i]] = sum(log(labels[ensemble[[2]]]*predict(model_reglog,data_logit[ensemble[[2]],],type='response') + (1-labels[ensemble[[2]]])*(1-labels[ensemble[[2]]]*predict(model_reglog,data_logit[ensemble[[2]],],type='response'))))
                     } else stop("validation must be boolean!")
@@ -215,7 +215,7 @@ sem_polytomique <- function(predictors,labels,interact=TRUE,validation=TRUE,test
                          }
 
                          new_logit <- stats::glm(fmla_new,family = stats::binomial(link = "logit"), data=Filter(function(x)(length(unique(x))>1),data_logit[ensemble[[1]],]), y=FALSE, model=FALSE)
-                         alpha = exp(-new_logit$deviance + 2*log(length(ensemble[[1]]))*length(new_logit$coefficients) - (-model_reglog$deviance + 2*log(length(ensemble[[1]]))*length(model_reglog$coefficients)))*(p_delta_transition[pq])/(1-p_delta_transition[pq])
+                         alpha = exp(-new_logit$deviance - log(length(ensemble[[1]]))*length(new_logit$coefficients) + model_reglog$deviance + log(length(ensemble[[1]]))*length(model_reglog$coefficients))*(p_delta_transition[pq])/(1-p_delta_transition[pq])
 
                          print(alpha)
                          if (sample(c(TRUE,FALSE),size=1,prob = c(min(alpha,1),1-min(alpha,1)))) {

@@ -14,8 +14,6 @@ cut_dataset(n, test = TRUE, validation = TRUE, proportions = c(0.2, 0.2))
 \item{validation}{TRUE if a test dataset is wanted, FALSE otherwise (default=TRUE).}
 
 \item{proportions}{The list of the (2) proportions wanted for test and validation set. Only the first is used when there is only one of either test or validation that is set to TRUE. Produces an error when the sum is greater to one. Useless if both test and validation are set to FALSE. Default: list(0.2,0.2).}
-
-\item{seed}{The seed for the random number generator (optional).}
 }
 \description{
 This function chooses the rows of a dataset to be included in the train, test (optional) and validation (optional) datasets according to proportions specified by the user.
