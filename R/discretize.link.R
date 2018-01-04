@@ -25,29 +25,31 @@ discretize_link <- function(link,df) {
 
      n = nrow(df)
      d = ncol(df)
-     types_data <- sapply(df,class)
+     types_data <- sapply(df[1,],class)
      if (sum(!(types_data %in% c("numeric","factor")))>0) {
           stop("Unsupported data types. Columns of predictors must be numeric or factor.")
      }
      emap = array(0,c(n,d))
 
      if (d>1) {
-          for (j in sample(1:d)) {
+          for (j in (1:d)) {
                if (types_data[j]=="numeric") {
-                    m = length(link[[j]]$coefficients)/2 + 1
-                    lev = c("1",sapply(names(link[[j]]$coefficients[seq(2,length(link[[j]]$coefficients),2)]), function(lev_name) substr(lev_name,start=3,stop=nchar(lev_name))))
-                    long_dataset <- data.frame(x = as.vector(sapply(df[,j], function(var) rep(var,m))), names = as.character(as.vector(rep(lev[seq(1:m)],n))))
-                    t = predict(link[[j]], newdata = long_dataset, choiceVar = "names", type="probs")
+                    # m = length(link[[j]]$coefficients)/2 + 1
+                    # lev = c("1",sapply(names(link[[j]]$coefficients[seq(2,length(link[[j]]$coefficients),2)]), function(lev_name) substr(lev_name,start=3,stop=nchar(lev_name))))
+                    # long_dataset <- data.frame(x = as.vector(sapply(df[,j], function(var) rep(var,m))), names = as.character(as.vector(rep(lev[seq(1:m)],n))))
+                    # t = predict(link[[j]], newdata = long_dataset, choiceVar = "names", type="probs")
+                    t = predict(link[[j]], newdata = data.frame(x = df[,j]), type="probs")
                } else {
                     t = prop.table(t(sapply(df[,j],function(row) link[[j]][,row])),1)
                }
                emap[,j] <- apply(t,1,function(p) names(which.max(p)))
           }
      } else if (types_data=="numeric") {
-          m = length(link$coefficients)/2 + 1
-          lev = c("1",sapply(names(link$coefficients[seq(2,length(link$coefficients),2)]), function(lev_name) substr(lev_name,start=3,stop=nchar(lev_name))))
-          long_dataset <- data.frame(x = as.vector(sapply(df, function(var) rep(var,m))), names = as.character(as.vector(rep(lev[seq(1:m)],n))))
-          t = predict(link, newdata = long_dataset, choiceVar = "names", type="probs")
+          # m = length(link$coefficients)/2 + 1
+          # lev = c("1",sapply(names(link$coefficients[seq(2,length(link$coefficients),2)]), function(lev_name) substr(lev_name,start=3,stop=nchar(lev_name))))
+          # long_dataset <- data.frame(x = as.vector(sapply(df, function(var) rep(var,m))), names = as.character(as.vector(rep(lev[seq(1:m)],n))))
+          # t = predict(link, newdata = long_dataset, choiceVar = "names", type="probs")
+          t = predict(link, newdata = data.frame(x = df[,j]), type="probs")
           emap[,1] <- apply(t,1,function(p) names(which.max(p)))
      } else {
           t = prop.table(t(sapply(df,function(row) link[,row])),1)
