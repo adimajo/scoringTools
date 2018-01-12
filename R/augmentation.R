@@ -35,7 +35,10 @@ augmentation <- function(xf, xnf, yf) {
           model_f <- stats::glm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
      } else {
           model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
-          methods::setIs(class(model_f), "glmORlogicalORspeedglm")
+          # methods::setOldClass(class(model_f)[1])
+          # methods::setOldClass(class(model_f)[2])
+          # methods::setIs(class(model_f)[1], "glmORlogicalORspeedglm")
+          # methods::setIs(class(model_f)[2], "glmORlogicalORspeedglm")
      }
 
      df <- rbind(df_f, data.frame(labels = rep(NA,nrow(xnf)), x = xnf))
@@ -71,7 +74,7 @@ augmentation <- function(xf, xnf, yf) {
           model_augmente = stats::glm(labels ~ ., family = stats::binomial(link='logit'), df_augmente[,-which(names(df_augmente) %in% c("poidsfinal","classe_SCORE"))], weights = df_augmente$poidsfinal)
      } else {
           model_augmente = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df_augmente[,-which(names(df_augmente) %in% c("poidsfinal","classe_SCORE"))], weights = df_augmente$poidsfinal)
-          methods::setIs(class(model_augmente), "glmORlogicalORspeedglm")
+          # methods::setIs(class(model_augmente), "glmORlogicalORspeedglm")
      }
 
 

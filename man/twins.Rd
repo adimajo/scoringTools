@@ -33,13 +33,7 @@ log_odd = apply(xf, 1, function(row) theta\%*\%row)
 yf = rbinom(100,1,1/(1+exp(-log_odd)))
 # We simulate data from not financed clients (MCAR mechanism)
 xnf = matrix(runif(100*2), nrow = 100, ncol = 2)
-list_models <- twins(xf,xnf,yf)
-# This is the model constructed using the financed clients (xf,yf):
-list_models[1]
-# This is the model on the acceptance process:
-list_models[2]
-# This is the model constructed using the twins method:
-list_models[3]
+twins(xf,xnf,yf)
 }
 \references{
 Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, \url{https://CRAN.R-project.org/package=speedglm}

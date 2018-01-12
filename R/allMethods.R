@@ -31,7 +31,7 @@ summary.discretization <- function(object) {
 #' @keywords test, discretization, predict, prediction
 
 predict.discretization <- function(object, predictors) {
-     predict(object@best.disc[[1]],as.data.frame(discretize_link(object@best.disc[[2]],predictors)))
+     predict(object@best.disc[[1]],as.data.frame(discretize_cutp(object@parameters[[1]][object@parameters[[6]][[1]],],object@best.disc[[2]][["Disc.data"]],predictors)))
 }
 
 #' Pipe operator
@@ -249,9 +249,9 @@ methods::setGeneric("discretize", function(object,...) attributes(object))
 #' @description This defines the method "discretize" which will discretize a new input dataset given a discretization scheme of S4 class discretization.
 
 methods::setMethod("discretize", methods::signature(object="discretization"), function(object,data) {
-     if (substr(object@method.name,1,3)=="sem") {
-          discretize_link(object@best.disc[[2]],data)
-     } else {
-          discretize_cutp(data,object@best.disc[[2]]@Disc.data,object@parameters[[1]])
-     }
+     # if (substr(object@method.name,1,3)=="sem") {
+     #      discretize_link(object@best.disc[[2]],data)
+     # } else {
+     discretize_cutp(data,object@best.disc[[2]]@Disc.data,object@parameters[[1]][object@parameters[[6]][[1]],])
+     # }
 })

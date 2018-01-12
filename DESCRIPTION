@@ -2,8 +2,6 @@ Package: scoring
 Type: Package
 Title: Credit Scoring tools
 Version: 0.1
-Author@R: person("Adrien", "Ehrhardt", email = "adrien.ehrhardt@inria.fr",
-                  role = c("aut", "cre"))
 Author: Adrien Ehrhardt [aut, cre]
 Maintainer: Adrien Ehrhardt <adrien.ehrhardt@inria.fr>
 Description: This package aims at regroupping essential tools for credit scoring. These statistical tools may be useful for other use-cases as well but were primarly designed for it. First, there are Reject Inference methods' functions,
@@ -13,18 +11,18 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1.9000
 Imports:
+    glmdisc,
     discretization,
     sqldf,
-    mnlogit,
-    magrittr
+    magrittr,
+    methods
 Suggests:
     MASS,
     speedglm,
     knitr,
     rmarkdown,
     plotly,
-    pROC,
-    Rmixmod
+    pROC
 URL: https://adimajo.github.io
 BugReports: https://github.com/adimajo/scoring/issues
 VignetteBuilder: knitr
