@@ -14,7 +14,8 @@
 #' cuts = seq(0,1,length.out = 4)
 #' xd = as.numeric(cut(x,cuts))
 #'
-#' long_dataset <- data.frame(e = as.vector(sapply(xd,function(var) (seq(1:3)[seq(1:3)]==var))),x = as.vector(sapply(x[,1], function(var) rep(var,3))),
+#' long_dataset <- data.frame(e = as.vector(sapply(xd,function(var) (seq(1:3)[seq(1:3)]==var))),
+#' x = as.vector(sapply(x[,1], function(var) rep(var,3))),
 #' names = as.character(as.vector(rep(seq(1:3)[seq(1:3)],length(x)))),stringsAsFactors=FALSE)
 #' link <- mnlogit::mnlogit(e ~ 1 | x | 1, data=long_dataset, choiceVar = "names")
 #' discretize_link(link,as.data.frame(x))

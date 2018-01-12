@@ -56,6 +56,7 @@ mdlp_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gin
 
                } else {
                     logit = speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x)(length(unique(x))>1),as.data.frame(sapply(disc$Disc.data,as.factor))))
+                    methods::setIs(class(logit), "glmORlogicalORspeedglm")
                }
 
                if (test==TRUE) {
@@ -91,7 +92,14 @@ mdlp_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gin
 
                }
 
-               return(methods::new(Class = "discretization", method.name = "mdlp", parameters = list(test,validation,criterion), best.disc = best.disc, performance = list(performance)))
+
+               if (test==TRUE) {
+                    return(methods::new(Class = "discretization", method.name = "mdlp", parameters = list(predictors,test,validation,criterion), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_link(best.disc[[2]],predictors[ensemble[[3]],]),labels[ensemble[[3]]])), cont.data = data.frame(cbind(predictors[ensemble[[3]],],labels[ensemble[[3]]]))))
+               } else if (validation==TRUE) {
+                    return(methods::new(Class = "discretization", method.name = "mdlp", parameters = list(predictors,test,validation,criterion), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_link(best.disc[[2]],predictors[ensemble[[2]],]),labels[ensemble[[2]]])), cont.data = data.frame(cbind(predictors[ensemble[[2]],],labels[ensemble[[2]]]))))
+               } else {
+                    return(methods::new(Class = "discretization", method.name = "mdlp", parameters = list(predictors,test,validation,criterion), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_link(best.disc[[2]],predictors[ensemble[[1]],]),labels[ensemble[[1]]])), cont.data = data.frame(cbind(predictors[ensemble[[1]],],labels[ensemble[[1]]]))))
+               }
 
 
           }

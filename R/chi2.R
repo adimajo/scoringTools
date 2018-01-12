@@ -51,6 +51,8 @@ chi2_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gin
 
                     } else {
                          logit[[i]] = speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x)(length(unique(x))>1),as.data.frame(sapply(disc[[i]]$Disc.data,as.factor))))
+                         methods::setIs(class(logit[[i]]), "glmORlogicalORspeedglm")
+
                     }
 
                     if (test==TRUE) {
@@ -62,9 +64,6 @@ chi2_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gin
                          if (criterion=='gini') ginidisc[[i]] = normalizedGini(labels[ensemble[[1]]],logit[[i]]$fitted.values) else aicdisc[[i]] = logit[[i]]$aic
                     }
                }
-
-
-               # setClass("chi2_disc", representation(method.name = "character", parameters = "list", reglog = "list", best.disc = "list", performance = "numeric"))
 
                if (test==TRUE) {
                     if (criterion=="gini") {
@@ -91,8 +90,13 @@ chi2_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gin
 
                }
 
-               # return(new(Class = "chi2_disc", method.name = "chi2", parameters = list(test,validation,criterion,param), reglog = logit, best.disc = best.disc, performance = performance))
-               return(list(method.name = "chi2", parameters = list(test,validation,criterion,param), reglog = logit, best.disc = best.disc, performance = performance))
+               if (test==TRUE) {
+                    return(methods::new(Class = "discretization", method.name = "chi2", parameters = list(predictors,test,validation,criterion,param), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_link(best.disc[[2]],predictors[ensemble[[3]],]),labels[ensemble[[3]]])), cont.data = data.frame(cbind(predictors[ensemble[[3]],],labels[ensemble[[3]]]))))
+               } else if (validation==TRUE) {
+                    return(methods::new(Class = "discretization", method.name = "chi2", parameters = list(predictors,test,validation,criterion,param), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_link(best.disc[[2]],predictors[ensemble[[2]],]),labels[ensemble[[2]]])), cont.data = data.frame(cbind(predictors[ensemble[[2]],],labels[ensemble[[2]]]))))
+               } else {
+                    return(methods::new(Class = "discretization", method.name = "chi2", parameters = list(predictors,test,validation,criterion,param), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_link(best.disc[[2]],predictors[ensemble[[1]],]),labels[ensemble[[1]]])), cont.data = data.frame(cbind(predictors[ensemble[[1]],],labels[ensemble[[1]]]))))
+               }
 
           }
           else {

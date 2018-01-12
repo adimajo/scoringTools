@@ -62,9 +62,11 @@ chiM_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gin
 
                     } else {
                          logit[[i]] = speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x)(length(unique(x))>1),as.data.frame(sapply(disc[[i]]$Disc.data,as.factor))))
+                         methods::setIs(class(logit[[i]]), "glmORlogicalORspeedglm")
+
                     }
 
-                    if (test==TRUE) {
+                    if (validation==TRUE) {
                          data_test = as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[2]],],disc[[i]][["Disc.data"]],predictors[ensemble[[1]],])),as.factor))
                          if (criterion=='gini') ginidisc[[i]] = normalizedGini(labels[ensemble[[2]]],predict(logit[[i]],data_test,type="response")) else aicdisc[[i]] = logit[[i]]$aic
                     } else {
@@ -73,32 +75,37 @@ chiM_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gin
                }
 
 
-               if (test==TRUE) {
+               if (validation==TRUE) {
                     if (criterion=="gini") {
                          best.disc = list(logit[[which.min(ginidisc)]],disc[[which.min(ginidisc)]],which.min(ginidisc))
-                         if (validation==TRUE) {
+                         if (test==TRUE) {
                               data_validation = as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[3]],],disc[[i]][["Disc.data"]],predictors[ensemble[[1]],])),as.factor))
                               performance = normalizedGini(labels[ensemble[[3]]],predict(best.disc[[1]],data_validation,type="response"))
                          } else performance = normalizedGini(labels[ensemble[[2]]],predict(best.disc[[1]],data_test,type="response"))
                     } else {
                          best.disc = list(logit[[which.min(aicdisc)]],disc[[which.min(aicdisc)]],which.min(aicdisc))
-                         if (validation==TRUE) performance = 0 else performance = 0
+                         if (test==TRUE) performance = 0 else performance = 0
                     }
                } else {
                     if (criterion=="gini") {
                          best.disc = list(logit[[which.min(ginidisc)]],disc[[which.min(ginidisc)]],which.min(ginidisc))
-                         if (validation==TRUE) {
+                         if (test==TRUE) {
                               data_validation = as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[3]],],disc[[i]][["Disc.data"]],predictors[ensemble[[1]],])),as.factor))
                               performance = normalizedGini(labels[ensemble[[3]]],predict(best.disc[[1]],data_validation,type="response"))
                          } else performance = normalizedGini(labels[ensemble[[1]]],best.disc[[1]]$fitted.values)
                     } else {
                          best.disc = list(logit[[which.min(aicdisc)]],disc[[which.min(aicdisc)]],which.min(aicdisc))
-                         if (validation==TRUE) performance = 0 else performance = best.disc[[1]]$aic
+                         if (test==TRUE) performance = 0 else performance = best.disc[[1]]$aic
                     }
                }
 
-               return(methods::new(Class = "discretization", method.name = "chiM", parameters = list(test,validation,criterion,param), best.disc = best.disc, performance = list(performance)))
-
+               if (test==TRUE) {
+                    return(methods::new(Class = "discretization", method.name = "chiM", parameters = list(predictors,test,validation,criterion,param), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_link(best.disc[[2]],predictors[ensemble[[3]],]),labels[ensemble[[3]]])), cont.data = data.frame(cbind(predictors[ensemble[[3]],],labels[ensemble[[3]]]))))
+               } else if (validation==TRUE) {
+                    return(methods::new(Class = "discretization", method.name = "chiM", parameters = list(predictors,test,validation,criterion,param), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_link(best.disc[[2]],predictors[ensemble[[2]],]),labels[ensemble[[2]]])), cont.data = data.frame(cbind(predictors[ensemble[[2]],],labels[ensemble[[2]]]))))
+               } else {
+                    return(methods::new(Class = "discretization", method.name = "chiM", parameters = list(predictors,test,validation,criterion,param), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_link(best.disc[[2]],predictors[ensemble[[1]],]),labels[ensemble[[1]]])), cont.data = data.frame(cbind(predictors[ensemble[[1]],],labels[ensemble[[1]]]))))
+               }
 
           }
           else {

@@ -38,6 +38,7 @@ parcelling <- function(xf,xnf,yf, probs = seq(0, 1, 0.25), alpha = rep(1,length(
           model_f <- stats::glm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
      } else {
           model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
+          methods::setIs(class(model_f), "glmORlogicalORspeedglm")
      }
 
      df <- rbind(df_f, data.frame(labels = rep(NA,nrow(xnf)), x = xnf))
@@ -73,8 +74,9 @@ parcelling <- function(xf,xnf,yf, probs = seq(0, 1, 0.25), alpha = rep(1,length(
           model_parcelling = stats::glm(labels ~ ., family = stats::binomial(link='logit'), df_parceling[,-which(names(df_parceling) %in% c("poids_final","classe_SCORE","acc"))])
      } else {
           model_parcelling = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df_parceling[,-which(names(df_parceling) %in% c("poids_final","classe_SCORE","acc"))])
+          methods::setIs(class(model_parcelling), "glmORlogicalORspeedglm")
      }
 
-     return(methods::new(Class = "reject_infered", method_name = "parceling", financed_model = model_f, acceptance_model = NA, infered_model = model_parcelling))
+     return(methods::new(Class = "reject_infered", method_name = "parceling", financed_model = model_f, acceptance_model = as.logical(NA), infered_model = model_parcelling))
 
 }

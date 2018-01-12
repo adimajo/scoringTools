@@ -35,6 +35,7 @@ fuzzy_augmentation <- function(xf,xnf,yf) {
           model_f <- stats::glm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
      } else {
           model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
+          methods::setIs(class(model_f), "glmORlogicalORspeedglm")
      }
 
      df <- rbind(df_f, data.frame(labels = rep(NA,nrow(xnf)), x = xnf))
@@ -47,7 +48,8 @@ fuzzy_augmentation <- function(xf,xnf,yf) {
           model_fuzzy = stats::glm(labels ~ ., family = stats::binomial(link='logit'), df[,-which(names(df) %in% c("acc"))])
      } else {
           model_fuzzy = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df[,-which(names(df) %in% c("acc"))])
+          methods::setIs(class(model_fuzzy), "glmORlogicalORspeedglm")
      }
 
-     return(methods::new(Class = "reject_infered", method_name = "fuzzy_augmentation", financed_model = model_f, acceptance_model = NA, infered_model = model_fuzzy))
+     return(methods::new(Class = "reject_infered", method_name = "fuzzy_augmentation", financed_model = model_f, acceptance_model = as.logical(NA), infered_model = model_fuzzy))
 }
