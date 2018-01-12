@@ -26,13 +26,7 @@
 #' yf = rbinom(100,1,1/(1+exp(-log_odd)))
 #' # We simulate data from not financed clients (MCAR mechanism)
 #' xnf = matrix(runif(100*2), nrow = 100, ncol = 2)
-#' list_models <- twins(xf,xnf,yf)
-#' # This is the model constructed using the financed clients (xf,yf):
-#' list_models[1]
-#' # This is the model on the acceptance process:
-#' list_models[2]
-#' # This is the model constructed using the twins method:
-#' list_models[3]
+#' twins(xf,xnf,yf)
 
 twins <- function(xf,xnf,yf) {
      df_f <- data.frame(labels = yf, x = xf)
@@ -41,7 +35,10 @@ twins <- function(xf,xnf,yf) {
           model_f <- stats::glm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
      } else {
           model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
-          methods::setIs(class(model_f), "glmORlogicalORspeedglm")
+          # methods::setOldClass(class(model_f)[1])
+          # methods::setOldClass(class(model_f)[2])
+          # methods::setIs(class(model_f)[1], "glmORlogicalORspeedglm")
+          # methods::setIs(class(model_f)[2], "glmORlogicalORspeedglm")
      }
      df <- rbind(df_f, data.frame(labels = rep(NA,nrow(xnf)), x = xnf))
      df$acc[1:nrow(df_f)] <- 1
@@ -51,7 +48,7 @@ twins <- function(xf,xnf,yf) {
           model_acc <- stats::glm(acc ~ ., family = stats::binomial(link='logit'), df[,-which(names(df) %in% c("labels"))])
      } else {
           model_acc <- speedglm::speedglm(acc ~ ., family = stats::binomial(link='logit'), df[,-which(names(df) %in% c("labels"))])
-          methods::setIs(class(model_acc), "glmORlogicalORspeedglm")
+          # methods::setIs(class(model_acc), "glmORlogicalORspeedglm")
      }
      df$score_acc <- predict(model_acc,df)
      df$score_def <- predict(model_f,df)
@@ -59,7 +56,7 @@ twins <- function(xf,xnf,yf) {
           model_twins = stats::glm(labels ~ score_acc + score_def, family = stats::binomial(link='logit'), df[df$acc==1,-which(names(df) %in% c("acc"))])
      } else {
           model_twins = speedglm::speedglm(labels ~ score_acc + score_def, family = stats::binomial(link='logit'), df[df$acc==1,-which(names(df) %in% c("acc"))])
-          methods::setIs(class(model_twins), "glmORlogicalORspeedglm")
+          # methods::setIs(class(model_twins), "glmORlogicalORspeedglm")
      }
      # return(list(financed.model = model_f, acceptation.model = model_acc, twins.model = model_twins))
      return(methods::new(Class = "reject_infered", method_name = "twins", financed_model = model_f, acceptance_model = model_acc, infered_model = model_twins))
