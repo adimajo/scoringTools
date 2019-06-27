@@ -41,6 +41,7 @@ twins <- function(xf,xnf,yf) {
           # methods::setIs(class(model_f)[2], "glmORlogicalORspeedglm")
      }
      df <- rbind(df_f, data.frame(labels = rep(NA,nrow(xnf)), x = xnf))
+     df$acc = NA
      df$acc[1:nrow(df_f)] <- 1
      df$acc[(nrow(df_f)+1):nrow(df)] <- 0
 

@@ -1,5 +1,5 @@
 ---
-title: "Credit Scoring Tools: the ... package"
+title: "Credit Scoring Tools: the scoringTools package"
 author: "Adrien Ehrhardt"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -27,16 +27,16 @@ knitr::kable(data.frame(Job=c("Craftsman","Technician","Executive","Office emplo
 
 ## Formulation
 
-The variable to predict, here denoted by \emph{Default}, is an active research field and we will not discuss it here. We suppose we already have a binary random variable $Y$ from which we have $n$ observations $\textbf{y} = (y_i)_1^n$.
+The variable to predict, here denoted by \emph{Default}, is an active research field and we will not discuss it here. We suppose we already have a binary random variable $Y$ from which we have $n$ observations $\mathbf{y} = (y_i)_1^n$.
 
-The $d$ predictive features, here for example the job, habitation situation, etc., are usually socio-demographic features asked by the financial institutions at the time of application. They are denoted by the random vector ${X} = (X^j)_1^d$ and as for $Y$ we have $n$ observations $\textbf{x}=(x_i)_1^n$.
+The $d$ predictive features, here for example the job, habitation situation, etc., are usually socio-demographic features asked by the financial institutions at the time of application. They are denoted by the random vector $\boldsymbol{X} = (X_j)_1^d$ and as for $Y$ we have $n$ observations $\mathbf{x}=(x_i)_1^n$.
 
-We suppose that observations $(\textbf{x},\textbf{y})$ come from an unknown distribution $p(x,y)$ which is not directly of interest. Our interest lies in the conditional probability of a client with characteristics $x$ of paying back his loan, i.e. $p(y|x)$, also unknown.
+We suppose that observations $(\mathbf{x},\mathbf{y})$ come from an unknown distribution $p(x,y)$ which is not directly of interest. Our interest lies in the conditional probability of a client with characteristics $\boldsymbol{x}$ of paying back his loan, i.e. $p(y|\boldsymbol{x})$, also unknown.
 
-In the context of Credit Scoring, we historically stick to logistic regression, for various reasons out of the scope of this vignette. The logistic regression model assumes the following relation between $X$ (supposed continuous here) and $Y$:
-$$\ln \left( \frac{p_\theta(Y=1|x)}{p_\theta(Y=0|x)} \right) = \theta_0 + \sum_{j=1}^d \theta_j*x^j  $$
+In the context of Credit Scoring, we historically stick to logistic regression, for various reasons out of the scope of this vignette. The logistic regression model assumes the following relation between $\boldsymbol{X}$ (supposed continuous here) and $Y$:
+$$\ln \left( \frac{p_{\boldsymbol{\theta}}(Y=1|\boldsymbol{x})}{p_{\boldsymbol{\theta}}(Y=0|\boldsymbol{x})} \right) = (1, \boldsymbol{x})'{\boldsymbol{\theta}}$$
 
-We would like to have the ‘‘best'' model compared to the true $p(y|x)$ from which we only have samples. Had we access to the true underlying model, we would like to minimize, w.r.t. $\theta$, $H_\theta = \mathbb(E)^{X,Y}[\ln(p_\theta(Y|X))]$. Since this is not possible, we approximate this criterion by maximizing, w.r.t. $\theta$, the likelihood $\ell(\theta;\textbf{x},\textbf{y}) = \sum_{i=1}^n \ln(p_\theta(y_i|x_i))$.
+We would like to have the ‘‘best'' model compared to the true $p(y|\boldsymbol{x})$ from which we only have samples. Had we access to the true underlying model, we would like to minimize, w.r.t. ${\boldsymbol{\theta}}$, $H_{\boldsymbol{\theta}} = \mathbb(E)_{(X,Y) \sim p}[\ln(p_{\boldsymbol{\theta}}(Y|\boldsymbol{X}))]$. Since this is not possible, we approximate this criterion by maximizing, w.r.t. $\theta$, the likelihood $\ell({\boldsymbol{\theta}};\mathbf{x},\mathbf{y}) = \sum_{i=1}^n \ln(p_{\boldsymbol{\theta}}(y_i|\boldsymbol{x}_i))$.
 
 In R, this is done by fitting a \code{glm} model to the data:
 
@@ -60,17 +60,19 @@ From this, it seems that Credit Scoring is pretty straightforward when the data 
 
 Nevertheless, there are a few theoretical limitations of the current approach, e.g.:
 
-* We don't observe rejected applicants's performance, i.e. we don't have observations $y_i$ for previously rejected applicants;
-* The performance variable $Y$ must be constructed using historical data but we can't wait for all current contracts to end, that's why financial institutions usually consider a defaulting client to be someone failing to pay two consecutive installments;
-* Credit risk modelers often ‘‘discretize'' the input data $X$, that is to say continuous variables are transformed into categorical variables corresponding to intervals of the support of $X$ and categorical variables might see their values regrouped to form a categorical variable with less values (but whose coefficients are ‘‘easier'' to estimate). Up to now, there was no theoretical grounds to do so and no uniformly better method;
-* Credit risk modelers have always sticked to logistic regression without knowing whether it is somewhat ‘‘close'' to the true underlying model.
+- We don't observe rejected applicants's performance, i.e. we don't have observations $y_i$ for previously rejected applicants;
+- The performance variable $Y$ must be constructed using historical data but we can't wait for all current contracts to end, that's why financial institutions usually consider a defaulting client to be someone failing to pay two consecutive installments;
+- Credit risk modelers often ‘‘discretize'' the input data $\boldsymbol{X}$, that is to say continuous variables are transformed into categorical variables corresponding to intervals of the support of $\boldsymbol{X}$ and categorical variables might see their values regrouped to form a categorical variable with less values (but whose coefficients are ‘‘easier'' to estimate). Up to now, there was no theoretical grounds to do so and no uniformly better method;
+- Credit risk modelers have always sticked to logistic regression without knowing whether it is somewhat ‘‘close'' to the true underlying model.
 
 ## Problems tackled in this package
 
-At the time of this writing, two problems have been tackled so far in the Credit Scoring framework:
+At the time of this writing, four problems have been tackled so far in the Credit Scoring framework:
 
 1. Reject Inference,
-2. ‘‘Discretization'' of continuous and qualitative features.
+2. ‘‘Quantization'' of continuous (discretization) and qualitative (grouping) features,
+3. Interactions among covariates,
+4. ‘‘Segmentation'' of clients into subpopulations with different scorecards: logistic regression trees.
 
 Findings from these two subjects have been formalized in two preprints articles, and respectively.
 
@@ -84,17 +86,17 @@ This package is about these two subjects on which we'll go deeper in the next tw
 
 From all applicants who get a Credit Score, there are three interesting sub-populations: the financed clients, who were granted a loan, the rejected applicants, who were rejected either by business rules (e.g. over-indebtedness) or because of a low Credit Score, and the not-taking up applicants who were offered a loan but decided not to take it (e.g. they don't need it anymore or they went to a competitor).
 
-Obviously, the performance variable $Y$ is observed only for financed clients so that we have $n$ observations of financed clients $(x_i,y_i)_1^n$ and $m$ observations of not financed clients for who we only have the characteristics $(x_i)_1^m$.
+Obviously, the performance variable $Y$ is observed only for financed clients so that we have $n$ observations of financed clients $(\boldsymbol{x}_i,y_i)_1^n$ and $n'$ observations of not financed clients for who we only have the characteristics $(\boldsymbol{x}_i)_1^{n'}$.
 
 ### Mathematical formulation
 
-Strictly speaking, we have observations from $p(x,y,Z=f)$ and by fitting a logistic regression to this data, we subsequently estimate $p(y|x,Z=f)$ which is quite ‘‘different'' from $p(y|x)$. Since the Credit Score is to be applied to the whole population to decide whether to accept/reject clients, it seems that this can lead to a biased model, even asymptotically.
+Strictly speaking, we have observations from $p(\boldsymbol{x},y,Z=f)$ and by fitting a logistic regression to this data, we subsequently estimate $p(y|\boldsymbol{x},Z=f)$ which is quite ‘‘different'' from $p(y|\boldsymbol{x})$. Since the Credit Score is to be applied to the whole population to decide whether to accept/reject clients, it seems that this can lead to a biased model, even asymptotically.
 
 There are three important keys to understand if the resulting model is biased:
 
-* Is the model local or global, i.e. does it compute $p(y|x)$ directly or does it have to model $p(x,y)$ and then deduce $p(y|x)$ in which case it is necessarily biased?
-* Is the model ‘‘true'', i.e. is there any $\theta$ such that $p(y|x) = p_\theta(y|x)$?
-* What is the missingness mechanism? Following Rubin's definition it can be MCAR (missingness of $y$ is indepedent of any variable), MAR (missingness of $y$ only depends on $x$) or MNAR (there are unobserved variables that determine $y$'s missingness).
+- Is the model local or global, i.e. does it compute $p(y|\boldsymbol{x})$ directly or does it have to model $p(\boldsymbol{x},y)$ and then deduce $p(y|\boldsymbol{x})$ in which case it is necessarily biased?
+- Is the model ‘‘true'', i.e. is there any $\boldsymbol{\theta}$ such that $p(y|\boldsymbol{x}) = p_{\boldsymbol{\theta}}(y|\boldsymbol{x})$?
+- What is the missingness mechanism? Following Rubin's definition it can be MCAR (missingness of $y$ is indepedent of any variable), MAR (missingness of $y$ only depends on $\boldsymbol{x}$) or MNAR (there are unobserved variables that determine $y$'s missingness).
 
 ## Theoretical findings
 
@@ -106,9 +108,9 @@ In short, using only financed clients' characteristics to learn a logistic regre
 # plot(augmentation_model)
 ```
 
-When the missingness mechanism is MNAR, $p(y|x,f) \neq p(y|x,nf)$ so that there is no way to ‘‘unbias'' the resulting model without introducing data from the financing mechanism and model $p(f|x,y)$.
+When the missingness mechanism is MNAR, $p(y|\boldsymbol{x},f) \neq p(y|\boldsymbol{x},nf)$ so that there is no way to ‘‘unbias'' the resulting model without introducing data from the financing mechanism and model $p(f|\boldsymbol{x},y)$.
 
-When the model is false, we could make use of not financed clients to estimate $p(f|x)$ and consider this as an importance function in the Importance Sampling framework. However, this gives good results when the importance function is known and under probabilistic assumptions not met in our use case. Here it must be evaluated separately and simulations show that this estimation process also introduces bias and variance and subsequently does not improve upon the financed clients' model. 
+When the model is false, we could make use of not financed clients to estimate $p(f|\boldsymbol{x})$ and consider this as an importance function in the Importance Sampling framework. However, this gives good results when the importance function is known and under probabilistic assumptions not met in our use case. Here it must be evaluated separately and simulations show that this estimation process also introduces bias and variance and subsequently does not improve upon the financed clients' model. 
 
 ## Reject Inference methods
 
@@ -145,10 +147,10 @@ The fifth method is Twins as described in the Appendix of .
 
 Each of these functions output an S4 object named ‘‘reject_infered''. This object has slots:
 
-* method: the Reject Inference method used;
-* financed_model: the logistic regression using only financed clients' characteristics;
-* acceptance_model: the logistic regression modeling the financing decision (empty for all methods except Augmentation and Twins);
-* infered_model: the logistic regression obtained using a given reject inference technique.
+- method: the Reject Inference method used;
+- financed_model: the logistic regression using only financed clients' characteristics;
+- acceptance_model: the logistic regression modeling the financing decision (empty for all methods except Augmentation and Twins);
+- infered_model: the logistic regression obtained using a given reject inference technique.
 
 ```{r, echo=FALSE, results='asis'}
 # augmentation_model@method
@@ -192,24 +194,24 @@ The plot method allows the modeler to compare each coefficient's values in the f
 # plot(augmentation_model)
 ```
 
-# Discretization
+# Quantization
 
 ## Context
 
-Under the term ‘‘discretization'', we refer to the process of transforming a continuous feature into a categorical feature which values uniquely correspond to intervals of the continuous feature and to the process of regrouping values of categorical feature.
+Under the term ‘‘quantization'', we refer to the process of transforming a continuous feature into a categorical feature which values uniquely correspond to intervals of the continuous feature and to the process of regrouping values of categorical feature.
 
 There are a few advantages to discretizing the input features:
 
-* Interpretability: the logistic regression becomes a simple addition;
-* Usability in other areas: we can address subgroups by focusing on one or several values of a given discretized feature;
-* Outliers have less influence in model fitting because they are regrouped in the first (or last) value of the discretized feature;
-* Non-linearity of the continuous value w.r.t. the log odd ratio: the real log odd ratio of each feature (all else equal) is considered linear in the logistic regression equation which might not be true. By discretizing each feature, we approximate ‘‘par morceau''.
+- Interpretability: the logistic regression becomes a simple addition;
+- Usability in other areas: we can address subgroups by focusing on one or several values of a given discretized feature;
+- Outliers have less influence in model fitting because they are regrouped in the first (or last) value of the discretized feature;
+- Non-linearity of the continuous value w.r.t. the log odd ratio: the real log odd ratio of each feature (all else equal) is considered linear in the logistic regression equation which might not be true. By discretizing each feature, we perform stepwise approximation.
 
 There are a few drawbacks as well:
 
-* Pre-processing task that can be costly in both human and computation time;
-* Loss in predictive power if continuous model is closer to the true model;
-* Harder to estimate each coefficient as there are more coefficients and subsequently less data to estimate each of them.
+- Pre-processing task that can be costly in both human and computation time;
+- Loss in predictive power if continuous model is closer to the true model;
+- Harder to estimate each coefficient as there are more coefficients and subsequently less data to estimate each of them.
 
 These advantages and drawbacks are explained in-depth in .
 
@@ -219,9 +221,9 @@ Despite its limitations, CA CF decided to go on developping their scorecards by 
 
 ### Model 
 
-We consider a random vector $X=(X^1,X^d)$ where $X^j$ can be either continuous or qualitative (with $o_j$ distinct values). We denote $E=(E^1,E^d)$ the discretized random vector where $E^j$ is the discretization of $X^j$, i.e. qualitative with $m_j$ values corresponding either to unique intervals of $X^j$ (continuous case) or to unique regroupments of $X^j$'s $o_j$ values (which implies $m_j \leq o_j$).
+We consider a random vector $\boldsymbol{X}=(X_1,X_d)$ where $X_j$ can be either continuous or qualitative (with $o_j$ distinct values). We denote by $\boldsymbol{\mathfrak{q}}=(\mathfrak{q}_1,\mathfrak{q}_d)$ the quantized random vector where $\mathfrak{q}_j$ is the quantization of $X_j$, i.e. qualitative with $m_j$ values corresponding either to unique intervals of $X_j$ (continuous case) or to unique regroupments of $X_j$'s $o_j$ values (which implies $m_j \leq o_j$).
 
-We suppose that by discretizing features $X$, we preserve all information about the target feature, i.e. $p(y|x,e) = p(y|e)$.
+We suppose that by quantizing features $\boldsymbol{X}$, we preserve all information about the target feature, i.e. $p(y|\boldsymbol{x},\boldsymbol{\mathfrak{q}}) = p(y|\boldsymbol{\mathfrak{q}})$.
 
 ### Hard optimization problem
 
@@ -229,15 +231,15 @@ Although this process seems straightforward, it is a rather complicated optimiza
 
 ### Choosing the ‘‘right'' model: which criterion?
 
-The task is to find the optimal logistic regression $p_\theta(y|e)$ where $e$ is unknown and must be chosen in a set \textbf{E} very large as said in the previous section. So the model selection problem can be expressed in terms of classical criteria, e.g. AIC, BIC, \ldots where \Theta and \textbf{E} have to be scanned.
+The task is to find the optimal logistic regression $p_{\boldsymbol{\theta}}(y|\boldsymbol{\mathfrak{q}})$ where $\boldsymbol{\mathfrak{q}}$ is unknown and must be chosen in a set $\mathbf{\mathfrak{Q}}_{\boldsymbol{m}}$ very large as said in the previous section. So the model selection problem can be expressed in terms of classical criteria, e.g. AIC, BIC, \ldots where \Theta and $\mathbf{\mathfrak{Q}}_{\boldsymbol{m}}$ have to be scanned:
 
-$$ (\hat{theta}, \hat{e}) = \arg \max_{(\theta,e)} AIC(p_\theta(y|e))$$
+$$ (\hat{\boldsymbol{\theta}}, \hat{\boldsymbol{\mathfrak{q}}}) = \arg \max_{(\boldsymbol{\theta},\boldsymbol{\mathfrak{q}})} AIC(p_{\boldsymbol{\theta}}(\mathbf{y}|\mathbf{\mathfrak{q}})).$$
 
 ### The need for generating ‘‘clever'' candidates
 
-The criterion developed in the previous part cannot be optimized directly because the set \textbf{E} of candidate discretizations is too large. The idea behind most existing supervised discretization method is to generate potentially ‘‘good'' candidates (although most methods don't depend on the predictive algorithm to be applied after discretization).
+The criterion developed in the previous part cannot be optimized directly because the set $\mathbf{\mathfrak{Q}}_{\boldsymbol{m}}$ of candidate discretizations is too large. The idea behind most existing supervised discretization method is to generate potentially ‘‘good'' candidates (although most methods don't depend on the predictive algorithm to be applied after discretization).
 
-By doing so, we reduce elements of \textbf{E} to the generated candidates which is a considerably smaller set, with most existing methods outputing only one discretization scheme. We go through a few of them in the next section.
+By doing so, we reduce elements of $\mathbf{\mathfrak{Q}}_{\boldsymbol{m}}$ to the generated candidates which is a considerably smaller set, with most existing methods outputing only one discretization scheme. We go through a few of them in the next section.
 
 ## Existing methods
 
@@ -268,13 +270,13 @@ We proposed a discretization algorithm that meets these criteria and naturally .
 
 In short, the algorithm considers the discretized features $E$ as latent variables which we will generate from its estimated a posteriori density function as part of an SEM-algorithm (see ). The algorithm alternates between:
 
-1. Fitting a logistic regression between $E$ and $Y$;
-2. Fitting polytomous logistic regression functions between each pair of $(X^j,E^j)$;
-3. Generate new discretized features $E$ by sampling them, as $p(e^j|e^{-j},x,y) \prop p(e^j|x^j) p(y|e)$.
+1. Fitting a logistic regression between $\boldsymbol{\mathfrak{q}}$ and $y$;
+2. Fitting polytomous logistic regression functions between each pair of $(x_j,\mathfrak{q}_j)$;
+3. Generate new discretized features $E$ by sampling them, as $p(\mathfrak{q}_j|\mathfrak{q}_{-\{j\}},\boldsymbol{x},y) \propto p(\mathfrak{q}_j|x_j) p(y|\boldsymbol{\mathfrak{q}})$.
 
 ### Implementation
 
-#### The SEM_discretization function
+#### The glmdisc function
 
 
 ```{r, echo=FALSE, results='asis'}
@@ -324,9 +326,9 @@ The predict method
 
 The plot method is associated with ‘‘types'':
 
-* ‘‘default'': same method as plotting the resulting best \code{glm} method;
-* ‘‘discretization'': plots each feature's discretization scheme;
-* ‘‘all'': produces all plots on the same frame.
+- ‘‘default'': same method as plotting the resulting best \code{glm} method;
+- ‘‘discretization'': plots each feature's discretization scheme;
+- ‘‘all'': produces all plots on the same frame.
 
 ```{r, echo=FALSE, results='asis'}
 # plot(sem_disc,type="discretization"")
@@ -344,23 +346,3 @@ The figure sizes have been customised so that you can easily put two images side
 plot(1:10)
 plot(10:1)
 ```
-
-You can enable figure captions by `fig_caption: yes` in YAML:
-
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
-```
-
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither."

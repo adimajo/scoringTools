@@ -48,6 +48,7 @@ parcelling <- function(xf,xnf,yf, probs = seq(0, 1, 0.25), alpha = rep(1,length(
      classe_SCORE <- stats::quantile(predict(model_f,df_f,type="response"), probs = probs)
      df_f$classe_SCORE <- cut(predict(model_f,df_f,type="response"), breaks = c(classe_SCORE[2:(length(classe_SCORE)-1)],Inf,-Inf), labels = names(classe_SCORE[-1]))
      df$classe_SCORE <- cut(predict(model_f,df,type="response"), breaks = c(classe_SCORE[2:(length(classe_SCORE)-1)],Inf,-Inf), labels = names(classe_SCORE[-1]))
+     df$acc = NA
      df$acc[1:nrow(df_f)] <- 1
      df$acc[(nrow(df_f)+1):nrow(df)] <- 0
 

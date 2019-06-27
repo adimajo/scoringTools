@@ -44,6 +44,7 @@ augmentation <- function(xf, xnf, yf) {
      df <- rbind(df_f, data.frame(labels = rep(NA,nrow(xnf)), x = xnf))
      df_f$classe_SCORE <- round(predict(model_f,df_f,type="response"), digits=1)
      df$classe_SCORE <- round(predict(model_f,df,type="response"), digits=1)
+     df$acc = NA
      df$acc[1:nrow(df_f)] <- 1
      df$acc[(nrow(df_f)+1):nrow(df)] <- 0
 
