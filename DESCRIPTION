@@ -13,6 +13,7 @@ LazyData: true
 RoxygenNote: 6.1.1
 Imports:
     glmdisc,
+    glmtree,
     discretization,
     sqldf,
     magrittr,
@@ -23,7 +24,8 @@ Suggests:
     knitr,
     rmarkdown,
     plotly,
-    pROC
+    pROC,
+    shiny
 URL: https://adimajo.github.io
 BugReports: https://github.com/adimajo/scoringTools/issues
 VignetteBuilder: knitr

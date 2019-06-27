@@ -40,7 +40,7 @@ We would like to have the ‘‘best'' model compared to the true $p(y|\boldsymb
 
 In R, this is done by fitting a \code{glm} model to the data:
 
-```{r, echo=FALSE, results='asis'}
+```{r, results='asis'}
 # scoring_model <- glm()
 ```
 
