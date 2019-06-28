@@ -40,18 +40,19 @@ We would like to have the ‘‘best'' model compared to the true $p(y|\boldsymb
 
 In R, this is done by fitting a \code{glm} model to the data:
 
-```{r, results='asis'}
-# scoring_model <- glm()
+```{r}
+library(scoringTools)
+scoring_model <- glm(Default ~ ., data = lendingClub, family = binomial(link = "logit"))
 ```
 
-We can now focus on the regression coefficients $\theta$:
+We can now focus on the regression coefficients $\boldsymbol{\theta}$:
 ```{r, echo=FALSE, results='asis'}
-# scoring_model$coefficients
+scoring_model$coefficients
 ```
 
-and the log-likelihood value at this estimation of $\theta$:
+and the deviance at this estimation of $\boldsymbol{\theta}$:
 ```{r, echo=FALSE, results='asis'}
-# scoring_model$LogLik
+scoring_model$deviance
 ```
 
 From this, it seems that Credit Scoring is pretty straightforward when the data is at hand.
@@ -100,12 +101,63 @@ There are three important keys to understand if the resulting model is biased:
 
 ## Theoretical findings
 
-Our theoretical findings on this subject is extensively discussed in .
+Our theoretical findings on this subject is discussed in [Ehrhardt et al. (2017)](https://arxiv.org/abs/1903.10855).
 
 In short, using only financed clients' characteristics to learn a logistic regression model is asymptotically correct when the missingness mechanism is MAR and the model is true. We can easily show this by simulating data:
 
 ```{r, fig.show='hold'}
-# plot(augmentation_model)
+data_cont_simu <- function(n,d,k) {
+    set.seed(k)
+    x = matrix(runif(n*d), nrow = n, ncol = d)
+    theta = c(1,-1)
+    log_odd = x %*% theta
+    
+    y = rbinom(n,1,1/(1+exp(-log_odd)))
+    
+    return(list(x,y))
+}
+
+if (require(ggplot2, quietly = TRUE)) {
+
+     data = data_cont_simu(100,2,1)
+     x = data[[1]]
+     y = data[[2]]
+     df = data.frame(x = x, y = y)
+     ggplot(df, aes(x = x.1, y = x.2, colour = factor(y))) +
+         geom_point()
+     
+     data = data_cont_simu(1000,2,1)
+     x = data[[1]]
+     y = data[[2]]
+     df = data.frame(x = x, y = y)
+     hat_theta = glm(y ~ . -1, data = df, family = binomial(link = "logit"))
+     df$decision = factor(ifelse(predict(hat_theta, df, type="response")>0.7, "reject", "accept"))
+     ggplot(df, aes(x = x.1, y = x.2, colour = decision)) +
+         geom_point()
+
+     theta_1 = matrix(NA, ncol = 1, nrow = 1000)
+     theta_2 = matrix(NA, ncol = 1, nrow = 1000)
+     theta_1_f = matrix(NA, ncol = 1, nrow = 1000)
+     theta_2_f = matrix(NA, ncol = 1, nrow = 1000)
+     for (k in 1:1000) {
+         
+         data = data_cont_simu(1000,2,k)
+         x = data[[1]]
+         y = data[[2]]
+         df = data.frame(x = x, y = y)
+         hat_theta = glm(y ~ . -1, data = df, family = binomial(link = "logit"))
+         
+         theta_1[k] = hat_theta$coefficients[1]
+         theta_2[k] = hat_theta$coefficients[2]
+         
+         df$decision = factor(ifelse(predict(hat_theta, df, type="response")>0.6, "reject", "accept"))
+         hat_theta_f = glm(y ~ . -1, data = df[df$decision == "accept",-ncol(df)], family = binomial(link = "logit"))
+         
+         theta_1_f[k] = hat_theta_f$coefficients[1]
+         theta_2_f[k] = hat_theta_f$coefficients[2]
+     }
+     ggplot(data.frame(theta_1), aes(x=theta_1)) + geom_histogram() + geom_vline(xintercept = 1)
+}
 ```
 
 When the missingness mechanism is MNAR, $p(y|\boldsymbol{x},f) \neq p(y|\boldsymbol{x},nf)$ so that there is no way to ‘‘unbias'' the resulting model without introducing data from the financing mechanism and model $p(f|\boldsymbol{x},y)$.
@@ -120,29 +172,32 @@ To deal with the possible bias of fitting a logistic regression to the financed 
 
 In this package, we implemented Reject Inference methods which were described for example in and were supposed to enable credit risk modelers to use not-financed clients' characteristics in the logistic regression learning process. We demonstrated that these methods are not statistically grounded. We nevertheless implemented these methods to show these results numerically.
 
-The first method is Fuzzy Augmentation as described in the Appendix of .
+The first method is Fuzzy Augmentation as described in the Appendix of [my PhD thesis](https://github.com/adimajo/manuscrit_these).
 ```{r, echo=FALSE, results='asis'}
-# fuzzy_model <- fuzzy_augmentation(xf,xnf,yf)
+xf = as.matrix(df[df$decision == "accept", c("x.1", "x.2")])
+xnf = as.matrix(df[df$decision == "reject", c("x.1", "x.2")])
+yf = df[df$decision == "accept", "y"]
+hat_theta_fuzzy = fuzzy_augmentation(xf,xnf,yf)
 ```
 
-The second method is Reclassification as described in the Appendix of .
+The second method is Reclassification as described in the Appendix of [my PhD thesis](https://github.com/adimajo/manuscrit_these).
 ```{r, echo=FALSE, results='asis'}
-# reclassification_model <- reclassifcation(xf,xnf,yf)
+hat_theta_reclassification = reclassification(xf,xnf,yf)
 ```
 
-The third method is Augmentation as described in the Appendix of .
+The third method is Augmentation as described in the Appendix of [my PhD thesis](https://github.com/adimajo/manuscrit_these).
 ```{r, echo=FALSE, results='asis'}
-# augmentation_model <- augmentation(xf,xnf,yf)
+hat_theta_augmentation = augmentation(xf,xnf,yf)
 ```
 
-The fourth method is Parcelling as described in the Appendix of .
+The fourth method is Parcelling as described in the Appendix of [my PhD thesis](https://github.com/adimajo/manuscrit_these).
 ```{r, echo=FALSE, results='asis'}
-# parcelling_model <- parcelling(xf,xnf,yf,alpha)
+hat_theta_parcelling = parcelling(xf,xnf,yf)
 ```
 
-The fifth method is Twins as described in the Appendix of .
+The fifth method is Twins as described in the Appendix of [my PhD thesis](https://github.com/adimajo/manuscrit_these).
 ```{r, echo=FALSE, results='asis'}
-# twins_model <- twins(xf,xnf,yf)
+hat_theta_twins = twins(xf,xnf,yf)
 ```
 
 Each of these functions output an S4 object named ‘‘reject_infered''. This object has slots:
@@ -153,10 +208,10 @@ Each of these functions output an S4 object named ‘‘reject_infered''. This o
 - infered_model: the logistic regression obtained using a given reject inference technique.
 
 ```{r, echo=FALSE, results='asis'}
-# augmentation_model@method
-# parcelling_model@financed_model
-# twins_model@acceptance_model
-# reclassification_model@infered_model
+# hat_theta_augmentation@method
+hat_theta_reclassification@financed_model
+hat_theta_twins@acceptance_model
+hat_theta_fuzzy@infered_model
 ```
 
 ### Methods
@@ -167,31 +222,28 @@ To efficiently use the generated S4 objects of class ‘‘reject_infered'' seve
 
 The print method shows the method used and the coefficients of infered_model, much like you would get from printing a \code{glm} object:
 ```{r, echo=FALSE, results='asis'}
-# print(augmentation_model)
-# print(glm())
+print(hat_theta_reclassification)
 ```
 
 #### summary method
 
 The summary method shows the method used alongside the coefficients of the financed model, eventually the acceptance model and the infered model with AIC values, much like you would get from doing a summary on a \code{glm} object:
 ```{r, echo=FALSE, results='asis'}
-# summary(augmentation_model)
-# summary(glm())
+summary(hat_theta_reclassification)
 ```
 
 #### predict method
 
 The predict method corresponds to the glm predict method for the infered model:
 ```{r, echo=FALSE, results='asis'}
-# predict(augmentation_model)
-# predict(augmentation_model@infered_model)
+# predict(hat_theta_reclassification, xf)
 ```
 
 #### plot method
 
 The plot method allows the modeler to compare each coefficient's values in the financed model and the infered model.
 ```{r, fig.show='hold'}
-# plot(augmentation_model)
+# plot(hat_theta_reclassification)
 ```
 
 # Quantization
@@ -227,13 +279,13 @@ We suppose that by quantizing features $\boldsymbol{X}$, we preserve all informa
 
 ### Hard optimization problem
 
-Although this process seems straightforward, it is a rather complicated optimization problem in terms of 
+Although this process seems straightforward, it is a rather complicated optimization problem in terms of combinatorics and estimation (being a discrete problem).
 
 ### Choosing the ‘‘right'' model: which criterion?
 
 The task is to find the optimal logistic regression $p_{\boldsymbol{\theta}}(y|\boldsymbol{\mathfrak{q}})$ where $\boldsymbol{\mathfrak{q}}$ is unknown and must be chosen in a set $\mathbf{\mathfrak{Q}}_{\boldsymbol{m}}$ very large as said in the previous section. So the model selection problem can be expressed in terms of classical criteria, e.g. AIC, BIC, \ldots where \Theta and $\mathbf{\mathfrak{Q}}_{\boldsymbol{m}}$ have to be scanned:
 
-$$ (\hat{\boldsymbol{\theta}}, \hat{\boldsymbol{\mathfrak{q}}}) = \arg \max_{(\boldsymbol{\theta},\boldsymbol{\mathfrak{q}})} AIC(p_{\boldsymbol{\theta}}(\mathbf{y}|\mathbf{\mathfrak{q}})).$$
+$$ (\hat{\boldsymbol{\theta}}, \hat{\boldsymbol{\mathfrak{q}}}) = \arg \max_{(\boldsymbol{\theta},\boldsymbol{\mathfrak{q}})} \text{AIC}(p_{\boldsymbol{\theta}}(\mathbf{y}|\mathbf{\mathfrak{q}})).$$
 
 ### The need for generating ‘‘clever'' candidates
 
@@ -335,14 +387,4 @@ The plot method is associated with ‘‘types'':
 ```
 
 
-
-
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
-```
+# Segmentation: logistic regression trees

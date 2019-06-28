@@ -19,6 +19,7 @@ Imports:
     magrittr,
     methods
 Suggests:
+    ggplot2,
     MASS,
     speedglm,
     knitr,
