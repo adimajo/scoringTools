@@ -6,6 +6,7 @@
 #' @param test Boolean : True if the algorithm should use predictors to construct a test set on which to search for the best discretization scheme using the provided criterion (default: TRUE).
 #' @param validation Boolean : True if the algorithm should use predictors to construct a validation set on which to calculate the provided criterion using the best discretization scheme (chosen thanks to the provided criterion on either the test set (if true) or the training set (otherwise)) (default: TRUE).
 #' @param criterion The criterion ('gini','aic','bic') to use to choose the best discretization scheme among the generated ones (default: 'gini'). Nota Bene: it is best to use 'gini' only when test is set to TRUE and 'aic' or 'bic' when it is not. When using 'aic' or 'bic' with a test set, the likelihood is returned as there is no need to penalize for generalization purposes.
+#' @param proportions The list of the (2) proportions wanted for test and validation set. Only the first is used when there is only one of either test or validation that is set to TRUE. Produces an error when the sum is greater to one. Useless if both test and validation are set to FALSE. Default: list(0.2,0.2).
 #' @keywords mdlp, discretization
 #' @importFrom stats predict
 #' @export
@@ -33,7 +34,7 @@
 #' mdlp_iter(x,y)
 
 
-mdlp_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gini') {
+mdlp_iter <- function(predictors,labels,test=F,validation=F,proportions = c(0.3,0.3),criterion='gini') {
      if (criterion %in% c('gini','aic')) {
           if (length(labels)==length(predictors[,1])) {
                # Calcul des longueurs pour reutilisation ulterieure
@@ -44,7 +45,7 @@ mdlp_iter <- function(predictors,labels,test=TRUE,validation=TRUE,criterion='gin
                if (criterion=="gini") ginidisc=list() else aicdisc=list()
 
                # Decoupage de l'ensemble
-               ensemble <- cut_dataset(n,test=test,validation=validation)
+               ensemble <- cut_dataset(n,proportions=proportions,test=test,validation=validation)
 
                data_train = as.data.frame(cbind(predictors[ensemble[[1]],],labels = labels[ensemble[[1]]]))
 

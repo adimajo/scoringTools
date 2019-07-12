@@ -1,5 +1,5 @@
-ui <- fluidPage(navbarPage("Scoring d'octroi",
-                           tabPanel("Import de données",
+ui <- fluidPage(navbarPage("Statistical problems in Credit Scoring",
+                           tabPanel("Data import",
                                     sidebarPanel(
                                          fileInput('file1', 'Choose CSV File',
                                                    multiple = TRUE,
@@ -42,7 +42,7 @@ ui <- fluidPage(navbarPage("Scoring d'octroi",
                            ),
 
 
-                           tabPanel("Réintégration des refusés",
+                           tabPanel("Reject Inference",
 
                                     # Sidebar with a slider input for number of bins
                                     sidebarLayout(
@@ -57,8 +57,8 @@ ui <- fluidPage(navbarPage("Scoring d'octroi",
 
                                               # Input: Select data ----
 
-                                              selectInput("selectedData", "Sélection des données",
-                                                          list("weights", "family", "gam", "loess", "rlm")),
+                                              selectInput("selectedData", "Data selection",
+                                                          list("lendingClub")),
 
 
                                               # Input: Select models to compute ----
@@ -87,32 +87,32 @@ ui <- fluidPage(navbarPage("Scoring d'octroi",
 
                                               conditionalPanel(
                                                    condition = "input.models.includes('rforest')",
-                                                   selectInput("rforestParam", "Paramètres Random Forest",
-                                                               list("weights", "family", "gam", "loess", "rlm"))
+                                                   selectInput("rforestParam", "Random Forest-specific parameters",
+                                                               list("ntree", "mtry", "replace", "maxnodes"))
                                               ),
 
                                               conditionalPanel(
                                                    condition = "input.models.includes('svm')",
-                                                   selectInput("svmParam", "Paramètres SVM",
-                                                               list("lm", "glm", "gam", "loess", "rlm"))
+                                                   selectInput("svmParam", "SVM-specific parameters",
+                                                               list("kernel", "degree", "gamma", "coef0"))
                                               ),
 
                                               conditionalPanel(
                                                    condition = "input.models.includes('nnet')",
-                                                   selectInput("nnetParam", "Paramètres réseaux de neurones",
-                                                               list("lm", "glm", "gam", "loess", "rlm"))
+                                                   selectInput("nnetParam", "Neural network-specific parameters",
+                                                               list("size", "decay", "maxit"))
                                               ),
 
                                               conditionalPanel(
                                                    condition = "input.reject.includes('parcelling')",
-                                                   selectInput("parcellingParam", "Paramètres Parcelling",
-                                                               list("lm", "glm", "gam", "loess", "rlm"))
+                                                   selectInput("parcellingParam", "Parcelling hyperparameters",
+                                                               list("probs", "alpha"))
                                               ),
 
                                               conditionalPanel(
                                                    condition = "input.reject.includes('reclassification')",
-                                                   selectInput("reclassificationParam", "Paramètres Reclassification",
-                                                               list("lm", "glm", "gam", "loess", "rlm"))
+                                                   selectInput("reclassificationParam", "Reclassification hyperparameter",
+                                                               list("thresh"))
                                               )
 
                                          ),
@@ -120,18 +120,43 @@ ui <- fluidPage(navbarPage("Scoring d'octroi",
                                          # Show a plot of the generated distribution
                                          mainPanel(
                                               tabsetPanel(
-                                                   tabPanel("Courbes ROC",
+                                                   tabPanel("ROC curves",
                                                             fluidRow(
                                                                  splitLayout(cellWidths = c("50%", "50%"), plotOutput("distPlot1"), plotOutput("distPlot2"))
                                                             )),
-                                                   tabPanel("Statistiques", tableOutput("essai")),
-                                                   tabPanel("Table")
+                                                   tabPanel("Gini indices", tableOutput("gini_reject"))
                                               )
                                          )
                                     )
                            ),
-                           tabPanel("Discrétisation"),
-                           tabPanel("Recouvrement"),
-                           tabPanel("Segmentation"),
-                           tabPanel("Grande dimension")
+
+
+
+                           tabPanel("Quantization",
+                                    # Sidebar with a slider input for number of bins
+                                    sidebarLayout(
+                                         sidebarPanel(
+                                              # Input: Select data ----
+
+                                              selectInput("selectedData", "Data selection",
+                                                          list("lendingClub"))
+                                         ),
+
+                                         # Show a plot of the generated distribution
+                                         mainPanel())),
+
+
+
+                           tabPanel("Logistic Regression Trees",
+                                    # Sidebar with a slider input for number of bins
+                                    sidebarLayout(
+                                         sidebarPanel(
+                                              # Input: Select data ----
+
+                                              selectInput("selectedData", "Data selection",
+                                                          list("lendingClub"))
+                                         ),
+
+                                         # Show a plot of the generated distribution
+                                         mainPanel()))
 ))
