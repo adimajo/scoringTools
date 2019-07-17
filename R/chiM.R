@@ -62,16 +62,26 @@ chiM_iter <- function(predictors,labels,test=F,validation=F,proportions = c(0.3,
                          logit[[i]] = stats::glm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x)(length(unique(x))>1),as.data.frame(sapply(disc[[i]]$Disc.data,as.factor))))
 
                     } else {
-                         logit[[i]] = speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x)(length(unique(x))>1),as.data.frame(sapply(disc[[i]]$Disc.data,as.factor))))
+                         logit[[i]] = speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x)(length(unique(x))>1),as.data.frame(sapply(disc[[i]]$Disc.data,as.factor))), fitted = TRUE)
                          # methods::setIs(class(logit[[i]]), "glmORlogicalORspeedglm")
 
                     }
 
                     if (validation==TRUE) {
                          data_test = as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[2]],],disc[[i]][["Disc.data"]],predictors[ensemble[[1]],])),as.factor))
-                         if (criterion=='gini') ginidisc[[i]] = glmdisc::normalizedGini(labels[ensemble[[2]]],predict(logit[[i]],data_test,type="response")) else aicdisc[[i]] = logit[[i]]$aic
+                         if (criterion=='gini') {
+                              ginidisc[[i]] = glmdisc::normalizedGini(labels[ensemble[[2]]],predict(logit[[i]],data_test,type="response"))
+                         } else {
+                              aicdisc[[i]] = logit[[i]]$aic
+                         }
                     } else {
-                         if (criterion=='gini') ginidisc[[i]] = glmdisc::normalizedGini(labels[ensemble[[1]]],logit[[i]]$fitted.values) else aicdisc[[i]] = logit[[i]]$aic
+                         if (criterion=='gini') {
+                              if (!requireNamespace("speedglm", quietly = TRUE)) {
+                                   ginidisc[[i]] = glmdisc::normalizedGini(labels[ensemble[[1]]],logit[[i]]$fitted.values)
+                              } else {
+                                   ginidisc[[i]] = glmdisc::normalizedGini(labels[ensemble[[1]]],logit[[i]]$linear.predictors)
+                              }
+                         } else aicdisc[[i]] = logit[[i]]$aic
                     }
                }
 
@@ -91,9 +101,15 @@ chiM_iter <- function(predictors,labels,test=F,validation=F,proportions = c(0.3,
                     if (criterion=="gini") {
                          best.disc = list(logit[[which.min(ginidisc)]],disc[[which.min(ginidisc)]],which.min(ginidisc))
                          if (test==TRUE) {
-                              data_validation = as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[3]],],disc[[i]][["Disc.data"]],predictors[ensemble[[1]],])),as.factor))
-                              performance = glmdisc::normalizedGini(labels[ensemble[[3]]],predict(best.disc[[1]],data_validation,type="response"))
-                         } else performance = glmdisc::normalizedGini(labels[ensemble[[1]]],best.disc[[1]]$fitted.values)
+                              data_validation = as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[2]],],disc[[i]][["Disc.data"]],predictors[ensemble[[1]],])),as.factor))
+                              performance = glmdisc::normalizedGini(labels[ensemble[[2]]],predict(best.disc[[1]],data_validation,type="response"))
+                         } else {
+                              if (!requireNamespace("speedglm", quietly = TRUE)) {
+                                   performance = glmdisc::normalizedGini(labels[ensemble[[1]]],best.disc[[1]]$fitted.values)
+                              } else {
+                                   performance = glmdisc::normalizedGini(labels[ensemble[[1]]],best.disc[[1]]$linear.predictors)
+                              }
+                         }
                     } else {
                          best.disc = list(logit[[which.min(aicdisc)]],disc[[which.min(aicdisc)]],which.min(aicdisc))
                          if (test==TRUE) performance = 0 else performance = best.disc[[1]]$aic

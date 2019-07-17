@@ -46,7 +46,8 @@ scoring_model <- glm(Default ~ ., data = lendingClub, family = binomial(link = "
 ```
 
 We can now focus on the regression coefficients $\boldsymbol{\theta}$:
-```{r, echo=FALSE, results='asis'}
+
+```{r, echo=FALSE}
 scoring_model$coefficients
 ```
 
@@ -295,8 +296,6 @@ By doing so, we reduce elements of $\mathbf{\mathfrak{Q}}_{\boldsymbol{m}}$ to t
 
 ## Existing methods
 
-
-
 ### The discretization package
 
 ### Chi-2 based methods
@@ -318,9 +317,9 @@ By doing so, we reduce elements of $\mathbf{\mathfrak{Q}}_{\boldsymbol{m}}$ to t
 
 ### General idea
 
-We proposed a discretization algorithm that meets these criteria and naturally . It was described in .
+We proposed a discretization algorithm that meets these criteria and naturally . It was described in <arxiv:>.
 
-In short, the algorithm considers the discretized features $E$ as latent variables which we will generate from its estimated a posteriori density function as part of an SEM-algorithm (see ). The algorithm alternates between:
+In short, the algorithm considers the discretized features $\boldsymbol{\mathfrak{q}}$ as latent variables which we will generate from its estimated a posteriori density function as part of an SEM-algorithm (see ). The algorithm alternates between:
 
 1. Fitting a logistic regression between $\boldsymbol{\mathfrak{q}}$ and $y$;
 2. Fitting polytomous logistic regression functions between each pair of $(x_j,\mathfrak{q}_j)$;
@@ -328,63 +327,11 @@ In short, the algorithm considers the discretized features $E$ as latent variabl
 
 ### Implementation
 
-#### The glmdisc function
-
-
-```{r, echo=FALSE, results='asis'}
-# sem_disc <- SEM_discretization()
-```
-
-
-#### Methods associated with it
-
-
-##### discretize method
-
-The discretize method discretizes a given dataset using a previously trained discretization scheme. Its output is also a ‘‘discretization'' object. 
-
-```{r, echo=FALSE, results='asis'}
-# new_disc <- discretize(new_dataset,sem_disc)
-```
-
-
-##### print method
-
-The print method
-
-```{r, echo=FALSE, results='asis'}
-# print(sem_disc)
-```
-
-
-##### summary method
-
-The summary method
-
-```{r, echo=FALSE, results='asis'}
-# summary(sem_disc)
-```
-
-##### predict method
-
-The predict method
-
-```{r, echo=FALSE, results='asis'}
-# predict(new_disc)
-```
-
-
-##### plot method
-
-The plot method is associated with ‘‘types'':
-
-- ‘‘default'': same method as plotting the resulting best \code{glm} method;
-- ‘‘discretization'': plots each feature's discretization scheme;
-- ‘‘all'': produces all plots on the same frame.
-
-```{r, echo=FALSE, results='asis'}
-# plot(sem_disc,type="discretization"")
-```
-
+The approach is implemented in the `glmdisc` package required by this package. Please refer to its vignette (by typing `vignette("glmdisc")`).
 
 # Segmentation: logistic regression trees
+
+
+
+The approach is implemented in the `glmtree` package required by this package. Please refer to its vignette (by typing `vignette("glmtree")`).
+

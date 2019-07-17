@@ -56,15 +56,25 @@ mdlp_iter <- function(predictors,labels,test=F,validation=F,proportions = c(0.3,
                     logit = stats::glm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x)(length(unique(x))>1),as.data.frame(sapply(disc$Disc.data,as.factor))))
 
                } else {
-                    logit = speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x)(length(unique(x))>1),as.data.frame(sapply(disc$Disc.data,as.factor))))
+                    logit = speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x)(length(unique(x))>1),as.data.frame(sapply(disc$Disc.data,as.factor))), fitted = TRUE)
                     # methods::setIs(class(logit), "glmORlogicalORspeedglm")
                }
 
-               if (test==TRUE) {
+               if (validation==TRUE) {
                     data_test = as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[2]],],disc[["Disc.data"]],predictors[ensemble[[1]],])),as.factor))
-                    if (criterion=='gini') ginidisc = glmdisc::normalizedGini(labels[ensemble[[2]]],predict(logit,data_test,type="response")) else aicdisc = logit$aic
+                    if (criterion=='gini') {
+                         ginidisc = glmdisc::normalizedGini(labels[ensemble[[2]]],predict(logit,data_test,type="response"))
+                    } else {
+                         aicdisc = logit$aic
+                    }
                } else {
-                    if (criterion=='gini') ginidisc = glmdisc::normalizedGini(labels[ensemble[[1]]],logit$fitted.values) else aicdisc = logit$aic
+                    if (criterion=='gini') {
+                         if (!requireNamespace("speedglm", quietly = TRUE)) {
+                              ginidisc = glmdisc::normalizedGini(labels[ensemble[[1]]],logit$fitted.values)
+                         } else {
+                              ginidisc = glmdisc::normalizedGini(labels[ensemble[[1]]],logit$linear.predictors)
+                         }
+                    } else aicdisc = logit$aic
                }
 
 
@@ -81,11 +91,17 @@ mdlp_iter <- function(predictors,labels,test=F,validation=F,proportions = c(0.3,
                     }
                } else {
                     if (criterion=="gini") {
-                         best.disc = list(logit,disc)
+                         best.disc = list(logit,disc,1)
                          if (validation==TRUE) {
                               data_validation = as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[3]],],disc[["Disc.data"]],predictors[ensemble[[1]],])),as.factor))
                               performance = glmdisc::normalizedGini(labels[ensemble[[3]]],predict(best.disc[[1]],data_validation,type="response"))
-                         } else performance = glmdisc::normalizedGini(labels[ensemble[[1]]],best.disc[[1]]$fitted.values)
+                         } else {
+                              if (!requireNamespace("speedglm", quietly = TRUE)) {
+                                   performance = glmdisc::normalizedGini(labels[ensemble[[1]]],best.disc[[1]]$fitted.values)
+                              } else {
+                                   performance = glmdisc::normalizedGini(labels[ensemble[[1]]], best.disc[[1]]$linear.predictors)
+                              }
+                         }
                     } else {
                          best.disc = list(logit,disc)
                          if (validation==TRUE) performance = 0 else performance = best.disc[[1]]$aic

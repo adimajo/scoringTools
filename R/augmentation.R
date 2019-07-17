@@ -74,7 +74,7 @@ augmentation <- function(xf, xnf, yf) {
      if (!requireNamespace("speedglm", quietly = TRUE)) {
           model_augmente = stats::glm(labels ~ ., family = stats::binomial(link='logit'), df_augmente[,-which(names(df_augmente) %in% c("poidsfinal","classe_SCORE"))], weights = df_augmente$poidsfinal)
      } else {
-          model_augmente = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df_augmente[,-which(names(df_augmente) %in% c("poidsfinal","classe_SCORE"))], weights = df_augmente$poidsfinal)
+          model_augmente = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df_augmente[,-which(names(df_augmente) %in% c("poidsfinal","classe_SCORE"))][!df_augmente$poidsfinal == 0,], weights = df_augmente$poidsfinal[!df_augmente$poidsfinal == 0])
           # methods::setIs(class(model_augmente), "glmORlogicalORspeedglm")
      }
 
