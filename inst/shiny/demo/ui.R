@@ -58,7 +58,7 @@ ui <- fluidPage(navbarPage("Statistical problems in Credit Scoring",
                                               # Input: Select data ----
 
                                               selectInput("selectedData", "Data selection",
-                                                          list("lendingClub")),
+                                                          list("lendingClub", "Imported Data")),
 
 
                                               # Input: Select models to compute ----
@@ -107,6 +107,18 @@ ui <- fluidPage(navbarPage("Statistical problems in Credit Scoring",
                                                    condition = "input.reject.includes('parcelling')",
                                                    selectInput("parcellingParam", "Parcelling hyperparameters",
                                                                list("probs", "alpha"))
+                                              ),
+
+                                              conditionalPanel(
+                                                   condition = "input.parcellingParam.includes('probs')",
+                                                   textInput("parcellingParamProbs", "Parcelling hyperparameter probs (a numeric vector is expected)",
+                                                             seq(0, 1, 0.25))
+                                              ),
+
+                                              conditionalPanel(
+                                                   condition = "input.parcellingParam.includes('alpha')",
+                                                   textInput("parcellingParamAlpha", "Parcelling hyperparameter alpha (a numeric vector is expected)",
+                                                             rep(1,length(probs)-1))
                                               ),
 
                                               conditionalPanel(

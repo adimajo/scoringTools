@@ -36,7 +36,28 @@ server <- function(input, output) {
      ## Courbe ROC avec tout le monde
 
      output$roc_tous <- renderPlot({
-          #
+
+          int_f = sample.int(nrow(input$selectedData), size = input$bins/100 * nrow(input$selectedData))
+          int_nf = !int_f %in% 1:nrow(input$selectedData)
+          x_f = input$selectedData[int_f, colnames(data_f) == input$var_cible]
+          x_nf = input$selectedData[int_nf,colnames(data_f) == input$var_cible]
+          y_f = input$selectedData[int_f, input$var_cible]
+          y_nf = input$selectedData[int_nf, input$var_cible]
+
+          for (model in (input$models)) {
+               switch(model,
+                    "log", {
+                         reglog_model = stats::glm( , data = input$selectedData, family = stats::binomial(link="logit"))
+                    },
+                    "tree", {
+                         tree_model = rpart::rpart( , data = input$selectedData, type = "class")
+                    },
+                    "rforest", {},
+                    "svm", {},
+                    "nnet", {},
+                    NULL, {}
+               )
+          }
      })
 
      output$distPlot1 <- renderPlot({
