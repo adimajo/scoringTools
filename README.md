@@ -1,7 +1,7 @@
-[![Travis build status](https://travis-ci.org/adimajo/scoring.svg?branch=master)](https://travis-ci.org/adimajo/scoring)
-[![Coverage status](https://codecov.io/gh/adimajo/scoring/branch/master/graph/badge.svg)](https://codecov.io/github/adimajo/scoring?branch=master)
+[![Travis build status](https://travis-ci.org/adimajo/scoringTools.svg?branch=master)](https://travis-ci.org/adimajo/scoringTools)
+[![Coverage status](https://codecov.io/gh/adimajo/scoringTools/branch/master/graph/badge.svg)](https://codecov.io/github/adimajo/scoringTools?branch=master)
 
-# Credit Scoring tools
+# Credit Scoring Tools
 
 This package has been developed as part of a CIFRE PhD, a special PhD contract in France which is for the most part financed by a company. This company subsequently gets to choose which subject(s) are tackled.
 
@@ -17,8 +17,8 @@ Three subjects are tackled in this package:
 
 The packages' websites (obtained from `pkgdown`) are available respectively at:
 
-* [adimajo.github.io/scoringTools](https:adimajo.github.io/scoringTools)
-* [adimajo.github.io/glmdisc](https:adimajo.github.io/glmdisc)
-* [adimajo.github.io/glmtree](https:adimajo.github.io/glmtree)
+* [adimajo.github.io/scoringTools](https://adimajo.github.io/scoringTools)
+* [adimajo.github.io/glmdisc](https://adimajo.github.io/glmdisc)
+* [adimajo.github.io/glmtree](https://adimajo.github.io/glmtree)
 
 A Shiny app explaining all aspects of this work is also accessible by running `runDemo()`.

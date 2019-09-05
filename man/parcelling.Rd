@@ -50,9 +50,9 @@ Ehrhardt, A., Biernacki, C., Vandewalle, V., Heinrich, P. and Beben, S. (2018), 
 \author{
 Adrien Ehrhardt
 }
-\keyword{credit,}
-\keyword{inference,}
-\keyword{r?int?gration,}
-\keyword{reject,}
-\keyword{scorecard,}
+\keyword{credit}
+\keyword{inference}
+\keyword{reject}
+\keyword{réintégration}
+\keyword{scorecard}
 \keyword{scoring}

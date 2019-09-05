@@ -5,7 +5,7 @@
 #' @param xnf The matrix of not financed clients' characteristics to be used in the scorecard (must be the same features in the same order as xf!).
 #' @param yf The matrix of financed clients' labels
 #' @return List containing the model using financed clients only and the model produced using the Augmentation method.
-#' @keywords reject, inference, r?int?gration, scorecard, credit, scoring
+#' @keywords reject inference réintégration scorecard credit scoring
 #' @importFrom stats predict
 #' @export
 #' @author Adrien Ehrhardt
@@ -35,10 +35,7 @@ augmentation <- function(xf, xnf, yf) {
           model_f <- stats::glm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
      } else {
           model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
-          # methods::setOldClass(class(model_f)[1])
-          # methods::setOldClass(class(model_f)[2])
-          # methods::setIs(class(model_f)[1], "glmORlogicalORspeedglm")
-          # methods::setIs(class(model_f)[2], "glmORlogicalORspeedglm")
+          class(model_f) = c(class(model_f),"glmORlogicalORspeedglm")
      }
 
      df <- rbind(df_f, data.frame(labels = rep(NA,nrow(xnf)), x = xnf))
@@ -75,7 +72,7 @@ augmentation <- function(xf, xnf, yf) {
           model_augmente = stats::glm(labels ~ ., family = stats::binomial(link='logit'), df_augmente[,-which(names(df_augmente) %in% c("poidsfinal","classe_SCORE"))], weights = df_augmente$poidsfinal)
      } else {
           model_augmente = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df_augmente[,-which(names(df_augmente) %in% c("poidsfinal","classe_SCORE"))][!df_augmente$poidsfinal == 0,], weights = df_augmente$poidsfinal[!df_augmente$poidsfinal == 0])
-          # methods::setIs(class(model_augmente), "glmORlogicalORspeedglm")
+          class(model_augmente) = c(class(model_augmente),"glmORlogicalORspeedglm")
      }
 
 

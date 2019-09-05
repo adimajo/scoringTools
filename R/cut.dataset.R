@@ -5,7 +5,7 @@
 #' @param test TRUE if a test dataset is wanted, FALSE otherwise (default=TRUE).
 #' @param validation TRUE if a test dataset is wanted, FALSE otherwise (default=TRUE).
 #' @param proportions The list of the (2) proportions wanted for test and validation set. Only the first is used when there is only one of either test or validation that is set to TRUE. Produces an error when the sum is greater to one. Useless if both test and validation are set to FALSE. Default: list(0.2,0.2).
-#' @keywords sample, test, train, validation
+#' @keywords sample test train validation
 
 # #' @examples
 

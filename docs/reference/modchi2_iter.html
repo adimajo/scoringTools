@@ -106,8 +106,9 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>modchi2_iter</span>(<span class='no'>predictors</span>, <span class='no'>labels</span>, <span class='kw'>test</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>validation</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>criterion</span> <span class='kw'>=</span> <span class='st'>"gini"</span>, <span class='kw'>param</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>alp</span> <span class='kw'>=</span> <span class='fl'>0.5</span>))</pre>
+    <pre class="usage"><span class='fu'>modchi2_iter</span>(<span class='no'>predictors</span>, <span class='no'>labels</span>, <span class='kw'>test</span> <span class='kw'>=</span> <span class='no'>F</span>, <span class='kw'>validation</span> <span class='kw'>=</span> <span class='no'>F</span>,
+  <span class='kw'>proportions</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0.3</span>, <span class='fl'>0.3</span>), <span class='kw'>criterion</span> <span class='kw'>=</span> <span class='st'>"gini"</span>, <span class='kw'>param</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>alp</span> <span class='kw'>=</span>
+  <span class='fl'>0.5</span>))</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -127,6 +128,10 @@
     <tr>
       <th>validation</th>
       <td><p>Boolean : True if the algorithm should use predictors to construct a validation set on which to calculate the provided criterion using the best discretization scheme (chosen thanks to the provided criterion on either the test set (if true) or the training set (otherwise)) (default: TRUE).</p></td>
+    </tr>
+    <tr>
+      <th>proportions</th>
+      <td><p>The list of the (2) proportions wanted for test and validation set. Only the first is used when there is only one of either test or validation that is set to TRUE. Produces an error when the sum is greater to one. Useless if both test and validation are set to FALSE. Default: list(0.2,0.2).</p></td>
     </tr>
     <tr>
       <th>criterion</th>

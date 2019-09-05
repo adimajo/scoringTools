@@ -1,18 +1,19 @@
 Package: scoringTools
 Type: Package
-Title: Credit Scoring tools
+Title: Credit Scoring Tools
 Version: 0.1
 Date: 2019-08-28
 Authors@R: c(person("Adrien", "Ehrhardt", email = "adrien.ehrhardt@centraliens-lille.org",
                   role = c("aut", "cre")))
 Maintainer: Adrien Ehrhardt <adrien.ehrhardt@centraliens-lille.org>
-Description: This package aims at regroupping essential tools for credit scoring. These statistical tools may be useful for other use-cases as well but were primarly designed for it. First, there are Reject Inference methods' functions <>. Second, we build upon the already CRAN-available package "discretization" and "glmdisc" to . Third, we provide a way.
+Description: Grouping essential tools for credit scoring. These statistical tools may be useful for other use-cases as well but were primarly designed for it. First, there are Reject Inference methods <arXiv:1903.10855>. Second, we build upon the already CRAN-available package "discretization" and "glmdisc" to automize discretization of continuous features, grouping of factor levels and introduction of pairwise interactions.
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
 Imports:
     glmdisc,
+    glmtree,
     discretization,
     sqldf,
     magrittr,
@@ -28,7 +29,6 @@ Suggests:
     shiny,
     testthat,
     covr
-Remotes: adimajo/glmtree
 URL: https://adimajo.github.io
 BugReports: https://github.com/adimajo/scoringTools/issues
 VignetteBuilder: knitr

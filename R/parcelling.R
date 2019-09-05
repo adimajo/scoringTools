@@ -7,7 +7,7 @@
 #' @param probs The sequence of quantiles to use to make scorebands (see the vignette).
 #' @param alpha The user-defined coefficients to use with Parcelling (see the vignette).
 #' @return List containing the model using financed clients only and the model produced using the Parcelling method.
-#' @keywords reject, inference, r?int?gration, scorecard, credit, scoring
+#' @keywords reject inference réintégration scorecard credit scoring
 #' @importFrom stats predict
 #' @export
 #' @author Adrien Ehrhardt

@@ -18,7 +18,7 @@ cut_dataset(n, proportions, test = TRUE, validation = TRUE)
 \description{
 This function chooses the rows of a dataset to be included in the train, test (optional) and validation (optional) datasets according to proportions specified by the user.
 }
-\keyword{sample,}
-\keyword{test,}
-\keyword{train,}
+\keyword{sample}
+\keyword{test}
+\keyword{train}
 \keyword{validation}

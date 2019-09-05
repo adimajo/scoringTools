@@ -14,7 +14,7 @@ get_cutp(disc_train_set, cont_train_set)
 \description{
 This function returns the cut-points
 }
-\keyword{sample,}
-\keyword{test,}
-\keyword{train,}
+\keyword{sample}
+\keyword{test}
+\keyword{train}
 \keyword{validation}

@@ -54,6 +54,6 @@ modchi2_iter(x,y)
 \author{
 Adrien Ehrhardt
 }
-\keyword{Chi2,}
+\keyword{Chi2}
 \keyword{discretization}
 \keyword{modified}

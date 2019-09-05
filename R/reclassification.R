@@ -6,7 +6,7 @@
 #' @param yf The matrix of financed clients' labels
 #' @param thresh The threshold to use in the Classification step, i.e. the probability above which a not financed client is considered to have a label equal to 1.
 #' @return List containing the model using financed clients only and the model produced using the Reclassification method.
-#' @keywords reject, inference, r?int?gration, scorecard, credit, scoring
+#' @keywords reject inference réintégration scorecard credit scoring
 #' @importFrom stats predict
 #' @export
 #' @author Adrien Ehrhardt

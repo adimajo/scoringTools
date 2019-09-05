@@ -16,7 +16,7 @@ discretize_cutp(cont_test_set, disc_train_set, cont_train_set)
 \description{
 This function discretizes a dataset when provided with both continuous and discretized versions of a training dataset.
 }
-\keyword{sample,}
-\keyword{test,}
-\keyword{train,}
+\keyword{sample}
+\keyword{test}
+\keyword{train}
 \keyword{validation}

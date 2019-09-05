@@ -106,8 +106,7 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>cut_dataset</span>(<span class='no'>n</span>, <span class='kw'>test</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>validation</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>proportions</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0.2</span>,
-  <span class='fl'>0.2</span>))</pre>
+    <pre class="usage"><span class='fu'>cut_dataset</span>(<span class='no'>n</span>, <span class='no'>proportions</span>, <span class='kw'>test</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>validation</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -117,16 +116,16 @@
       <td><p>The total number of rows to sample from.</p></td>
     </tr>
     <tr>
+      <th>proportions</th>
+      <td><p>The list of the (2) proportions wanted for test and validation set. Only the first is used when there is only one of either test or validation that is set to TRUE. Produces an error when the sum is greater to one. Useless if both test and validation are set to FALSE. Default: list(0.2,0.2).</p></td>
+    </tr>
+    <tr>
       <th>test</th>
       <td><p>TRUE if a test dataset is wanted, FALSE otherwise (default=TRUE).</p></td>
     </tr>
     <tr>
       <th>validation</th>
       <td><p>TRUE if a test dataset is wanted, FALSE otherwise (default=TRUE).</p></td>
-    </tr>
-    <tr>
-      <th>proportions</th>
-      <td><p>The list of the (2) proportions wanted for test and validation set. Only the first is used when there is only one of either test or validation that is set to TRUE. Produces an error when the sum is greater to one. Useless if both test and validation are set to FALSE. Default: list(0.2,0.2).</p></td>
     </tr>
     </table>
     

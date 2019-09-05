@@ -106,8 +106,9 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>chi2_iter</span>(<span class='no'>predictors</span>, <span class='no'>labels</span>, <span class='kw'>test</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>validation</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>criterion</span> <span class='kw'>=</span> <span class='st'>"gini"</span>, <span class='kw'>param</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='fu'>list</span>(<span class='kw'>alp</span> <span class='kw'>=</span> <span class='fl'>0.001</span>, <span class='kw'>del</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)))</pre>
+    <pre class="usage"><span class='fu'>chi2_iter</span>(<span class='no'>predictors</span>, <span class='no'>labels</span>, <span class='kw'>test</span> <span class='kw'>=</span> <span class='no'>F</span>, <span class='kw'>validation</span> <span class='kw'>=</span> <span class='no'>F</span>,
+  <span class='kw'>proportions</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0.3</span>, <span class='fl'>0.3</span>), <span class='kw'>criterion</span> <span class='kw'>=</span> <span class='st'>"gini"</span>,
+  <span class='kw'>param</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='fu'>list</span>(<span class='kw'>alp</span> <span class='kw'>=</span> <span class='fl'>0.001</span>, <span class='kw'>del</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)))</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -127,6 +128,10 @@
     <tr>
       <th>validation</th>
       <td><p>Boolean : True if the algorithm should use predictors to construct a validation set on which to calculate the provided criterion using the best discretization scheme (chosen thanks to the provided criterion on either the test set (if true) or the training set (otherwise)) (default: TRUE).</p></td>
+    </tr>
+    <tr>
+      <th>proportions</th>
+      <td><p>The list of the (2) proportions wanted for test and validation set. Only the first is used when there is only one of either test or validation that is set to TRUE. Produces an error when the sum is greater to one. Useless if both test and validation are set to FALSE. Default: list(0.2,0.2).</p></td>
     </tr>
     <tr>
       <th>criterion</th>
@@ -150,18 +155,14 @@
 <span class='kw'>function</span>(<span class='no'>element</span>) <span class='no'>theta</span>[<span class='no'>xd</span>[<span class='no'>row_id</span>,<span class='no'>element</span>],<span class='no'>element</span>]))))
 <span class='no'>y</span> <span class='kw'>=</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/stats/topics/Binomial'>rbinom</a></span>(<span class='fl'>100</span>,<span class='fl'>1</span>,<span class='fl'>1</span>/(<span class='fl'>1</span>+<span class='fu'>exp</span>(-<span class='no'>log_odd</span>)))
 
-<span class='fu'>chi2_iter</span>(<span class='no'>x</span>,<span class='no'>y</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Speedglm not installed, using glm instead (slower).</span></div><div class='output co'>#&gt; 
-#&gt; Call:  stats::glm(formula = labels ~ ., family = stats::binomial(link = "logit"), 
-#&gt;     data = Filter(function(x) (length(unique(x)) &gt; 1), as.data.frame(sapply(disc[[i]]$Disc.data, 
-#&gt;         as.factor))))
+<span class='fu'>chi2_iter</span>(<span class='no'>x</span>,<span class='no'>y</span>)</div><div class='output co'>#&gt; Generalized Linear Model of class 'speedglm':
+#&gt; 
+#&gt; Call:  speedglm::speedglm(formula = labels ~ ., data = Filter(function(x) (length(unique(x)) &gt;      1), as.data.frame(sapply(disc[[i]]$Disc.data, as.factor))),      family = stats::binomial(link = "logit"), fitted = TRUE) 
 #&gt; 
 #&gt; Coefficients:
 #&gt; (Intercept)          V12          V22          V32  
-#&gt;        2.63        -3.46       -20.47        -2.44  
-#&gt; 
-#&gt; Degrees of Freedom: 59 Total (i.e. Null);  56 Residual
-#&gt; Null Deviance:	    83.2 
-#&gt; Residual Deviance: 32.9 	AIC: 40.9</div></pre>
+#&gt;        1.67        -1.75       -19.87        -1.90  
+#&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

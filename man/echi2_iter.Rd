@@ -55,6 +55,6 @@ Liu, H. and Setiono, R. (1995). Chi2: Feature selection and discretization of nu
 \author{
 Adrien Ehrhardt
 }
-\keyword{Chi2,}
+\keyword{Chi2}
 \keyword{discretization}
 \keyword{extended}

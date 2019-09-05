@@ -58,4 +58,4 @@ Tsai, C. J., Lee, C. I. and Yang, W. P. (2008). A discretization algorithm based
 Adrien Ehrhardt
 }
 \keyword{discretization}
-\keyword{topdown,}
+\keyword{topdown}

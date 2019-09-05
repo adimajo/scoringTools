@@ -55,5 +55,5 @@ Kerber, R. (1992). ChiMerge : Discretization of numeric attributes, \emph{In Pro
 \author{
 Adrien Ehrhardt
 }
-\keyword{chiMerge,}
+\keyword{chiMerge}
 \keyword{discretization}

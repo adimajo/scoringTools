@@ -17,7 +17,7 @@
 This function aims at producing useful graphs in the context of credit scoring in order to simplify the validation process
 of the produced credit score.
 }
-\keyword{discretization,}
-\keyword{predict,}
+\keyword{discretization}
+\keyword{predict}
 \keyword{prediction}
-\keyword{test,}
+\keyword{test}

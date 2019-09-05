@@ -39,5 +39,5 @@ y = stats::rbinom(100,1,1/(1+exp(-log_odd)))
 
 chi2_iter(x,y)
 }
-\keyword{chi2,}
+\keyword{chi2}
 \keyword{discretization}

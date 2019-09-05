@@ -53,4 +53,4 @@ Fayyad, U. M. and Irani, K. B.(1993). Multi-interval discretization of continuou
 Adrien Ehrhardt
 }
 \keyword{discretization}
-\keyword{mdlp,}
+\keyword{mdlp}

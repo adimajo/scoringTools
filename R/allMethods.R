@@ -28,7 +28,7 @@ summary.discretization <- function(object) {
 #' It then applies the learnt logistic regression model and outputs its prediction (see predict.glm).
 #' @param object The S4 discretization object.
 #' @param predictors The test dataframe to discretize and for which we wish to have predictions.
-#' @keywords test, discretization, predict, prediction
+#' @keywords test discretization predict prediction
 
 predict.discretization <- function(object, predictors) {
      predict(object@best.disc[[1]],as.data.frame(discretize_cutp(object@parameters[[1]][object@parameters[[6]][[1]],],object@best.disc[[2]][["Disc.data"]],predictors)))
@@ -52,7 +52,7 @@ NULL
 #' @param object The S4 discretization object.
 #' @param type The test dataframe to discretize and for which we wish to have predictions.
 #' @param ... See additional parameters of plotly (if installed) or the standard plot function (from the graphics package).
-#' @keywords test, discretization, predict, prediction
+#' @keywords test discretization predict prediction
 #' @importFrom magrittr "%>%"
 
 plot.discretization <- function(object,type,...) {

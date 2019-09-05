@@ -4,7 +4,7 @@
 #' @param cont_test_set The matrix or dataframe of the dataset to discretize.
 #' @param disc_train_set The matrix or dataframe of the discretized training dataset.
 #' @param cont_train_set The matrix or dataframe of the continuous training dataset.
-#' @keywords sample, test, train, validation
+#' @keywords sample test train validation
 
 # #' @examples
 # #' # Create continuous training and test sets.

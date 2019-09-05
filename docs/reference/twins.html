@@ -154,17 +154,14 @@ Ehrhardt, A., Biernacki, C., Vandewalle, V., Heinrich, P. and Beben, S. (2018), 
 <span class='no'>yf</span> <span class='kw'>=</span> <span class='fu'>rbinom</span>(<span class='fl'>100</span>,<span class='fl'>1</span>,<span class='fl'>1</span>/(<span class='fl'>1</span>+<span class='fu'>exp</span>(-<span class='no'>log_odd</span>)))
 <span class='co'># We simulate data from not financed clients (MCAR mechanism)</span>
 <span class='no'>xnf</span> <span class='kw'>=</span> <span class='fu'>matrix</span>(<span class='fu'>runif</span>(<span class='fl'>100</span>*<span class='fl'>2</span>), <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='fl'>2</span>)
-<span class='fu'>twins</span>(<span class='no'>xf</span>,<span class='no'>xnf</span>,<span class='no'>yf</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Speedglm not installed, using glm instead (slower).</span></div><div class='output co'>#&gt; 
-#&gt; Call:  stats::glm(formula = labels ~ score_acc + score_def, family = stats::binomial(link = "logit"), 
-#&gt;     data = df[df$acc == 1, -which(names(df) %in% c("acc"))])
+<span class='fu'>twins</span>(<span class='no'>xf</span>,<span class='no'>xnf</span>,<span class='no'>yf</span>)</div><div class='output co'>#&gt; Generalized Linear Model of class 'speedglm':
+#&gt; 
+#&gt; Call:  speedglm::speedglm(formula = labels ~ score_acc + score_def,      data = df[df$acc == 1, -which(names(df) %in% c("acc"))],      family = stats::binomial(link = "logit")) 
 #&gt; 
 #&gt; Coefficients:
 #&gt; (Intercept)    score_acc    score_def  
-#&gt;    5.31e-16     5.90e-15     1.00e+00  
-#&gt; 
-#&gt; Degrees of Freedom: 99 Total (i.e. Null);  97 Residual
-#&gt; Null Deviance:	    137 
-#&gt; Residual Deviance: 119 	AIC: 125</div></pre>
+#&gt;    4.97e-16    -9.23e-15     1.00e+00  
+#&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

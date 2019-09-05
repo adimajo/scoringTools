@@ -5,7 +5,7 @@
 #' @param xnf The matrix of not financed clients' characteristics to be used in the scorecard (must be the same in the same order as xf!).
 #' @param yf The matrix of financed clients' labels
 #' @return List containing the model using financed clients only and the model produced using the Fuzzy Augmentation method.
-#' @keywords reject, inference, r?int?gration, scorecard, credit, scoring
+#' @keywords reject inference réintégration scorecard credit scoring
 #' @importFrom stats predict
 #' @export
 #' @author Adrien Ehrhardt

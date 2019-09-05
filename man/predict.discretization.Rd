@@ -15,7 +15,7 @@
 This function discretizes a user-provided test dataset given a discretization scheme provided by an S4 "discretization" object.
 It then applies the learnt logistic regression model and outputs its prediction (see predict.glm).
 }
-\keyword{discretization,}
-\keyword{predict,}
+\keyword{discretization}
+\keyword{predict}
 \keyword{prediction}
-\keyword{test,}
+\keyword{test}

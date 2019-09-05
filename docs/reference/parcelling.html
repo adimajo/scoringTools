@@ -163,18 +163,14 @@ Ehrhardt, A., Biernacki, C., Vandewalle, V., Heinrich, P. and Beben, S. (2018), 
 <span class='no'>yf</span> <span class='kw'>=</span> <span class='fu'>rbinom</span>(<span class='fl'>100</span>,<span class='fl'>1</span>,<span class='fl'>1</span>/(<span class='fl'>1</span>+<span class='fu'>exp</span>(-<span class='no'>log_odd</span>)))
 <span class='co'># We simulate data from not financed clients (MCAR mechanism)</span>
 <span class='no'>xnf</span> <span class='kw'>=</span> <span class='fu'>matrix</span>(<span class='fu'>runif</span>(<span class='fl'>100</span>*<span class='fl'>2</span>), <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='fl'>2</span>)
-<span class='fu'>parcelling</span>(<span class='no'>xf</span>,<span class='no'>xnf</span>,<span class='no'>yf</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Speedglm not installed, using glm instead (slower).</span></div><div class='output co'>#&gt; 
-#&gt; Call:  stats::glm(formula = labels ~ ., family = stats::binomial(link = "logit"), 
-#&gt;     data = df_parceling[, -which(names(df_parceling) %in% c("poids_final", 
-#&gt;         "classe_SCORE", "acc"))])
+<span class='fu'>parcelling</span>(<span class='no'>xf</span>,<span class='no'>xnf</span>,<span class='no'>yf</span>)</div><div class='output co'>#&gt; Generalized Linear Model of class 'speedglm':
+#&gt; 
+#&gt; Call:  speedglm::speedglm(formula = labels ~ ., data = df_parceling[,      -which(names(df_parceling) %in% c("poids_final", "classe_SCORE",          "acc"))], family = stats::binomial(link = "logit")) 
 #&gt; 
 #&gt; Coefficients:
 #&gt; (Intercept)          x.1          x.2  
-#&gt;       0.748        1.077       -3.190  
-#&gt; 
-#&gt; Degrees of Freedom: 199 Total (i.e. Null);  197 Residual
-#&gt; Null Deviance:	    273 
-#&gt; Residual Deviance: 236 	AIC: 242</div></pre>
+#&gt;       0.394        1.528       -3.039  
+#&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
