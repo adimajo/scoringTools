@@ -43,7 +43,7 @@ fuzzy_augmentation <- function(xf, xnf, yf) {
   } else {
     model_fuzzy <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), df[, -which(names(df) %in% c("acc"))])
   }
-  class(model_fuzzy) <- c(class(model_fuzzy), "glmORlogicalORspeedglm")
+  class(model_fuzzy) <- c("glmORlogicalORspeedglm", class(model_fuzzy))
 
   return(methods::new(Class = "reject_infered", method_name = "fuzzy_augmentation", financed_model = model_f, acceptance_model = as.logical(NA), infered_model = model_fuzzy))
 }

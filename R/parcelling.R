@@ -68,7 +68,7 @@ parcelling <- function(xf, xnf, yf, probs = seq(0, 1, 0.25), alpha = rep(1, leng
   } else {
     model_parcelling <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), df_parceling[, -which(names(df_parceling) %in% c("poids_final", "classe_SCORE", "acc"))])
   }
-  class(model_parcelling) <- c(class(model_parcelling), "glmORlogicalORspeedglm")
+  class(model_parcelling) <- c("glmORlogicalORspeedglm", class(model_parcelling))
 
   return(methods::new(Class = "reject_infered", method_name = "parceling", financed_model = model_f, acceptance_model = as.logical(NA), infered_model = model_parcelling))
 }

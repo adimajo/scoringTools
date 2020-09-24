@@ -44,7 +44,7 @@ reclassification <- function(xf, xnf, yf, thresh = 0.5) {
   } else {
     model_reclassification <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), df[, -which(names(df) %in% c("acc"))])
   }
-  class(model_reclassification) <- c(class(model_reclassification), "glmORlogicalORspeedglm")
+  class(model_reclassification) <- c("glmORlogicalORspeedglm", class(model_reclassification))
 
   return(methods::new(Class = "reject_infered", method_name = "reclassification", financed_model = model_f, acceptance_model = as.logical(NA), infered_model = model_reclassification))
 }

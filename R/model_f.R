@@ -25,6 +25,6 @@ model_finances <- function(df_f) {
   } else {
     model_f <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), data = df_f)
   }
-  class(model_f) <- c(class(model_f), "glmORlogicalORspeedglm")
+  class(model_f) <- c("glmORlogicalORspeedglm", class(model_f))
   return(model_f)
 }

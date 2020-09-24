@@ -41,7 +41,7 @@ twins <- function(xf, xnf, yf) {
   } else {
     model_acc <- speedglm::speedglm(acc ~ ., family = stats::binomial(link = "logit"), df[, -which(names(df) %in% c("labels"))])
   }
-  class(model_acc) <- c(class(model_acc), "glmORlogicalORspeedglm")
+  class(model_acc) <- c("glmORlogicalORspeedglm", class(model_acc))
 
   df$score_acc <- predict(model_acc, df)
   df$score_def <- predict(model_f, df)
@@ -50,7 +50,7 @@ twins <- function(xf, xnf, yf) {
   } else {
     model_twins <- speedglm::speedglm(labels ~ score_acc + score_def, family = stats::binomial(link = "logit"), df[df$acc == 1, -which(names(df) %in% c("acc"))])
   }
-  class(model_twins) <- c(class(model_twins), "glmORlogicalORspeedglm")
+  class(model_twins) <- c("glmORlogicalORspeedglm", class(model_twins))
 
   return(methods::new(Class = "reject_infered", method_name = "twins", financed_model = model_f, acceptance_model = model_acc, infered_model = model_twins))
 }
