@@ -4,8 +4,14 @@
 \alias{mdlp_iter}
 \title{Wrapper function for the mdlp function from the discretization package.}
 \usage{
-mdlp_iter(predictors, labels, test = F, validation = F,
-  proportions = c(0.3, 0.3), criterion = "gini")
+mdlp_iter(
+  predictors,
+  labels,
+  test = F,
+  validation = F,
+  proportions = c(0.3, 0.3),
+  criterion = "gini"
+)
 }
 \arguments{
 \item{predictors}{The matrix array containing the numeric attributes to discretize.}
@@ -31,15 +37,19 @@ In the context of Credit Scoring, a logistic regression is fitted between the â€
 \examples{
 # Simulation of a discretized logit model
 set.seed(1)
-x = matrix(runif(300), nrow = 100, ncol = 3)
-cuts = seq(0,1,length.out= 4)
-xd = apply(x,2, function(col) as.numeric(cut(col,cuts)))
-theta = t(matrix(c(0,0,0,2,2,2,-2,-2,-2),ncol=3,nrow=3))
-log_odd = rowSums(t(sapply(seq_along(xd[,1]), function(row_id) sapply(seq_along(xd[row_id,]),
-function(element) theta[xd[row_id,element],element]))))
-y = stats::rbinom(100,1,1/(1+exp(-log_odd)))
+x <- matrix(runif(300), nrow = 100, ncol = 3)
+cuts <- seq(0, 1, length.out = 4)
+xd <- apply(x, 2, function(col) as.numeric(cut(col, cuts)))
+theta <- t(matrix(c(0, 0, 0, 2, 2, 2, -2, -2, -2), ncol = 3, nrow = 3))
+log_odd <- rowSums(t(sapply(seq_along(xd[, 1]), function(row_id) {
+  sapply(
+    seq_along(xd[row_id, ]),
+    function(element) theta[xd[row_id, element], element]
+  )
+})))
+y <- stats::rbinom(100, 1, 1 / (1 + exp(-log_odd)))
 
-mdlp_iter(x,y)
+mdlp_iter(x, y)
 }
 \references{
 Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, \url{https://CRAN.R-project.org/package=speedglm}

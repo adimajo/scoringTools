@@ -1,10 +1,10 @@
 ---
-title: "Credit Scoring Tools: the scoringTools package"
+title: "Credit Scoring Tools: the `scoringTools` package"
 author: "Adrien Ehrhardt"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Credit Scoring Tools}
+  %\VignetteIndexEntry{`scoringTools` package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

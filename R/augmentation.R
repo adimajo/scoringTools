@@ -19,63 +19,54 @@
 #' Ehrhardt, A., Biernacki, C., Vandewalle, V., Heinrich, P. and Beben, S. (2018), Reject Inference Methods in Credit Scoring: a rational review,
 #' @examples
 #' # We simulate data from financed clients
-#' set.seed(1)
-#' xf = matrix(runif(100*2), nrow = 100, ncol = 2)
-#' theta = c(2,-2)
-#' log_odd = apply(xf, 1, function(row) theta%*%row)
-#' yf = rbinom(100,1,1/(1+exp(-log_odd)))
+#' xf <- matrix(runif(100 * 2), nrow = 100, ncol = 2)
+#' theta <- c(2, -2)
+#' log_odd <- apply(xf, 1, function(row) theta %*% row)
+#' yf <- rbinom(100, 1, 1 / (1 + exp(-log_odd)))
 #' # We simulate data from not financed clients (MCAR mechanism)
-#' xnf = matrix(runif(100*2), nrow = 100, ncol = 2)
-#' augmentation(xf,xnf,yf)
-
+#' xnf <- matrix(runif(100 * 2), nrow = 100, ncol = 2)
+#' augmentation(xf, xnf, yf)
 augmentation <- function(xf, xnf, yf) {
-     df_f <- data.frame(labels = yf, x = xf)
-     if (!requireNamespace("speedglm", quietly = TRUE)) {
-          warning("Speedglm not installed, using glm instead (slower).",call. = FALSE)
-          model_f <- stats::glm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
-     } else {
-          model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
-          class(model_f) = c(class(model_f),"glmORlogicalORspeedglm")
-     }
+  check_consistency(xf, xnf, yf)
+  df_f <- data.frame(labels = yf, x = xf)
+  model_f <- model_finances(df_f)
 
-     df <- rbind(df_f, data.frame(labels = rep(NA,nrow(xnf)), x = xnf))
-     df_f$classe_SCORE <- round(predict(model_f,df_f,type="response"), digits=1)
-     df$classe_SCORE <- round(predict(model_f,df,type="response"), digits=1)
-     df$acc = NA
-     df$acc[1:nrow(df_f)] <- 1
-     df$acc[(nrow(df_f)+1):nrow(df)] <- 0
+  df <- rbind(df_f, data.frame(labels = rep(NA, nrow(xnf)), x = xnf))
+  df_f$classe_SCORE <- round(predict(model_f, df_f, type = "response"), digits = 1)
+  df$classe_SCORE <- round(predict(model_f, df, type = "response"), digits = 1)
+  df$acc <- NA
+  df$acc[1:nrow(df_f)] <- 1
+  df$acc[(nrow(df_f) + 1):nrow(df)] <- 0
 
-     poids <- sqldf::sqldf(
-          'select distinct count(*) as count, classe_SCORE, acc
+  poids <- sqldf::sqldf(
+    "select distinct count(*) as count, classe_SCORE, acc
           from df
           group by classe_SCORE, acc
-          '
-     )
-     poids_acceptes <- poids[poids$acc==1,]
-     poids_rejetes <- poids[poids$acc==0,]
+          "
+  )
+  poids_acceptes <- poids[poids$acc == 1, ]
+  poids_rejetes <- poids[poids$acc == 0, ]
 
-     poids_acceptes$count_acc <- poids_acceptes$count
-     poids_acceptes$count <- NULL
-     poids_acceptes$acc <- NULL
+  poids_acceptes$count_acc <- poids_acceptes$count
+  poids_acceptes$count <- NULL
+  poids_acceptes$acc <- NULL
 
-     poids_rejetes$count_rej <- poids_rejetes$count
-     poids_rejetes$count <- NULL
-     poids_rejetes$acc <- NULL
+  poids_rejetes$count_rej <- poids_rejetes$count
+  poids_rejetes$count <- NULL
+  poids_rejetes$acc <- NULL
 
-     poids_tot <- merge(poids_acceptes, poids_rejetes, by="classe_SCORE", all.x=TRUE, all.y=TRUE)
-     poids_tot$poidsfinal <- ifelse(is.na(poids_tot$count_acc),0,ifelse(is.na(poids_tot$count_rej),1,1+poids_tot$count_rej/poids_tot$count_acc))
-     poids_tot$count_acc <- NULL
-     poids_tot$count_rej <- NULL
+  poids_tot <- merge(poids_acceptes, poids_rejetes, by = "classe_SCORE", all.x = TRUE, all.y = TRUE)
+  poids_tot$poidsfinal <- ifelse(is.na(poids_tot$count_acc), 0, ifelse(is.na(poids_tot$count_rej), 1, 1 + poids_tot$count_rej / poids_tot$count_acc))
+  poids_tot$count_acc <- NULL
+  poids_tot$count_rej <- NULL
 
-     df_augmente <- merge(df_f, poids_tot, by="classe_SCORE", all.x=TRUE, all.y=TRUE)
-     if (!requireNamespace("speedglm", quietly = TRUE)) {
-          model_augmente = stats::glm(labels ~ ., family = stats::binomial(link='logit'), df_augmente[,-which(names(df_augmente) %in% c("poidsfinal","classe_SCORE"))], weights = df_augmente$poidsfinal)
-     } else {
-          model_augmente = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df_augmente[,-which(names(df_augmente) %in% c("poidsfinal","classe_SCORE"))][!df_augmente$poidsfinal == 0,], weights = df_augmente$poidsfinal[!df_augmente$poidsfinal == 0])
-          class(model_augmente) = c(class(model_augmente),"glmORlogicalORspeedglm")
-     }
+  df_augmente <- merge(df_f, poids_tot, by = "classe_SCORE", all.x = TRUE, all.y = TRUE)
+  if (!requireNamespace("speedglm", quietly = TRUE)) {
+    model_augmente <- stats::glm(labels ~ ., family = stats::binomial(link = "logit"), df_augmente[, -which(names(df_augmente) %in% c("poidsfinal", "classe_SCORE"))], weights = df_augmente$poidsfinal)
+  } else {
+    model_augmente <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), df_augmente[, -which(names(df_augmente) %in% c("poidsfinal", "classe_SCORE"))][!df_augmente$poidsfinal == 0, ], weights = df_augmente$poidsfinal[!df_augmente$poidsfinal == 0])
+  }
+  class(model_augmente) <- c(class(model_augmente), "glmORlogicalORspeedglm")
 
-
-     return(methods::new(Class = "reject_infered", method_name = "augmentation", financed_model = model_f, acceptance_model = as.logical(NA), infered_model = model_augmente))
-
+  return(methods::new(Class = "reject_infered", method_name = "augmentation", financed_model = model_f, acceptance_model = as.logical(NA), infered_model = model_augmente))
 }

@@ -19,47 +19,38 @@
 #' Ehrhardt, A., Biernacki, C., Vandewalle, V., Heinrich, P. and Beben, S. (2018), Reject Inference Methods in Credit Scoring: a rational review,
 #' @examples
 #' # We simulate data from financed clients
-#' set.seed(1)
-#' xf = matrix(runif(100*2), nrow = 100, ncol = 2)
-#' theta = c(2,-2)
-#' log_odd = apply(xf, 1, function(row) theta%*%row)
-#' yf = rbinom(100,1,1/(1+exp(-log_odd)))
+#' xf <- matrix(runif(100 * 2), nrow = 100, ncol = 2)
+#' theta <- c(2, -2)
+#' log_odd <- apply(xf, 1, function(row) theta %*% row)
+#' yf <- rbinom(100, 1, 1 / (1 + exp(-log_odd)))
 #' # We simulate data from not financed clients (MCAR mechanism)
-#' xnf = matrix(runif(100*2), nrow = 100, ncol = 2)
-#' twins(xf,xnf,yf)
+#' xnf <- matrix(runif(100 * 2), nrow = 100, ncol = 2)
+#' twins(xf, xnf, yf)
+twins <- function(xf, xnf, yf) {
+  check_consistency(xf, xnf, yf)
+  df_f <- data.frame(labels = yf, x = xf)
+  model_f <- model_finances(df_f)
 
-twins <- function(xf,xnf,yf) {
-     df_f <- data.frame(labels = yf, x = xf)
-     if (!requireNamespace("speedglm", quietly = TRUE)) {
-          warning("Speedglm not installed, using glm instead (slower).",call. = FALSE)
-          model_f <- stats::glm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
-     } else {
-          model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
-          # methods::setOldClass(class(model_f)[1])
-          # methods::setOldClass(class(model_f)[2])
-          # methods::setIs(class(model_f)[1], "glmORlogicalORspeedglm")
-          # methods::setIs(class(model_f)[2], "glmORlogicalORspeedglm")
-     }
-     df <- rbind(df_f, data.frame(labels = rep(NA,nrow(xnf)), x = xnf))
-     df$acc = NA
-     df$acc[1:nrow(df_f)] <- 1
-     df$acc[(nrow(df_f)+1):nrow(df)] <- 0
+  df <- rbind(df_f, data.frame(labels = rep(NA, nrow(xnf)), x = xnf))
+  df$acc <- NA
+  df$acc[1:nrow(df_f)] <- 1
+  df$acc[(nrow(df_f) + 1):nrow(df)] <- 0
 
-     if (!requireNamespace("speedglm", quietly = TRUE)) {
-          model_acc <- stats::glm(acc ~ ., family = stats::binomial(link='logit'), df[,-which(names(df) %in% c("labels"))])
-     } else {
-          model_acc <- speedglm::speedglm(acc ~ ., family = stats::binomial(link='logit'), df[,-which(names(df) %in% c("labels"))])
-          # methods::setIs(class(model_acc), "glmORlogicalORspeedglm")
-     }
-     df$score_acc <- predict(model_acc,df)
-     df$score_def <- predict(model_f,df)
-     if (!requireNamespace("speedglm", quietly = TRUE)) {
-          model_twins = stats::glm(labels ~ score_acc + score_def, family = stats::binomial(link='logit'), df[df$acc==1,-which(names(df) %in% c("acc"))])
-     } else {
-          model_twins = speedglm::speedglm(labels ~ score_acc + score_def, family = stats::binomial(link='logit'), df[df$acc==1,-which(names(df) %in% c("acc"))])
-          # methods::setIs(class(model_twins), "glmORlogicalORspeedglm")
-     }
-     # return(list(financed.model = model_f, acceptation.model = model_acc, twins.model = model_twins))
-     return(methods::new(Class = "reject_infered", method_name = "twins", financed_model = model_f, acceptance_model = model_acc, infered_model = model_twins))
+  if (!requireNamespace("speedglm", quietly = TRUE)) {
+    model_acc <- stats::glm(acc ~ ., family = stats::binomial(link = "logit"), df[, -which(names(df) %in% c("labels"))])
+  } else {
+    model_acc <- speedglm::speedglm(acc ~ ., family = stats::binomial(link = "logit"), df[, -which(names(df) %in% c("labels"))])
+  }
+  class(model_acc) <- c(class(model_acc), "glmORlogicalORspeedglm")
 
+  df$score_acc <- predict(model_acc, df)
+  df$score_def <- predict(model_f, df)
+  if (!requireNamespace("speedglm", quietly = TRUE)) {
+    model_twins <- stats::glm(labels ~ score_acc + score_def, family = stats::binomial(link = "logit"), df[df$acc == 1, -which(names(df) %in% c("acc"))])
+  } else {
+    model_twins <- speedglm::speedglm(labels ~ score_acc + score_def, family = stats::binomial(link = "logit"), df[df$acc == 1, -which(names(df) %in% c("acc"))])
+  }
+  class(model_twins) <- c(class(model_twins), "glmORlogicalORspeedglm")
+
+  return(methods::new(Class = "reject_infered", method_name = "twins", financed_model = model_f, acceptance_model = model_acc, infered_model = model_twins))
 }

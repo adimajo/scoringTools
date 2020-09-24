@@ -26,14 +26,13 @@ We use predictions of both models on the labeled observations to construct a "me
 }
 \examples{
 # We simulate data from financed clients
-set.seed(1)
-xf = matrix(runif(100*2), nrow = 100, ncol = 2)
-theta = c(2,-2)
-log_odd = apply(xf, 1, function(row) theta\%*\%row)
-yf = rbinom(100,1,1/(1+exp(-log_odd)))
+xf <- matrix(runif(100 * 2), nrow = 100, ncol = 2)
+theta <- c(2, -2)
+log_odd <- apply(xf, 1, function(row) theta \%*\% row)
+yf <- rbinom(100, 1, 1 / (1 + exp(-log_odd)))
 # We simulate data from not financed clients (MCAR mechanism)
-xnf = matrix(runif(100*2), nrow = 100, ncol = 2)
-twins(xf,xnf,yf)
+xnf <- matrix(runif(100 * 2), nrow = 100, ncol = 2)
+twins(xf, xnf, yf)
 }
 \references{
 Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, \url{https://CRAN.R-project.org/package=speedglm}

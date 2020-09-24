@@ -4,9 +4,15 @@
 \alias{modchi2_iter}
 \title{Wrapper function for the modified Chi2 function from the discretization package.}
 \usage{
-modchi2_iter(predictors, labels, test = F, validation = F,
-  proportions = c(0.3, 0.3), criterion = "gini", param = list(alp =
-  0.5))
+modchi2_iter(
+  predictors,
+  labels,
+  test = F,
+  validation = F,
+  proportions = c(0.3, 0.3),
+  criterion = "gini",
+  param = list(alp = 0.5)
+)
 }
 \arguments{
 \item{predictors}{The matrix array containing the numeric attributes to discretize.}

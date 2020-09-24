@@ -1,3 +1,4 @@
+![R package](https://github.com/adimajo/scoringTools/workflows/R%20package/badge.svg)
 [![Travis build status](https://travis-ci.org/adimajo/scoringTools.svg?branch=master)](https://travis-ci.org/adimajo/scoringTools)
 [![Coverage status](https://codecov.io/gh/adimajo/scoringTools/branch/master/graph/badge.svg)](https://codecov.io/github/adimajo/scoringTools?branch=master)
 
@@ -11,9 +12,9 @@ In order to accept / reject loan applications more efficiently (both quicker and
 
 Three subjects are tackled in this package:
 
-* Reject Inference: using not financed clients' information to build a scorecard (see `vignette("scoringTools"`)
-* Quantization (discretization and grouping of levels) and interaction screening (see `vignette("glmdisc"`)
-* Logistic regression trees (see `vignette("glmtree"`)
+* Reject Inference: using not financed clients' information to build a scorecard (see `vignette("scoringTools")`)
+* Quantization (discretization and grouping of levels) and interaction screening (see `vignette("glmdisc")`)
+* Logistic regression trees (see `vignette("glmtree")`)
 
 The packages' websites (obtained from `pkgdown`) are available respectively at:
 

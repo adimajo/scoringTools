@@ -1,17 +1,17 @@
-## ---- echo=FALSE, results='asis'-----------------------------------------
+## ---- echo=FALSE, results='asis'----------------------------------------------
 knitr::kable(data.frame(Job=c("Craftsman","Technician","Executive","Office employee"),Habitation = c("Owner","Renter","Starter","By family"),Time_in_job = c(10,20,5,2), Children = c(0,1,2,3), Family_status=  c("Divorced","Widower","Single","Married"),Default = c("No","No","Yes","No")))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 library(scoringTools)
 scoring_model <- glm(Default ~ ., data = lendingClub, family = binomial(link = "logit"))
 
-## ---- echo=FALSE---------------------------------------------------------
+## ---- echo=FALSE--------------------------------------------------------------
 scoring_model$coefficients
 
-## ---- echo=FALSE, results='asis'-----------------------------------------
+## ---- echo=FALSE, results='asis'----------------------------------------------
 scoring_model$deviance
 
-## ---- fig.show='hold'----------------------------------------------------
+## ---- fig.show='hold'---------------------------------------------------------
 data_cont_simu <- function(n,d,k) {
     set.seed(k)
     x = matrix(runif(n*d), nrow = n, ncol = d)
@@ -65,39 +65,39 @@ if (require(ggplot2, quietly = TRUE)) {
      ggplot(data.frame(theta_1), aes(x=theta_1)) + geom_histogram() + geom_vline(xintercept = 1)
 }
 
-## ---- echo=FALSE, results='asis'-----------------------------------------
+## ---- echo=FALSE, results='asis'----------------------------------------------
 xf = as.matrix(df[df$decision == "accept", c("x.1", "x.2")])
 xnf = as.matrix(df[df$decision == "reject", c("x.1", "x.2")])
 yf = df[df$decision == "accept", "y"]
 hat_theta_fuzzy = fuzzy_augmentation(xf,xnf,yf)
 
-## ---- echo=FALSE, results='asis'-----------------------------------------
+## ---- echo=FALSE, results='asis'----------------------------------------------
 hat_theta_reclassification = reclassification(xf,xnf,yf)
 
-## ---- echo=FALSE, results='asis'-----------------------------------------
+## ---- echo=FALSE, results='asis'----------------------------------------------
 hat_theta_augmentation = augmentation(xf,xnf,yf)
 
-## ---- echo=FALSE, results='asis'-----------------------------------------
+## ---- echo=FALSE, results='asis'----------------------------------------------
 hat_theta_parcelling = parcelling(xf,xnf,yf)
 
-## ---- echo=FALSE, results='asis'-----------------------------------------
+## ---- echo=FALSE, results='asis'----------------------------------------------
 hat_theta_twins = twins(xf,xnf,yf)
 
-## ---- echo=FALSE, results='asis'-----------------------------------------
+## ---- echo=FALSE, results='asis'----------------------------------------------
 # hat_theta_augmentation@method
 hat_theta_reclassification@financed_model
 hat_theta_twins@acceptance_model
 hat_theta_fuzzy@infered_model
 
-## ---- echo=FALSE, results='asis'-----------------------------------------
+## ---- echo=FALSE, results='asis'----------------------------------------------
 print(hat_theta_reclassification)
 
-## ---- echo=FALSE, results='asis'-----------------------------------------
+## ---- echo=FALSE, results='asis'----------------------------------------------
 summary(hat_theta_reclassification)
 
-## ---- echo=FALSE, results='asis'-----------------------------------------
+## ---- echo=FALSE, results='asis'----------------------------------------------
 # predict(hat_theta_reclassification, xf)
 
-## ---- fig.show='hold'----------------------------------------------------
+## ---- fig.show='hold'---------------------------------------------------------
 # plot(hat_theta_reclassification)
 

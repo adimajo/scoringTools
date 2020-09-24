@@ -21,66 +21,54 @@
 #' Ehrhardt, A., Biernacki, C., Vandewalle, V., Heinrich, P. and Beben, S. (2018), Reject Inference Methods in Credit Scoring: a rational review,
 #' @examples
 #' # We simulate data from financed clients
-#' set.seed(1)
-#' xf = matrix(runif(100*2), nrow = 100, ncol = 2)
-#' theta = c(2,-2)
-#' log_odd = apply(xf, 1, function(row) theta%*%row)
-#' yf = rbinom(100,1,1/(1+exp(-log_odd)))
+#' xf <- matrix(runif(100 * 2), nrow = 100, ncol = 2)
+#' theta <- c(2, -2)
+#' log_odd <- apply(xf, 1, function(row) theta %*% row)
+#' yf <- rbinom(100, 1, 1 / (1 + exp(-log_odd)))
 #' # We simulate data from not financed clients (MCAR mechanism)
-#' xnf = matrix(runif(100*2), nrow = 100, ncol = 2)
-#' parcelling(xf,xnf,yf)
+#' xnf <- matrix(runif(100 * 2), nrow = 100, ncol = 2)
+#' parcelling(xf, xnf, yf)
+parcelling <- function(xf, xnf, yf, probs = seq(0, 1, 0.25), alpha = rep(1, length(probs) - 1)) {
+  check_consistency(xf, xnf, yf)
+  df_f <- data.frame(labels = yf, x = xf)
+  model_f <- model_finances(df_f)
 
-parcelling <- function(xf,xnf,yf, probs = seq(0, 1, 0.25), alpha = rep(1,length(probs)-1)) {
-     df_f <- data.frame(labels = yf, x = xf)
+  df <- rbind(df_f, data.frame(labels = rep(NA, nrow(xnf)), x = xnf))
+  classe_SCORE <- stats::quantile(predict(model_f, df_f, type = "response"), probs = probs)
+  df_f$classe_SCORE <- cut(predict(model_f, df_f, type = "response"), breaks = c(classe_SCORE[2:(length(classe_SCORE) - 1)], Inf, -Inf), labels = names(classe_SCORE[-1]))
+  df$classe_SCORE <- cut(predict(model_f, df, type = "response"), breaks = c(classe_SCORE[2:(length(classe_SCORE) - 1)], Inf, -Inf), labels = names(classe_SCORE[-1]))
+  df$acc <- NA
+  df$acc[1:nrow(df_f)] <- 1
+  df$acc[(nrow(df_f) + 1):nrow(df)] <- 0
 
-     if (!requireNamespace("speedglm", quietly = TRUE)) {
-          warning("Speedglm not installed, using glm instead (slower).",call. = FALSE)
-          model_f <- stats::glm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
-     } else {
-          model_f <- speedglm::speedglm(labels ~ ., family=stats::binomial(link="logit"), data = df_f)
-          # methods::setOldClass(class(model_f)[1])
-          # methods::setOldClass(class(model_f)[2])
-          # methods::setIs(class(model_f)[1], "glmORlogicalORspeedglm")
-          # methods::setIs(class(model_f)[2], "glmORlogicalORspeedglm")
-     }
-
-     df <- rbind(df_f, data.frame(labels = rep(NA,nrow(xnf)), x = xnf))
-     classe_SCORE <- stats::quantile(predict(model_f,df_f,type="response"), probs = probs)
-     df_f$classe_SCORE <- cut(predict(model_f,df_f,type="response"), breaks = c(classe_SCORE[2:(length(classe_SCORE)-1)],Inf,-Inf), labels = names(classe_SCORE[-1]))
-     df$classe_SCORE <- cut(predict(model_f,df,type="response"), breaks = c(classe_SCORE[2:(length(classe_SCORE)-1)],Inf,-Inf), labels = names(classe_SCORE[-1]))
-     df$acc = NA
-     df$acc[1:nrow(df_f)] <- 1
-     df$acc[(nrow(df_f)+1):nrow(df)] <- 0
-
-     poids_part <- sqldf::sqldf(
-          'select distinct count(labels) as count, classe_SCORE, labels
+  poids_part <- sqldf::sqldf(
+    "select distinct count(labels) as count, classe_SCORE, labels
           from df_f
           group by classe_SCORE, labels
-          '
-     )
+          "
+  )
 
-     poids_bon <- poids_part[poids_part$labels==1,]
-     poids_mauvais <- poids_part[poids_part$labels==0,]
-     poids_bon$labels <- NULL
-     poids_mauvais$labels <- NULL
-     poids <- merge(poids_bon, poids_mauvais, by="classe_SCORE", all.x=TRUE, all.y=TRUE)
-     poids$poids_final <- poids$count.y/(poids$count.x+poids$count.y)
-     poids$poids_final <- poids$poids_final*alpha
-     poids$count.x <- NULL
-     poids$count.y <- NULL
+  poids_bon <- poids_part[poids_part$labels == 1, ]
+  poids_mauvais <- poids_part[poids_part$labels == 0, ]
+  poids_bon$labels <- NULL
+  poids_mauvais$labels <- NULL
+  poids <- merge(poids_bon, poids_mauvais, by = "classe_SCORE", all.x = TRUE, all.y = TRUE)
+  poids$poids_final <- poids$count.y / (poids$count.x + poids$count.y)
+  poids$poids_final <- poids$poids_final * alpha
+  poids$count.x <- NULL
+  poids$count.y <- NULL
 
-     df_parceling <- merge(df, poids, by="classe_SCORE", all.x=TRUE, all.y=TRUE)
-     df_parceling$poids_final <- ifelse(is.na(df_parceling$poids_final), 1, df_parceling$poids_final)
+  df_parceling <- merge(df, poids, by = "classe_SCORE", all.x = TRUE, all.y = TRUE)
+  df_parceling$poids_final <- ifelse(is.na(df_parceling$poids_final), 1, df_parceling$poids_final)
 
-     df_parceling[df_parceling$acc==0,"labels"] <- sapply(df_parceling[df_parceling$acc==0,"poids_final"],function(x) (stats::rbinom(1,1,1-x)))
+  df_parceling[df_parceling$acc == 0, "labels"] <- sapply(df_parceling[df_parceling$acc == 0, "poids_final"], function(x) (stats::rbinom(1, 1, 1 - x)))
 
-     if (!requireNamespace("speedglm", quietly = TRUE)) {
-          model_parcelling = stats::glm(labels ~ ., family = stats::binomial(link='logit'), df_parceling[,-which(names(df_parceling) %in% c("poids_final","classe_SCORE","acc"))])
-     } else {
-          model_parcelling = speedglm::speedglm(labels ~ ., family = stats::binomial(link='logit'), df_parceling[,-which(names(df_parceling) %in% c("poids_final","classe_SCORE","acc"))])
-          # methods::setIs(class(model_parcelling), "glmORlogicalORspeedglm")
-     }
+  if (!requireNamespace("speedglm", quietly = TRUE)) {
+    model_parcelling <- stats::glm(labels ~ ., family = stats::binomial(link = "logit"), df_parceling[, -which(names(df_parceling) %in% c("poids_final", "classe_SCORE", "acc"))])
+  } else {
+    model_parcelling <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), df_parceling[, -which(names(df_parceling) %in% c("poids_final", "classe_SCORE", "acc"))])
+  }
+  class(model_parcelling) <- c(class(model_parcelling), "glmORlogicalORspeedglm")
 
-     return(methods::new(Class = "reject_infered", method_name = "parceling", financed_model = model_f, acceptance_model = as.logical(NA), infered_model = model_parcelling))
-
+  return(methods::new(Class = "reject_infered", method_name = "parceling", financed_model = model_f, acceptance_model = as.logical(NA), infered_model = model_parcelling))
 }

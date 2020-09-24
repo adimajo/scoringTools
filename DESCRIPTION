@@ -1,8 +1,8 @@
 Package: scoringTools
 Type: Package
 Title: Credit Scoring Tools
-Version: 0.1
-Date: 2019-08-28
+Version: 0.1.0
+Date: 2020-08-26
 Authors@R: c(person("Adrien", "Ehrhardt", email = "adrien.ehrhardt@centraliens-lille.org",
                   role = c("aut", "cre")))
 Maintainer: Adrien Ehrhardt <adrien.ehrhardt@centraliens-lille.org>
@@ -10,7 +10,7 @@ Description: Grouping essential tools for credit scoring. These statistical tool
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Imports:
     glmdisc,
     glmtree,
@@ -32,3 +32,25 @@ Suggests:
 URL: https://adimajo.github.io
 BugReports: https://github.com/adimajo/scoringTools/issues
 VignetteBuilder: knitr
+Collate: 
+    'allClasses.R'
+    'allMethods.R'
+    'augmentation.R'
+    'check_consistency.R'
+    'chi2.R'
+    'chiM.R'
+    'cut.dataset.R'
+    'data.R'
+    'discretize.cutp.R'
+    'echi2.R'
+    'fuzzyAugmentation.R'
+    'get_cutp.R'
+    'mdlp.R'
+    'modChi2.R'
+    'model_f.R'
+    'parcelling.R'
+    'reclassification.R'
+    'runDemo.R'
+    'scoring.R'
+    'topdown.R'
+    'twins.R'
