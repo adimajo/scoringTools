@@ -277,24 +277,25 @@ plot.discretization <- function(object, type, ...) {
 #' Generic method "discretize" for discretization objects.
 #'
 #' This function discretizes a new data set using a previously learnt discretization scheme.
-#' @rdname discretize-method
-#' @name discretize
-#' @docType methods
+# #' @rdname discretize
+# #' @name discretize
+# #' @docType methods
 #' @exportMethod discretize
 #' @param object the S4 discretization object
 #' @param data new data to discretize
 #' @description This defines the generic method "discretize" which will discretize a new input dataset given a discretization scheme of S4 class discretization.
 methods::setGeneric("discretize", function(object, data) attributes(object))
 
-#' Method for discretizing a new input dataset given a discretization scheme of class "discretization".
-#'
-#' This function discretizes a new data set using a previously learnt discretization scheme.
-#' @rdname discretize-method
-#' @name discretize
-#' @aliases discretize,scoringTools-method
-#' @param object the S4 discretization object
-#' @param data new data to discretize
-#' @description This defines the method "discretize" which will discretize a new input dataset given a discretization scheme of S4 class discretization.
+# #' Method for discretizing a new input dataset given a discretization scheme of class "discretization".
+# #'
+# #' This function discretizes a new data set using a previously learnt discretization scheme.
+# #' @rdname discretize-method
+# #' @name discretize-method
+# #' @aliases discretize,scoringTools-method
+# #' @param object the S4 discretization object
+# #' @param data new data to discretize
+# #' @description This defines the method "discretize" which will discretize a new input dataset given a discretization scheme of S4 class discretization.
+#' @rdname discretize
 methods::setMethod("discretize", methods::signature(object = "discretization"), function(object, data) {
   # if (substr(object@method.name,1,3)=="sem") {
   #      discretize_link(object@best.disc[[2]],data)

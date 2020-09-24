@@ -1,8 +1,8 @@
 #' Class discretization
 #'
 #' An S4 class to represent a discretization scheme.
-#' @rdname discretization-class
-#' @name discretization-class
+#' @rdname discretization
+#' @name discretization
 #' @slot method.name The name of the used discretization method.
 #' @slot parameters The parameters associated with the used method.
 #' @slot best.disc The best discretization scheme found by the method given its parameters.

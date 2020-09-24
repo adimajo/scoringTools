@@ -66,7 +66,7 @@ augmentation <- function(xf, xnf, yf) {
   } else {
     model_augmente <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), df_augmente[, -which(names(df_augmente) %in% c("poidsfinal", "classe_SCORE"))][!df_augmente$poidsfinal == 0, ], weights = df_augmente$poidsfinal[!df_augmente$poidsfinal == 0])
   }
-  class(model_augmente) <- c(class(model_augmente), "glmORlogicalORspeedglm")
+  class(model_augmente) <- c("glmORlogicalORspeedglm", class(model_augmente))
 
   return(methods::new(Class = "reject_infered", method_name = "augmentation", financed_model = model_f, acceptance_model = as.logical(NA), infered_model = model_augmente))
 }
