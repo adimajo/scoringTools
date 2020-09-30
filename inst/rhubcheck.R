@@ -28,6 +28,10 @@ res <- do.call(rbind, lapply(statuses, function(thisStatus) {
 }))
 print(res)
 
-if (any(colSums(res[2L:4L]) > 0)) {
+if (any(colSums(res[2L:3L]) > 0)) {
         stop("Some checks with errors, warnings or notes.")
+}
+
+if (any(colSums(res[4L:4L]) > 0)) {
+        warning("Some checks with notes.")
 }
