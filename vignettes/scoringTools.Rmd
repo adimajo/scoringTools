@@ -76,9 +76,7 @@ At the time of this writing, four problems have been tackled so far in the Credi
 3. Interactions among covariates,
 4. ‘‘Segmentation'' of clients into subpopulations with different scorecards: logistic regression trees.
 
-Findings from these two subjects have been formalized in two preprints articles, and respectively.
-
-This package is about these two subjects on which we'll go deeper in the next two sections.
+This package is about the first two subjects on which we'll go deeper in the next two sections.
 
 # Reject Inference
 
@@ -327,11 +325,9 @@ In short, the algorithm considers the discretized features $\boldsymbol{\mathfra
 
 ### Implementation
 
-The approach is implemented in the `glmdisc` package required by this package. Please refer to its vignette (by typing `vignette("glmdisc")`).
+The approach is implemented in the `glmdisc` package Please refer to its vignette (by typing `vignette("glmdisc")`).
 
 # Segmentation: logistic regression trees
-
-
 
 The approach is implemented in the `glmtree` package required by this package. Please refer to its vignette (by typing `vignette("glmtree")`).
 

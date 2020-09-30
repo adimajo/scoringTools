@@ -67,16 +67,16 @@ mdlp_iter <- function(predictors, labels, test = F, validation = F, proportions 
   if (validation == TRUE) {
     data_test <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[2]], ], disc[["Disc.data"]], predictors[ensemble[[1]], ])), as.factor), stringsAsFactors = TRUE)
     if (criterion == "gini") {
-      ginidisc <- glmdisc::normalizedGini(labels[ensemble[[2]]], predict(logit, data_test, type = "response"))
+      ginidisc <- normalizedGini(labels[ensemble[[2]]], predict(logit, data_test, type = "response"))
     } else {
       aicdisc <- logit$aic
     }
   } else {
     if (criterion == "gini") {
       if (!requireNamespace("speedglm", quietly = TRUE)) {
-        ginidisc <- glmdisc::normalizedGini(labels[ensemble[[1]]], logit$fitted.values)
+        ginidisc <- normalizedGini(labels[ensemble[[1]]], logit$fitted.values)
       } else {
-        ginidisc <- glmdisc::normalizedGini(labels[ensemble[[1]]], logit$linear.predictors)
+        ginidisc <- normalizedGini(labels[ensemble[[1]]], logit$linear.predictors)
       }
     } else {
       aicdisc <- logit$aic
@@ -89,9 +89,9 @@ mdlp_iter <- function(predictors, labels, test = F, validation = F, proportions 
       best.disc <- list(logit, disc)
       if (validation == TRUE) {
         data_validation <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[3]], ], disc[["Disc.data"]], predictors[ensemble[[1]], ])), as.factor), stringsAsFactors = TRUE)
-        performance <- glmdisc::normalizedGini(labels[ensemble[[3]]], predict(best.disc[[1]], data_validation, type = "response"))
+        performance <- normalizedGini(labels[ensemble[[3]]], predict(best.disc[[1]], data_validation, type = "response"))
       } else {
-        performance <- glmdisc::normalizedGini(labels[ensemble[[2]]], predict(best.disc[[1]], data_test, type = "response"))
+        performance <- normalizedGini(labels[ensemble[[2]]], predict(best.disc[[1]], data_test, type = "response"))
       }
     } else {
       best.disc <- list(logit, disc)
@@ -102,12 +102,12 @@ mdlp_iter <- function(predictors, labels, test = F, validation = F, proportions 
       best.disc <- list(logit, disc, 1)
       if (validation == TRUE) {
         data_validation <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[3]], ], disc[["Disc.data"]], predictors[ensemble[[1]], ])), as.factor), stringsAsFactors = TRUE)
-        performance <- glmdisc::normalizedGini(labels[ensemble[[3]]], predict(best.disc[[1]], data_validation, type = "response"))
+        performance <- normalizedGini(labels[ensemble[[3]]], predict(best.disc[[1]], data_validation, type = "response"))
       } else {
         if (!requireNamespace("speedglm", quietly = TRUE)) {
-          performance <- glmdisc::normalizedGini(labels[ensemble[[1]]], best.disc[[1]]$fitted.values)
+          performance <- normalizedGini(labels[ensemble[[1]]], best.disc[[1]]$fitted.values)
         } else {
-          performance <- glmdisc::normalizedGini(labels[ensemble[[1]]], best.disc[[1]]$linear.predictors)
+          performance <- normalizedGini(labels[ensemble[[1]]], best.disc[[1]]$linear.predictors)
         }
       }
     } else {
