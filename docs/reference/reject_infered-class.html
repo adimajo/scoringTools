@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generic method "discretize" for discretization objects. — discretize • scoringTools</title>
+<title>Class reject_infered — reject_infered-class • scoringTools</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Generic method "discretize" for discretization objects. — discretize" />
-<meta property="og:description" content="This defines the generic method &quot;discretize&quot; which will discretize a new input dataset given a discretization scheme of S4 class discretization." />
+<meta property="og:title" content="Class reject_infered — reject_infered-class" />
+<meta property="og:description" content="An S4 class to represent a reject inference technique." />
 
 
 
@@ -114,36 +114,31 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Generic method "discretize" for discretization objects.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/adimajo/scoringTools/blob/master/R/allMethods.R'><code>R/allMethods.R</code></a></small>
-    <div class="hidden name"><code>discretize.Rd</code></div>
+    <h1>Class reject_infered</h1>
+    <small class="dont-index">Source: <a href='https://github.com/adimajo/scoringTools/blob/master/R/allClasses.R'><code>R/allClasses.R</code></a></small>
+    <div class="hidden name"><code>reject_infered-class.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This defines the generic method "discretize" which will discretize a new input dataset given a discretization scheme of S4 class discretization.</p>
+    <p>An S4 class to represent a reject inference technique.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>discretize</span>(<span class='no'>object</span>, <span class='no'>data</span>)
 
-<span class='co'># S4 method for discretization</span>
-<span class='fu'>discretize</span>(<span class='no'>object</span>, <span class='no'>data</span>)</pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>object</th>
-      <td><p>the S4 discretization object</p></td>
-    </tr>
-    <tr>
-      <th>data</th>
-      <td><p>new data to discretize</p></td>
-    </tr>
-    </table>
+    <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    
 
-    <p>This function discretizes a new data set using a previously learnt discretization scheme.</p>
+<dl'>
+<dt><code>method_name</code></dt><dd><p>The name of the used reject inference method.</p></dd>
+
+<dt><code>financed_model</code></dt><dd><p>The logistic regression model on financed clients.</p></dd>
+
+<dt><code>acceptance_model</code></dt><dd><p>The acceptance model (if estimated by the given method).</p></dd>
+
+<dt><code>infered_model</code></dt><dd><p>The logistic regression model resulting from the reject inference method.</p></dd>
+
+</dl>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -34,7 +34,6 @@ This function discretizes a training set using the chi2 method and the user-prov
 }
 \examples{
 # Simulation of a discretized logit model
-set.seed(1)
 x <- matrix(runif(300), nrow = 100, ncol = 3)
 cuts <- seq(0, 1, length.out = 4)
 xd <- apply(x, 2, function(col) as.numeric(cut(col, cuts)))

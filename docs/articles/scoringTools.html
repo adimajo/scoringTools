@@ -76,7 +76,7 @@
       <h1 data-toc-skip>Credit Scoring Tools: the <code>scoringTools</code> package</h1>
                         <h4 class="author">Adrien Ehrhardt</h4>
             
-            <h4 class="date">2020-08-26</h4>
+            <h4 class="date">2020-09-30</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/adimajo/scoringTools/blob/master/vignettes/scoringTools.Rmd"><code>vignettes/scoringTools.Rmd</code></a></small>
       <div class="hidden name"><code>scoringTools.Rmd</code></div>
@@ -394,24 +394,19 @@
 <a href="#functions" class="anchor"></a>Functions</h3>
 <p>In this package, we implemented Reject Inference methods which were described for example in and were supposed to enable credit risk modelers to use not-financed clients’ characteristics in the logistic regression learning process. We demonstrated that these methods are not statistically grounded. We nevertheless implemented these methods to show these results numerically.</p>
 <p>The first method is Fuzzy Augmentation as described in the Appendix of <a href="https://github.com/adimajo/manuscrit_these">my PhD thesis</a>.</p>
-<pre><code>## Warning in if ((class(yf) != "integer") | (levels(factor(yf)) != c("0", : the
-## condition has length &gt; 1 and only the first element will be used</code></pre>
+<pre><code>## Warning: Speedglm not installed, using glm instead (slower).</code></pre>
 <pre><code>## Warning in eval(family$initialize): non-integer #successes in a binomial glm!</code></pre>
 <p>The second method is Reclassification as described in the Appendix of <a href="https://github.com/adimajo/manuscrit_these">my PhD thesis</a>.</p>
-<pre><code>## Warning in if ((class(yf) != "integer") | (levels(factor(yf)) != c("0", : the
-## condition has length &gt; 1 and only the first element will be used</code></pre>
+<pre><code>## Warning: Speedglm not installed, using glm instead (slower).</code></pre>
 <p>The third method is Augmentation as described in the Appendix of <a href="https://github.com/adimajo/manuscrit_these">my PhD thesis</a>.</p>
-<pre><code>## Warning in if ((class(yf) != "integer") | (levels(factor(yf)) != c("0", : the
-## condition has length &gt; 1 and only the first element will be used</code></pre>
+<pre><code>## Warning: Speedglm not installed, using glm instead (slower).</code></pre>
 <pre><code>## Warning in eval(family$initialize): non-integer #successes in a binomial glm!</code></pre>
 <p>The fourth method is Parcelling as described in the Appendix of <a href="https://github.com/adimajo/manuscrit_these">my PhD thesis</a>.</p>
-<pre><code>## Warning in if ((class(yf) != "integer") | (levels(factor(yf)) != c("0", : the
-## condition has length &gt; 1 and only the first element will be used</code></pre>
+<pre><code>## Warning: Speedglm not installed, using glm instead (slower).</code></pre>
 <p>The fifth method is Twins as described in the Appendix of <a href="https://github.com/adimajo/manuscrit_these">my PhD thesis</a>.</p>
-<pre><code>## Warning in if ((class(yf) != "integer") | (levels(factor(yf)) != c("0", : the
-## condition has length &gt; 1 and only the first element will be used</code></pre>
-<pre><code>## Warning in speedglm::speedglm(acc ~ ., family = stats::binomial(link =
-## "logit"), : Maximum number of iterations reached without convergence</code></pre>
+<pre><code>## Warning: Speedglm not installed, using glm instead (slower).</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
 <p>Each of these functions output an S4 object named ‘‘reject_infered’’. This object has slots:</p>
 <ul>
 <li>method: the Reject Inference method used;</li>
@@ -419,18 +414,18 @@
 <li>acceptance_model: the logistic regression modeling the financing decision (empty for all methods except Augmentation and Twins);</li>
 <li>infered_model: the logistic regression obtained using a given reject inference technique.</li>
 </ul>
-<p>Generalized Linear Model of class ‘speedglm’:</p>
-<p>Call: speedglm::speedglm(formula = labels ~ ., data = df_f, family = stats::binomial(link = “logit”))</p>
+<p>Call: stats::glm(formula = labels ~ ., family = stats::binomial(link = “logit”), data = df_f)</p>
 <p>Coefficients: (Intercept) x.x.1 x.x.2<br>
 -0.001515 1.493633 -1.570911</p>
-<p>Generalized Linear Model of class ‘speedglm’:</p>
-<p>Call: speedglm::speedglm(formula = acc ~ ., data = df[, -which(names(df) %in% c(“labels”))], family = stats::binomial(link = “logit”))</p>
+<p>Degrees of Freedom: 815 Total (i.e. Null); 813 Residual Null Deviance: 1122 Residual Deviance: 1080 AIC: 1086</p>
+<p>Call: stats::glm(formula = acc ~ ., family = stats::binomial(link = “logit”), data = df[, -which(names(df) %in% c(“labels”))])</p>
 <p>Coefficients: (Intercept) x.x.1 x.x.2<br>
 1754 -5037 5753</p>
-<p>Generalized Linear Model of class ‘speedglm’:</p>
-<p>Call: speedglm::speedglm(formula = labels ~ ., data = df[, -which(names(df) %in% c(“acc”))], family = stats::binomial(link = “logit”))</p>
+<p>Degrees of Freedom: 999 Total (i.e. Null); 997 Residual Null Deviance: 954.8 Residual Deviance: 2.042e-05 AIC: 6</p>
+<p>Call: stats::glm(formula = labels ~ ., family = stats::binomial(link = “logit”), data = df[, -which(names(df) %in% c(“acc”))])</p>
 <p>Coefficients: (Intercept) x.x.1 x.x.2<br>
 -0.001515 1.493633 -1.570911</p>
+<p>Degrees of Freedom: 999 Total (i.e. Null); 997 Residual Null Deviance: 1165 Residual Deviance: 1080 AIC: 1215</p>
 </div>
 <div id="methods" class="section level3">
 <h3 class="hasAnchor">
@@ -439,10 +434,11 @@
 <div id="print-method" class="section level4">
 <h4 class="hasAnchor">
 <a href="#print-method" class="anchor"></a>print method</h4>
-<p>The print method shows the method used and the coefficients of infered_model, much like you would get from printing a  object: Generalized Linear Model of class ‘speedglm’:</p>
-<p>Call: speedglm::speedglm(formula = labels ~ ., data = df[, -which(names(df) %in% c(“acc”))], family = stats::binomial(link = “logit”))</p>
+<p>The print method shows the method used and the coefficients of infered_model, much like you would get from printing a  object:</p>
+<p>Call: stats::glm(formula = labels ~ ., family = stats::binomial(link = “logit”), data = df[, -which(names(df) %in% c(“acc”))])</p>
 <p>Coefficients: (Intercept) x.x.1 x.x.2<br>
 0.3168 2.5703 -2.7744</p>
+<p>Degrees of Freedom: 999 Total (i.e. Null); 997 Residual Null Deviance: 1377 Residual Deviance: 1162 AIC: 1168</p>
 </div>
 <div id="summary-method" class="section level4">
 <h4 class="hasAnchor">
@@ -458,7 +454,7 @@
 <h4 class="hasAnchor">
 <a href="#plot-method" class="anchor"></a>plot method</h4>
 <p>The plot method allows the modeler to compare each coefficient’s values in the financed model and the infered model.</p>
-<div class="sourceCode" id="cb14"><html><body><pre class="r"># plot(hat_theta_reclassification)</pre></body></html></div>
+<div class="sourceCode" id="cb15"><html><body><pre class="r"># plot(hat_theta_reclassification)</pre></body></html></div>
 </div>
 </div>
 </div>

@@ -25,12 +25,12 @@ jobs:
       - name: Check code style
         run: Rscript inst/lint.R
       - name: Install dependencies
-        run: devtools::install_deps(dependencies = TRUE)
+        run: devtools::install_deps(dependencies = NA)
         shell: Rscript {0}
       - name: Check documentation
         run: Rscript inst/document.R
       - name: Check package (as CRAN)
-        run: devtools::check(document = FALSE, args = "--no-tests", error_on = "note")
+        run: devtools::check(document = FALSE, args = "--no-tests", error_on = "warning")
         shell: Rscript {0}
       - name: Install package
         run: devtools::install()

@@ -43,7 +43,6 @@ HyunJi Kim (2012). discretization: Data preprocessing, discretization for classi
 Tay, F. E. H. and Shen, L. (2002). Modified Chi2 Algorithm for Discretization, \emph{IEEE Transactions on knowledge and data engineering}, \strong{14}, 666–670.
 #' @examples
 # Simulation of a discretized logit model
-set.seed(1)
 x = matrix(runif(300), nrow = 100, ncol = 3)
 cuts = seq(0,1,length.out= 4)
 xd = apply(x,2, function(col) as.numeric(cut(col,cuts)))

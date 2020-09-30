@@ -177,7 +177,6 @@ Fayyad, U. M. and Irani, K. B.(1993). Multi-interval discretization of continuou
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Simulation of a discretized logit model</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>1</span>)
 <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span>(<span class='fl'>300</span>), <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='fl'>3</span>)
 <span class='no'>cuts</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0</span>, <span class='fl'>1</span>, <span class='kw'>length.out</span> <span class='kw'>=</span> <span class='fl'>4</span>)
 <span class='no'>xd</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/apply.html'>apply</a></span>(<span class='no'>x</span>, <span class='fl'>2</span>, <span class='kw'>function</span>(<span class='no'>col</span>) <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/cut.html'>cut</a></span>(<span class='no'>col</span>, <span class='no'>cuts</span>)))
@@ -190,14 +189,18 @@ Fayyad, U. M. and Irani, K. B.(1993). Multi-interval discretization of continuou
 })))
 <span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span>(<span class='fl'>100</span>, <span class='fl'>1</span>, <span class='fl'>1</span> / (<span class='fl'>1</span> + <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(-<span class='no'>log_odd</span>)))
 
-<span class='fu'>mdlp_iter</span>(<span class='no'>x</span>, <span class='no'>y</span>)</div><div class='output co'>#&gt; Generalized Linear Model of class 'speedglm':
-#&gt; 
-#&gt; Call:  speedglm::speedglm(formula = labels ~ ., data = Filter(function(x) (length(unique(x)) &gt;      1), as.data.frame(sapply(disc$Disc.data, as.factor))), family = stats::binomial(link = "logit"),      fitted = TRUE) 
+<span class='fu'>mdlp_iter</span>(<span class='no'>x</span>, <span class='no'>y</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Speedglm not installed, using glm instead (slower).</span></div><div class='output co'>#&gt; 
+#&gt; Call:  stats::glm(formula = labels ~ ., family = stats::binomial(link = "logit"), 
+#&gt;     data = Filter(function(x) (length(unique(x)) &gt; 1), as.data.frame(sapply(disc$Disc.data, 
+#&gt;         as.factor))))
 #&gt; 
 #&gt; Coefficients:
-#&gt; (Intercept)          V12          V22  
-#&gt;        1.46        -2.79       -20.11  
-#&gt; </div></pre>
+#&gt; (Intercept)          V12          V32  
+#&gt;        1.63        -3.21        -2.17  
+#&gt; 
+#&gt; Degrees of Freedom: 99 Total (i.e. Null);  97 Residual
+#&gt; Null Deviance:	    138 
+#&gt; Residual Deviance: 87.8 	AIC: 93.8</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

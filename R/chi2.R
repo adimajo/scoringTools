@@ -13,7 +13,6 @@
 #' @export
 #' @examples
 #' # Simulation of a discretized logit model
-#' set.seed(1)
 #' x <- matrix(runif(300), nrow = 100, ncol = 3)
 #' cuts <- seq(0, 1, length.out = 4)
 #' xd <- apply(x, 2, function(col) as.numeric(cut(col, cuts)))
@@ -28,99 +27,95 @@
 #'
 #' chi2_iter(x, y)
 chi2_iter <- function(predictors, labels, test = F, validation = F, proportions = c(0.3, 0.3), criterion = "gini", param = list(list(alp = 0.001, del = 0.5))) {
-  if (criterion %in% c("gini", "aic")) {
-    if (length(labels) == length(predictors[, 1])) {
-      # Calcul des longueurs pour reutilisation ulterieure
-      n <- length(labels)
-      d <- length(predictors[1, ])
-      # Initialisation des listes de modele
-      logit <- list()
-      disc <- list()
-      ginidisc <- list()
-      # Initialisation du critere de performance
-      if (criterion == "gini") ginidisc <- list() else aicdisc <- list()
+  if (!criterion %in% c("gini", "aic")) {
+    stop(simpleError("Criterion must be either 'gini' or 'aic'"))
+  }
+  if (!length(labels) == length(predictors[, 1])) {
+    stop(simpleError("Arguments labels and predictors must have same length."))
+  }
+  # Calcul des longueurs pour reutilisation ulterieure
+  n <- length(labels)
+  d <- length(predictors[1, ])
+  # Initialisation des listes de modele
+  logit <- list()
+  disc <- list()
+  ginidisc <- list()
+  # Initialisation du critere de performance
+  if (criterion == "gini") ginidisc <- list() else aicdisc <- list()
 
-      # Decoupage de l'ensemble
-      ensemble <- cut_dataset(n, proportions = proportions, test = test, validation = validation)
+  # Decoupage de l'ensemble
+  ensemble <- cut_dataset(n, proportions = proportions, test = test, validation = validation)
 
-      data_train <- as.data.frame(cbind(predictors[ensemble[[1]], ], labels = labels[ensemble[[1]]]))
+  data_train <- as.data.frame(cbind(predictors[ensemble[[1]], ], labels = labels[ensemble[[1]]]))
 
-      # Chi2
-      for (i in 1:length(param)) {
-        disc[[i]] <- discretization::chi2(data = data_train, alp = param[[i]][[1]], del = param[[i]][[2]])
-        if (!requireNamespace("speedglm", quietly = TRUE)) {
-          warning("Speedglm not installed, using glm instead (slower).", call. = FALSE)
-          logit[[i]] <- stats::glm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc[[i]]$Disc.data, as.factor))))
-        } else {
-          logit[[i]] <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc[[i]]$Disc.data, as.factor))), fitted = TRUE)
-          # methods::setIs(class(logit[[i]]), "glmORlogicalORspeedglm")
-        }
-
-        if (validation == TRUE) {
-          data_test <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[2]], ], disc[[i]][["Disc.data"]], predictors[ensemble[[1]], ])), as.factor))
-          if (criterion == "gini") {
-            ginidisc[[i]] <- glmdisc::normalizedGini(labels[ensemble[[2]]], predict(logit[[i]], data_test, type = "response"))
-          } else {
-            aicdisc[[i]] <- logit[[i]]$aic
-          }
-        } else {
-          if (criterion == "gini") {
-            if (!requireNamespace("speedglm", quietly = TRUE)) {
-              ginidisc[[i]] <- glmdisc::normalizedGini(labels[ensemble[[1]]], logit[[i]]$fitted.values)
-            } else {
-              ginidisc[[i]] <- glmdisc::normalizedGini(labels[ensemble[[1]]], logit[[i]]$linear.predictors)
-            }
-          } else {
-            aicdisc[[i]] <- logit[[i]]$aic
-          }
-        }
-      }
-
-      if (test == TRUE) {
-        if (criterion == "gini") {
-          best.disc <- list(logit[[which.min(ginidisc)]], disc[[which.min(ginidisc)]], which.min(ginidisc))
-          if (validation == TRUE) {
-            data_validation <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[3]], ], disc[[i]][["Disc.data"]], predictors[ensemble[[1]], ])), as.factor))
-            performance <- glmdisc::normalizedGini(labels[ensemble[[3]]], predict(best.disc[[1]], data_validation, type = "response"))
-          } else {
-            performance <- glmdisc::normalizedGini(labels[ensemble[[2]]], predict(best.disc[[1]], data_test, type = "response"))
-          }
-        } else {
-          best.disc <- list(logit[[which.min(aicdisc)]], disc[[which.min(aicdisc)]], which.min(aicdisc))
-          if (validation == TRUE) performance <- 0 else performance <- 0
-        }
-      } else {
-        if (criterion == "gini") {
-          best.disc <- list(logit[[which.min(ginidisc)]], disc[[which.min(ginidisc)]], which.min(ginidisc))
-          if (validation == TRUE) {
-            data_validation <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[3]], ], disc[[i]][["Disc.data"]], predictors[ensemble[[1]], ])), as.factor))
-            performance <- glmdisc::normalizedGini(labels[ensemble[[3]]], predict(best.disc[[1]], data_validation, type = "response"))
-          } else {
-            if (!requireNamespace("speedglm", quietly = TRUE)) {
-              performance <- glmdisc::normalizedGini(labels[ensemble[[1]]], best.disc[[1]]$fitted.values)
-            } else {
-              performance <- glmdisc::normalizedGini(labels[ensemble[[1]]], best.disc[[1]]$linear.predictors)
-            }
-          }
-        } else {
-          best.disc <- list(logit[[which.min(aicdisc)]], disc[[which.min(aicdisc)]], which.min(aicdisc))
-          if (validation == TRUE) performance <- 0 else performance <- best.disc[[1]]$aic
-        }
-      }
-
-      if (test == TRUE) {
-        return(methods::new(Class = "discretization", method.name = "chi2", parameters = list(predictors, test, validation, criterion, param, ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_cutp(predictors[ensemble[[3]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels[ensemble[[3]]])), cont.data = data.frame(cbind(predictors[ensemble[[3]], ], labels[ensemble[[3]]]))))
-      } else if (validation == TRUE) {
-        return(methods::new(Class = "discretization", method.name = "chi2", parameters = list(predictors, test, validation, criterion, param, ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_cutp(predictors[ensemble[[2]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels[ensemble[[2]]])), cont.data = data.frame(cbind(predictors[ensemble[[2]], ], labels[ensemble[[2]]]))))
-      } else {
-        return(methods::new(Class = "discretization", method.name = "chi2", parameters = list(predictors, test, validation, criterion, param, ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_cutp(predictors[ensemble[[1]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels[ensemble[[1]]])), cont.data = data.frame(cbind(predictors[ensemble[[1]], ], labels[ensemble[[1]]]))))
-      }
+  # Chi2
+  for (i in 1:length(param)) {
+    disc[[i]] <- discretization::chi2(data = data_train, alp = param[[i]][[1]], del = param[[i]][[2]])
+    if (!requireNamespace("speedglm", quietly = TRUE)) {
+      warning("Speedglm not installed, using glm instead (slower).", call. = FALSE)
+      logit[[i]] <- stats::glm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc[[i]]$Disc.data, as.factor))))
+    } else {
+      logit[[i]] <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc[[i]]$Disc.data, as.factor))), fitted = TRUE)
+      # methods::setIs(class(logit[[i]]), "glmORlogicalORspeedglm")
     }
-    else {
-      print("Arguments labels and predictors must have same length.")
+
+    if (validation == TRUE) {
+      data_test <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[2]], ], disc[[i]][["Disc.data"]], predictors[ensemble[[1]], ])), as.factor))
+      if (criterion == "gini") {
+        ginidisc[[i]] <- glmdisc::normalizedGini(labels[ensemble[[2]]], predict(logit[[i]], data_test, type = "response"))
+      } else {
+        aicdisc[[i]] <- logit[[i]]$aic
+      }
+    } else {
+      if (criterion == "gini") {
+        if (!requireNamespace("speedglm", quietly = TRUE)) {
+          ginidisc[[i]] <- glmdisc::normalizedGini(labels[ensemble[[1]]], logit[[i]]$fitted.values)
+        } else {
+          ginidisc[[i]] <- glmdisc::normalizedGini(labels[ensemble[[1]]], logit[[i]]$linear.predictors)
+        }
+      } else {
+        aicdisc[[i]] <- logit[[i]]$aic
+      }
     }
   }
-  else {
-    print("Criterion must be either 'gini' or 'aic'")
+
+  if (test == TRUE) {
+    if (criterion == "gini") {
+      best.disc <- list(logit[[which.min(ginidisc)]], disc[[which.min(ginidisc)]], which.min(ginidisc))
+      if (validation == TRUE) {
+        data_validation <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[3]], ], disc[[i]][["Disc.data"]], predictors[ensemble[[1]], ])), as.factor))
+        performance <- glmdisc::normalizedGini(labels[ensemble[[3]]], predict(best.disc[[1]], data_validation, type = "response"))
+      } else {
+        performance <- glmdisc::normalizedGini(labels[ensemble[[2]]], predict(best.disc[[1]], data_test, type = "response"))
+      }
+    } else {
+      best.disc <- list(logit[[which.min(aicdisc)]], disc[[which.min(aicdisc)]], which.min(aicdisc))
+      if (validation == TRUE) performance <- 0 else performance <- 0
+    }
+  } else {
+    if (criterion == "gini") {
+      best.disc <- list(logit[[which.min(ginidisc)]], disc[[which.min(ginidisc)]], which.min(ginidisc))
+      if (validation == TRUE) {
+        data_validation <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[3]], ], disc[[i]][["Disc.data"]], predictors[ensemble[[1]], ])), as.factor))
+        performance <- glmdisc::normalizedGini(labels[ensemble[[3]]], predict(best.disc[[1]], data_validation, type = "response"))
+      } else {
+        if (!requireNamespace("speedglm", quietly = TRUE)) {
+          performance <- glmdisc::normalizedGini(labels[ensemble[[1]]], best.disc[[1]]$fitted.values)
+        } else {
+          performance <- glmdisc::normalizedGini(labels[ensemble[[1]]], best.disc[[1]]$linear.predictors)
+        }
+      }
+    } else {
+      best.disc <- list(logit[[which.min(aicdisc)]], disc[[which.min(aicdisc)]], which.min(aicdisc))
+      if (validation == TRUE) performance <- 0 else performance <- best.disc[[1]]$aic
+    }
+  }
+
+  if (test == TRUE) {
+    return(methods::new(Class = "discretization", method.name = "chi2", parameters = list(predictors, test, validation, criterion, param, ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_cutp(predictors[ensemble[[3]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels[ensemble[[3]]])), cont.data = data.frame(cbind(predictors[ensemble[[3]], ], labels[ensemble[[3]]]))))
+  } else if (validation == TRUE) {
+    return(methods::new(Class = "discretization", method.name = "chi2", parameters = list(predictors, test, validation, criterion, param, ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_cutp(predictors[ensemble[[2]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels[ensemble[[2]]])), cont.data = data.frame(cbind(predictors[ensemble[[2]], ], labels[ensemble[[2]]]))))
+  } else {
+    return(methods::new(Class = "discretization", method.name = "chi2", parameters = list(predictors, test, validation, criterion, param, ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_cutp(predictors[ensemble[[1]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels[ensemble[[1]]])), cont.data = data.frame(cbind(predictors[ensemble[[1]], ], labels[ensemble[[1]]]))))
   }
 }
