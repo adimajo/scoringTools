@@ -63,14 +63,14 @@ chiM_iter <- function(predictors, labels, test = F, validation = F, proportions 
     disc[[i]] <- discretization::chiM(data = data_train, alpha = param[[i]])
     if (!requireNamespace("speedglm", quietly = TRUE)) {
       warning("Speedglm not installed, using glm instead (slower).", call. = FALSE)
-      logit[[i]] <- stats::glm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc[[i]]$Disc.data, as.factor))))
+      logit[[i]] <- stats::glm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc[[i]]$Disc.data, as.factor), stringsAsFactors = TRUE)))
     } else {
-      logit[[i]] <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc[[i]]$Disc.data, as.factor))), fitted = TRUE)
+      logit[[i]] <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc[[i]]$Disc.data, as.factor), stringsAsFactors = TRUE)), fitted = TRUE)
       # methods::setIs(class(logit[[i]]), "glmORlogicalORspeedglm")
     }
 
     if (validation == TRUE) {
-      data_test <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[2]], ], disc[[i]][["Disc.data"]], predictors[ensemble[[1]], ])), as.factor))
+      data_test <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[2]], ], disc[[i]][["Disc.data"]], predictors[ensemble[[1]], ])), as.factor), stringsAsFactors = TRUE)
       if (criterion == "gini") {
         ginidisc[[i]] <- glmdisc::normalizedGini(labels[ensemble[[2]]], predict(logit[[i]], data_test, type = "response"))
       } else {
@@ -94,7 +94,7 @@ chiM_iter <- function(predictors, labels, test = F, validation = F, proportions 
     if (criterion == "gini") {
       best.disc <- list(logit[[which.min(ginidisc)]], disc[[which.min(ginidisc)]], which.min(ginidisc))
       if (test == TRUE) {
-        data_validation <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[3]], ], disc[[i]][["Disc.data"]], predictors[ensemble[[1]], ])), as.factor))
+        data_validation <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[3]], ], disc[[i]][["Disc.data"]], predictors[ensemble[[1]], ])), as.factor), stringsAsFactors = TRUE)
         performance <- glmdisc::normalizedGini(labels[ensemble[[3]]], predict(best.disc[[1]], data_validation, type = "response"))
       } else {
         performance <- glmdisc::normalizedGini(labels[ensemble[[2]]], predict(best.disc[[1]], data_test, type = "response"))
@@ -107,7 +107,7 @@ chiM_iter <- function(predictors, labels, test = F, validation = F, proportions 
     if (criterion == "gini") {
       best.disc <- list(logit[[which.min(ginidisc)]], disc[[which.min(ginidisc)]], which.min(ginidisc))
       if (test == TRUE) {
-        data_validation <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[2]], ], disc[[i]][["Disc.data"]], predictors[ensemble[[1]], ])), as.factor))
+        data_validation <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[2]], ], disc[[i]][["Disc.data"]], predictors[ensemble[[1]], ])), as.factor), stringsAsFactors = TRUE)
         performance <- glmdisc::normalizedGini(labels[ensemble[[2]]], predict(best.disc[[1]], data_validation, type = "response"))
       } else {
         if (!requireNamespace("speedglm", quietly = TRUE)) {
@@ -123,10 +123,10 @@ chiM_iter <- function(predictors, labels, test = F, validation = F, proportions 
   }
 
   if (test == TRUE) {
-    return(methods::new(Class = "discretization", method.name = "chiM", parameters = list(predictors, test, validation, criterion, param, ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_cutp(predictors[ensemble[[3]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels[ensemble[[3]]])), cont.data = data.frame(cbind(predictors[ensemble[[3]], ], labels[ensemble[[3]]]))))
+    return(methods::new(Class = "discretization", method.name = "chiM", parameters = list(predictors, test, validation, criterion, param, ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_cutp(predictors[ensemble[[3]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels[ensemble[[3]]]), stringsAsFactors = TRUE), cont.data = data.frame(cbind(predictors[ensemble[[3]], ], labels[ensemble[[3]]]))))
   } else if (validation == TRUE) {
-    return(methods::new(Class = "discretization", method.name = "chiM", parameters = list(predictors, test, validation, criterion, param, ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_cutp(predictors[ensemble[[2]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels[ensemble[[2]]])), cont.data = data.frame(cbind(predictors[ensemble[[2]], ], labels[ensemble[[2]]]))))
+    return(methods::new(Class = "discretization", method.name = "chiM", parameters = list(predictors, test, validation, criterion, param, ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_cutp(predictors[ensemble[[2]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels[ensemble[[2]]]), stringsAsFactors = TRUE), cont.data = data.frame(cbind(predictors[ensemble[[2]], ], labels[ensemble[[2]]]))))
   } else {
-    return(methods::new(Class = "discretization", method.name = "chiM", parameters = list(predictors, test, validation, criterion, param, ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_cutp(predictors[ensemble[[1]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels[ensemble[[1]]])), cont.data = data.frame(cbind(predictors[ensemble[[1]], ], labels[ensemble[[1]]]))))
+    return(methods::new(Class = "discretization", method.name = "chiM", parameters = list(predictors, test, validation, criterion, param, ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_cutp(predictors[ensemble[[1]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels[ensemble[[1]]]), stringsAsFactors = TRUE), cont.data = data.frame(cbind(predictors[ensemble[[1]], ], labels[ensemble[[1]]]))))
   }
 }
