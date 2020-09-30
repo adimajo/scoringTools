@@ -65,9 +65,9 @@ topdown_iter <- function(predictors, labels, test = F, validation = F, proportio
     disc[[i]] <- discretization::disc.Topdown(data = data_train, method = param[[i]])
     if (!requireNamespace("speedglm", quietly = TRUE)) {
       warning("Speedglm not installed, using glm instead (slower).", call. = FALSE)
-      logit[[i]] <- stats::glm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc[[i]]$Disc.data, as.factor))))
+      logit[[i]] <- stats::glm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc[[i]]$Disc.data, as.factor), stringsAsFactors = TRUE)))
     } else {
-      logit[[i]] <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc[[i]]$Disc.data, as.factor))), fitted = TRUE)
+      logit[[i]] <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc[[i]]$Disc.data, as.factor), stringsAsFactors = TRUE)), fitted = TRUE)
       # methods::setIs(class(logit[[i]]), "glmORlogicalORspeedglm")
     }
     if (validation == TRUE) {
