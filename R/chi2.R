@@ -53,9 +53,9 @@ chi2_iter <- function(predictors, labels, test = F, validation = F, proportions 
     disc[[i]] <- discretization::chi2(data = data_train, alp = param[[i]][[1]], del = param[[i]][[2]])
     if (!requireNamespace("speedglm", quietly = TRUE)) {
       warning("Speedglm not installed, using glm instead (slower).", call. = FALSE)
-      logit[[i]] <- stats::glm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc[[i]]$Disc.data, as.factor))))
+      logit[[i]] <- stats::glm(formula = stats::formula("labels ~ ."), family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc[[i]]$Disc.data, as.factor))), weights = NULL)
     } else {
-      logit[[i]] <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc[[i]]$Disc.data, as.factor))), fitted = TRUE)
+      logit[[i]] <- speedglm::speedglm(formula = stats::formula("labels ~ ."), family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc[[i]]$Disc.data, as.factor))), fitted = TRUE, weights = NULL)
       # methods::setIs(class(logit[[i]]), "glmORlogicalORspeedglm")
     }
 
