@@ -21,6 +21,7 @@ Imports:
     methods
 Suggests:
     Rmixmod,
+    mvtnorm,
     ggplot2,
     speedglm,
     knitr,

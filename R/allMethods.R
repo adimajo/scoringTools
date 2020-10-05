@@ -57,9 +57,11 @@ predict.discretization <- function(object, newdata) {
 }
 methods::setMethod(f = "predict", signature = c(object = "discretization", newdata = "data.frame"), definition = predict.discretization)
 methods::setMethod(f = "predict", signature = c(object = "discretization", newdata = "matrix"), definition = predict.discretization)
-methods::setMethod(f = "predict", signature = c(object = "speedglm", newdata = "data.frame"), definition = speedglm:::predict.speedglm)
 methods::setMethod(f = "predict", signature = c(object = "glmORlogicalORspeedglm"), definition = stats::predict)
 methods::setMethod(f = "predict", signature = c(object = "glmORlogicalORspeedglm"), definition = stats::predict)
+if (is_speedglm_installed()) {
+  methods::setMethod(f = "predict", signature = c(object = "speedglm", newdata = "data.frame"), definition = speedglm:::predict.speedglm)
+}
 
 #' Pipe operator
 #'
