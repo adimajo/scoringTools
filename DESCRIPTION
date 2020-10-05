@@ -20,6 +20,7 @@ Imports:
     dplyr,
     methods
 Suggests:
+    Rmixmod,
     ggplot2,
     speedglm,
     knitr,
