@@ -1,5 +1,13 @@
 context("test-methods")
 
+test_that("runDemo", {
+  runDemo()
+})
+
+test_that("normalizedGini errors", {
+  expect_error(normalizedGini(c(0,1,0), c(0.1, 0.1)))
+})
+
 test_that("show method for reject works", {
   xf <- matrix(runif(100 * 2), nrow = 100, ncol = 2)
   theta <- c(2, -2)
@@ -61,7 +69,12 @@ test_that("plot method for discretization works", {
   })))
   y <- stats::rbinom(100, 1, 1 / (1 + exp(-log_odd)))
   chi2_modele <- chi2_iter(x, y)
-  plotly_plot <- plot(x = chi2_modele, type = "ROC")
+  expect_warning(plotly_plot <- plot(x = chi2_modele, type = "ROC"))
+  chi2_modele <- chi2_iter(x, y, validation = TRUE)
+  expect_warning(plotly_plot <- plot(x = chi2_modele, type = "ROC"))
+  expect_error(plotly_plot <- plot(x = chi2_modele, type = "lift"))
+  expect_error(plotly_plot <- plot(x = chi2_modele, type = "discretization"))
+  expect_error(plotly_plot <- plot(x = chi2_modele, type = "glm"))
 })
 
 test_that("discretize method for discretization works", {

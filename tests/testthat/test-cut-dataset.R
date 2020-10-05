@@ -18,6 +18,15 @@ test_that("cut_dataset errors with test and validation and only one proportion",
   expect_error(cut_dataset(20, c(0.1), test = T, validation = T))
 })
 
+test_that("cut_dataset errors with test or validation and more than one proportion", {
+  expect_error(cut_dataset(20, proportions = c(), test = T, validation = F))
+  expect_error(cut_dataset(20, proportions = c(), test = F, validation = T))
+  expect_error(cut_dataset(20, c(-0.1), test = T, validation = F))
+  expect_error(cut_dataset(20, c(-0.1), test = F, validation = T))
+  expect_error(cut_dataset(20, c(1.1), test = T, validation = F))
+  expect_error(cut_dataset(20, c(1.1), test = F, validation = T))
+})
+
 test_that("cut_dataset works with test and validation", {
   test_de_cut <- cut_dataset(20, c(0.1, 0.1), test = T, validation = T)
   expect_type(test_de_cut[[1]], "integer")

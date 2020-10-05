@@ -2,7 +2,20 @@
 NULL
 
 is_speedglm_installed <- function() {
-  requireNamespace("speedglm", quietly = TRUE)
+  installed <- requireNamespace("speedglm", quietly = TRUE)
+  # if (installed) {
+  #   les_methodes <- methods::findMethods("predict")@signatures
+  #   for (j in length(les_methodes)) {
+  #     present <- FALSE
+  #     if ("speedglm" %in% les_methodes[[j]]) {
+  #       present <- TRUE
+  #     }
+  #   }
+  #   if (!present) {
+  #     methods::setMethod(f = "predict", signature = c(object = "speedglm", newdata = "data.frame"), definition = speedglm:::predict.speedglm)
+  #   }
+  # }
+  return(installed)
 }
 
 methods::setMethod("show", methods::signature(object = "reject_infered"), function(object) {
@@ -154,15 +167,15 @@ plot.discretization <- function(x, type, ...) {
     }
 
     if (type == "lift") {
-
+      stop(simpleError("Not implemented."))
     }
 
     if (type == "discretization") {
-
+      stop(simpleError("Not implemented."))
     }
 
     if (type == "glm") {
-
+      stop(simpleError("Not implemented."))
     }
   } else {
     for (j in 1:length(x@best.disc[[2]])) {

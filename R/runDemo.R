@@ -6,5 +6,5 @@ runDemo <- function() {
     stop("Could not find demo directory. Try re-installing `scoringTools`.", call. = FALSE)
   }
 
-  shiny::runApp(appDir, launch.browser = T, display.mode = "normal")
+  shiny::runApp(appDir, launch.browser = TRUE, display.mode = "normal")
 }

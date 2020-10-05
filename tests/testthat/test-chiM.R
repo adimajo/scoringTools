@@ -15,7 +15,7 @@ test_that("chiM method works with speedglm", {
   for (test in c(TRUE, FALSE)) {
     for (validation in c(TRUE, FALSE)) {
       for (criterion in c("gini", "aic")) {
-        chiM_modele <- chiM_iter(x, y, test = test, validation = validation, criterion = criterion)
+        chiM_modele <- chiM_iter(x, y, test = test, validation = validation, criterion = criterion, param = list(alpha = 0.01))
         expect_s4_class(chiM_modele, "discretization")
         expect_equal(chiM_modele@method.name, "chiM")
         expect_equal(
@@ -25,7 +25,7 @@ test_that("chiM method works with speedglm", {
             test,
             validation,
             criterion,
-            list(alpha = 0.05)
+            list(alpha = 0.01)
           )
         )
         expect_s3_class(chiM_modele@best.disc[[1]], "speedglm")

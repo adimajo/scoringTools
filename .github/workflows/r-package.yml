@@ -46,4 +46,6 @@ jobs:
           RHUB_TOKEN: ${{ secrets.RHUB_TOKEN }}
         run: Rscript inst/rhubcheck.R "macos-highsierra-release-cran" "$RHUB_TOKEN"
       - name: Check on Windows
+        env:
+          RHUB_TOKEN: ${{ secrets.RHUB_TOKEN }}
         run: Rscript inst/rhubcheck.R "windows-x86_64-devel" "$RHUB_TOKEN"
