@@ -39,7 +39,7 @@ reclassification <- function(xf, xnf, yf, thresh = 0.5) {
 
   df[df$acc == 0, "labels"] <- (predict(model_f, df[df$acc == 0, ], type = "response") > thresh) * 1
 
-  if (!requireNamespace("speedglm", quietly = TRUE)) {
+  if (!is_speedglm_installed()) {
     model_reclassification <- stats::glm(labels ~ ., family = stats::binomial(link = "logit"), df[, -which(names(df) %in% c("acc"))])
   } else {
     model_reclassification <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), df[, -which(names(df) %in% c("acc"))])

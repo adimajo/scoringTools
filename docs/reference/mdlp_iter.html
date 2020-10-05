@@ -90,6 +90,21 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/figure1.html">Supplementary material for ``Reject Inference in Credit Scoring: a rationale review'': Figure 1</a>
+    </li>
+    <li>
+      <a href="../articles/figure2.html">Supplementary material for ``Reject Inference in Credit Scoring: a rationale review'': Figure 2</a>
+    </li>
+  </ul>
+</li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -189,18 +204,14 @@ Fayyad, U. M. and Irani, K. B.(1993). Multi-interval discretization of continuou
 })))
 <span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span>(<span class='fl'>100</span>, <span class='fl'>1</span>, <span class='fl'>1</span> / (<span class='fl'>1</span> + <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(-<span class='no'>log_odd</span>)))
 
-<span class='fu'>mdlp_iter</span>(<span class='no'>x</span>, <span class='no'>y</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Speedglm not installed, using glm instead (slower).</span></div><div class='output co'>#&gt; 
-#&gt; Call:  stats::glm(formula = labels ~ ., family = stats::binomial(link = "logit"), 
-#&gt;     data = Filter(function(x) (length(unique(x)) &gt; 1), as.data.frame(sapply(disc$Disc.data, 
-#&gt;         as.factor))))
+<span class='fu'>mdlp_iter</span>(<span class='no'>x</span>, <span class='no'>y</span>)</div><div class='output co'>#&gt; Generalized Linear Model of class 'speedglm':
+#&gt; 
+#&gt; Call:  speedglm::speedglm(formula = labels ~ ., data = Filter(function(x) (length(unique(x)) &gt;      1), as.data.frame(sapply(disc$Disc.data, as.factor), stringsAsFactors = TRUE)),      family = stats::binomial(link = "logit"), fitted = TRUE) 
 #&gt; 
 #&gt; Coefficients:
-#&gt; (Intercept)          V12          V32  
-#&gt;        1.63        -3.21        -2.17  
-#&gt; 
-#&gt; Degrees of Freedom: 99 Total (i.e. Null);  97 Residual
-#&gt; Null Deviance:	    138 
-#&gt; Residual Deviance: 87.8 	AIC: 93.8</div></pre>
+#&gt; (Intercept)          X32  
+#&gt;       0.288       -2.159  
+#&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

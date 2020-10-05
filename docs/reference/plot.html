@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Discretization of a test dataset when provided with an already discretized training set. — discretize_cutp • scoringTools</title>
+<title>Different kinds of plots using either plotly (if available) or the standard plot (graphics package). — plot • scoringTools</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Discretization of a test dataset when provided with an already discretized training set. — discretize_cutp" />
-<meta property="og:description" content="This function discretizes a dataset when provided with both continuous and discretized versions of a training dataset." />
+<meta property="og:title" content="Different kinds of plots using either plotly (if available) or the standard plot (graphics package). — plot" />
+<meta property="og:description" content="This function aims at producing useful graphs in the context of credit scoring in order to simplify the validation process
+of the produced credit score." />
 
 
 
@@ -129,34 +130,41 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Discretization of a test dataset when provided with an already discretized training set.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/adimajo/scoringTools/blob/master/R/discretize.cutp.R'><code>R/discretize.cutp.R</code></a></small>
-    <div class="hidden name"><code>discretize_cutp.Rd</code></div>
+    <h1>Different kinds of plots using either plotly (if available) or the standard plot (graphics package).</h1>
+    <small class="dont-index">Source: <a href='https://github.com/adimajo/scoringTools/blob/master/R/allMethods.R'><code>R/allMethods.R</code></a></small>
+    <div class="hidden name"><code>plot.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function discretizes a dataset when provided with both continuous and discretized versions of a training dataset.</p>
+    <p>This function aims at producing useful graphs in the context of credit scoring in order to simplify the validation process
+of the produced credit score.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>discretize_cutp</span>(<span class='no'>cont_test_set</span>, <span class='no'>disc_train_set</span>, <span class='no'>cont_train_set</span>)</pre>
+    <pre class="usage"><span class='fu'>plot.discretization</span>(<span class='no'>x</span>, <span class='no'>type</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>cont_test_set</th>
-      <td><p>The matrix or dataframe of the dataset to discretize.</p></td>
+      <th>x</th>
+      <td><p>S4 discretization object.</p></td>
     </tr>
     <tr>
-      <th>disc_train_set</th>
-      <td><p>The matrix or dataframe of the discretized training dataset.</p></td>
+      <th>type</th>
+      <td><p>Type of plot. For now only "ROC" is supported.</p></td>
     </tr>
     <tr>
-      <th>cont_train_set</th>
-      <td><p>The matrix or dataframe of the continuous training dataset.</p></td>
+      <th>...</th>
+      <td><p>Additional plot parameters.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
+
+    
+<ul>
+<li><p><code>plot.discretization</code>: plots for the S4 discretization object</p></li>
+</ul>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

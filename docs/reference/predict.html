@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Discretization of a test dataset when provided with an already discretized training set. — discretize_cutp • scoringTools</title>
+<title>Prediction on a raw test set of the best logistic regression model on discretized data. — predict • scoringTools</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Discretization of a test dataset when provided with an already discretized training set. — discretize_cutp" />
-<meta property="og:description" content="This function discretizes a dataset when provided with both continuous and discretized versions of a training dataset." />
+<meta property="og:title" content="Prediction on a raw test set of the best logistic regression model on discretized data. — predict" />
+<meta property="og:description" content="This function discretizes a user-provided test dataset given a discretization scheme provided by an S4 &quot;discretization&quot; object.
+It then applies the learnt logistic regression model and outputs its prediction (see predict.glm)." />
 
 
 
@@ -129,34 +130,37 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Discretization of a test dataset when provided with an already discretized training set.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/adimajo/scoringTools/blob/master/R/discretize.cutp.R'><code>R/discretize.cutp.R</code></a></small>
-    <div class="hidden name"><code>discretize_cutp.Rd</code></div>
+    <h1>Prediction on a raw test set of the best logistic regression model on discretized data.</h1>
+    <small class="dont-index">Source: <a href='https://github.com/adimajo/scoringTools/blob/master/R/allMethods.R'><code>R/allMethods.R</code></a></small>
+    <div class="hidden name"><code>predict.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function discretizes a dataset when provided with both continuous and discretized versions of a training dataset.</p>
+    <p>This function discretizes a user-provided test dataset given a discretization scheme provided by an S4 "discretization" object.
+It then applies the learnt logistic regression model and outputs its prediction (see predict.glm).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>discretize_cutp</span>(<span class='no'>cont_test_set</span>, <span class='no'>disc_train_set</span>, <span class='no'>cont_train_set</span>)</pre>
+    <pre class="usage"><span class='fu'>predict.discretization</span>(<span class='no'>object</span>, <span class='no'>newdata</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>cont_test_set</th>
-      <td><p>The matrix or dataframe of the dataset to discretize.</p></td>
+      <th>object</th>
+      <td><p>The S4 discretization object.</p></td>
     </tr>
     <tr>
-      <th>disc_train_set</th>
-      <td><p>The matrix or dataframe of the discretized training dataset.</p></td>
-    </tr>
-    <tr>
-      <th>cont_train_set</th>
-      <td><p>The matrix or dataframe of the continuous training dataset.</p></td>
+      <th>newdata</th>
+      <td><p>The test dataframe to discretize and for which we wish to have predictions.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
+
+    
+<ul>
+<li><p><code>predict.discretization</code>: Prediction on a raw test set of the best logistic regression model on discretized data.</p></li>
+</ul>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

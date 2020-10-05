@@ -1,6 +1,10 @@
 #' @include allClasses.R
 NULL
 
+is_speedglm_installed <- function() {
+  requireNamespace("speedglm", quietly = TRUE)
+}
+
 methods::setMethod("show", methods::signature(object = "reject_infered"), function(object) {
   methods::show(object@infered_model)
 })
@@ -19,23 +23,43 @@ print.discretization <- function(object) {
   print(object@best.disc[[1]])
 }
 
+#' Summary
+#'
+#' @name summary
+#' @description Summary generic.
+#' @param object S4 discretization object.
+if (!isGeneric("summary")) {
+  methods::setGeneric("summary", function(object, ...) standardGeneric("summary"))
+}
 
+#' @describeIn summary Summary for the discretization class.
 summary.discretization <- function(object) {
   summary(object@best.disc[[1]])
 }
+methods::setMethod(f = "summary", signature = c(object = "discretization"), definition = summary.discretization)
 
 
 #' Prediction on a raw test set of the best logistic regression model on discretized data.
 #'
-#' This function discretizes a user-provided test dataset given a discretization scheme provided by an S4 "discretization" object.
+#' @name predict
+#' @description This function discretizes a user-provided test dataset given a discretization scheme provided by an S4 "discretization" object.
 #' It then applies the learnt logistic regression model and outputs its prediction (see predict.glm).
 #' @param object The S4 discretization object.
-#' @param predictors The test dataframe to discretize and for which we wish to have predictions.
-#' @keywords test discretization predict prediction
-
-predict.discretization <- function(object, predictors) {
-  predict(object@best.disc[[1]], as.data.frame(discretize_cutp(object@parameters[[1]][object@parameters[[6]][[1]], ], object@best.disc[[2]][["Disc.data"]], predictors)))
+#' @param newdata The test dataframe to discretize and for which we wish to have predictions.
+if (!isGeneric("predict")) {
+  methods::setGeneric("predict", function(object, newdata, ...) standardGeneric("predict"))
 }
+
+#' @describeIn predict Prediction on a raw test set of the best logistic regression model on discretized data.
+predict.discretization <- function(object, newdata) {
+  predict(object = object@best.disc[[1]], newdata = data.frame(discretize_cutp(object@parameters[[1]][object@parameters[[6]][[1]], ], object@best.disc[[2]][["Disc.data"]], newdata)) %>%
+    dplyr::mutate_if(is.numeric, as.factor), type = "response")
+}
+methods::setMethod(f = "predict", signature = c(object = "discretization", newdata = "data.frame"), definition = predict.discretization)
+methods::setMethod(f = "predict", signature = c(object = "discretization", newdata = "matrix"), definition = predict.discretization)
+methods::setMethod(f = "predict", signature = c(object = "speedglm", newdata = "data.frame"), definition = speedglm:::predict.speedglm)
+methods::setMethod(f = "predict", signature = c(object = "glmORlogicalORspeedglm"), definition = stats::predict)
+methods::setMethod(f = "predict", signature = c(object = "glmORlogicalORspeedglm"), definition = stats::predict)
 
 #' Pipe operator
 #'
@@ -47,212 +71,83 @@ predict.discretization <- function(object, predictors) {
 #' @usage lhs \%>\% rhs
 NULL
 
-
 #' Different kinds of plots using either plotly (if available) or the standard plot (graphics package).
 #'
-#' This function aims at producing useful graphs in the context of credit scoring in order to simplify the validation process
+#' @name plot
+#' @description This function aims at producing useful graphs in the context of credit scoring in order to simplify the validation process
 #' of the produced credit score.
-#' @param object The S4 discretization object.
-#' @param type The test dataframe to discretize and for which we wish to have predictions.
-#' @param ... See additional parameters of plotly (if installed) or the standard plot function (from the graphics package).
-#' @keywords test discretization predict prediction
-#' @importFrom magrittr "%>%"
+#' @param x S4 discretization object.
+#' @param type Type of plot. For now only "ROC" is supported.
+#'
+if (!isGeneric("plot")) {
+  methods::setGeneric("plot", function(x, y, type, ...) standardGeneric("plot"))
+}
 
-plot.discretization <- function(object, type, ...) {
+#' @describeIn plot plots for the S4 discretization object
+#' @param x S4 discretization object.
+#' @param type Type of plot. For now only "ROC" is supported.
+#' @param ... Additional plot parameters.
+#' @importFrom magrittr "%>%"
+plot.discretization <- function(x, type, ...) {
   if (requireNamespace("plotly", quietly = TRUE)) {
 
     # The produced graph depends on the 'type' variable
     if (type == "ROC") {
       if (requireNamespace("pROC", quietly = TRUE)) {
-        if (object@parameters[[1]] == TRUE) {
-          roc_curve <- pROC::roc(object@disc.data$labels, predict(object@best.disc[[1]], object@disc.data, type = "response"))
-          plotly::plot_ly(data.frame(Specificity = roc_curve$specificities, Sensitivity = roc_curve$sensitivities),
-            x = ~ (1 - Specificity), y = ~Sensitivity, hoverinfo = "none",
-            height = 600, width = 800
-          ) %>%
-            plotly::add_lines(
-              name = "Model",
-              line = list(shape = "spline", color = "#737373", width = 7),
-              fill = "tozeroy", fillcolor = "#2A3356"
-            ) %>%
-
-            # add_annotations(y = roc_curve$sensitivities, x = 1-roc_curve$specificities, text = sample(1:5, size = 28, replace = T),
-            #                 ax = 20, ay = 20,
-            #                 arrowcolor = "white",
-            #                 arrowhead = 3,
-            #                 font = list(color = "white")) %>%
-
-            plotly::add_segments(
-              x = 0, y = 0, xend = 1, yend = 1,
-              line = list(dash = "7px", color = "#F35B25", width = 4),
-              name = "Random"
-            ) %>%
-            plotly::add_segments(
-              x = 0, y = 0, xend = 0, yend = 1,
-              line = list(dash = "10px", color = "black", width = 4),
-              showlegend = F
-            ) %>%
-            plotly::add_segments(
-              x = 0, y = 1, xend = 1, yend = 1,
-              line = list(dash = "10px", color = "black", width = 4),
-              showlegend = F
-            ) %>%
-            plotly::add_annotations(
-              x = 0.8, y = 0.2, showarrow = F,
-              text = paste0("Area Under Curve: ", round(roc_curve$auc, 3)),
-              font = list(family = "serif", size = 18, color = "#E8E2E2")
-            ) %>%
-
-            # add_annotations(x = 0, y = 1, showarrow = F, xanchor = "left",
-            #                 xref = "paper", yref = "paper",
-            #                 text = paste0("Receiver Operator Curve"),
-            #                 font = list(family = "arial", size = 30, color = "#595959")) %>%
-
-            plotly::add_annotations(
-              x = 0, y = 0.98, showarrow = F, xanchor = "left",
-              xref = "paper", yref = "paper",
-              text = paste0("Charts the percentage of correctly identified defaults against the percentage of false alarms."),
-              font = list(family = "serif", size = 14, color = "#999999")
-            ) %>%
-            plotly::layout(
-              title = "ROC Curve", xaxis = list(
-                range = c(0, 1), zeroline = F, showgrid = F,
-                title = "1 - Specificity"
-              ),
-              yaxis = list(
-                range = c(0, 1), zeroline = F, showgrid = F,
-                domain = c(0, 0.9),
-                title = "Sensibility"
-              ),
-              plot_bgcolor = "#E8E2E2"
-            )
-        } else if (object@parameters[[2]] == TRUE) {
+        if (x@parameters[[3]] == TRUE) {
           warning("No test data, using validation data might provide an overly optimist estimate of the algorithm's performance.")
-          roc_curve <- pROC::roc(object@disc.data$labels, predict(object@best.disc[[1]], object@disc.data, type = "response"))
-          plotly::plot_ly(data.frame(Specificity = roc_curve$specificities, Sensitivity = roc_curve$sensitivities),
-            x = ~ (1 - Specificity), y = ~Sensitivity, hoverinfo = "none",
-            height = 600, width = 800
-          ) %>%
-            plotly::add_lines(
-              name = "Model",
-              line = list(shape = "spline", color = "#737373", width = 7),
-              fill = "tozeroy", fillcolor = "#2A3356"
-            ) %>%
-
-            # add_annotations(y = roc_curve$sensitivities, x = 1-roc_curve$specificities, text = sample(1:5, size = 28, replace = T),
-            #                 ax = 20, ay = 20,
-            #                 arrowcolor = "white",
-            #                 arrowhead = 3,
-            #                 font = list(color = "white")) %>%
-
-            plotly::add_segments(
-              x = 0, y = 0, xend = 1, yend = 1,
-              line = list(dash = "7px", color = "#F35B25", width = 4),
-              name = "Random"
-            ) %>%
-            plotly::add_segments(
-              x = 0, y = 0, xend = 0, yend = 1,
-              line = list(dash = "10px", color = "black", width = 4),
-              showlegend = F
-            ) %>%
-            plotly::add_segments(
-              x = 0, y = 1, xend = 1, yend = 1,
-              line = list(dash = "10px", color = "black", width = 4),
-              showlegend = F
-            ) %>%
-            plotly::add_annotations(
-              x = 0.8, y = 0.2, showarrow = F,
-              text = paste0("Area Under Curve: ", round(roc_curve$auc, 3)),
-              font = list(family = "serif", size = 18, color = "#E8E2E2")
-            ) %>%
-
-            # add_annotations(x = 0, y = 1, showarrow = F, xanchor = "left",
-            #                 xref = "paper", yref = "paper",
-            #                 text = paste0("Receiver Operator Curve"),
-            #                 font = list(family = "arial", size = 30, color = "#595959")) %>%
-
-            plotly::add_annotations(
-              x = 0, y = 0.98, showarrow = F, xanchor = "left",
-              xref = "paper", yref = "paper",
-              text = paste0("Charts the percentage of correctly identified defaults against the percentage of false alarms."),
-              font = list(family = "serif", size = 14, color = "#999999")
-            ) %>%
-            plotly::layout(
-              title = "ROC Curve", xaxis = list(
-                range = c(0, 1), zeroline = F, showgrid = F,
-                title = "1 - Specificity"
-              ),
-              yaxis = list(
-                range = c(0, 1), zeroline = F, showgrid = F,
-                domain = c(0, 0.9),
-                title = "Sensibility"
-              ),
-              plot_bgcolor = "#E8E2E2"
-            )
         } else {
           warning("No test data, no validation data, using train data will provide an overly optimist estimate of the algorithm's performance.")
-          roc_curve <- pROC::roc(object@disc.data$labels, predict(object@best.disc[[1]], object@disc.data, type = "response"))
-          plotly::plot_ly(data.frame(Specificity = roc_curve$specificities, Sensitivity = roc_curve$sensitivities),
-            x = ~ (1 - Specificity), y = ~Sensitivity, hoverinfo = "none",
-            height = 600, width = 800
-          ) %>%
-            plotly::add_lines(
-              name = "Model",
-              line = list(shape = "spline", color = "#737373", width = 7),
-              fill = "tozeroy", fillcolor = "#2A3356"
-            ) %>%
-
-            # add_annotations(y = roc_curve$sensitivities, x = 1-roc_curve$specificities, text = sample(1:5, size = 28, replace = T),
-            #                 ax = 20, ay = 20,
-            #                 arrowcolor = "white",
-            #                 arrowhead = 3,
-            #                 font = list(color = "white")) %>%
-
-            plotly::add_segments(
-              x = 0, y = 0, xend = 1, yend = 1,
-              line = list(dash = "7px", color = "#F35B25", width = 4),
-              name = "Random"
-            ) %>%
-            plotly::add_segments(
-              x = 0, y = 0, xend = 0, yend = 1,
-              line = list(dash = "10px", color = "black", width = 4),
-              showlegend = F
-            ) %>%
-            plotly::add_segments(
-              x = 0, y = 1, xend = 1, yend = 1,
-              line = list(dash = "10px", color = "black", width = 4),
-              showlegend = F
-            ) %>%
-            plotly::add_annotations(
-              x = 0.8, y = 0.2, showarrow = F,
-              text = paste0("Area Under Curve: ", round(roc_curve$auc, 3)),
-              font = list(family = "serif", size = 18, color = "#E8E2E2")
-            ) %>%
-
-            # add_annotations(x = 0, y = 1, showarrow = F, xanchor = "left",
-            #                 xref = "paper", yref = "paper",
-            #                 text = paste0("Receiver Operator Curve"),
-            #                 font = list(family = "arial", size = 30, color = "#595959")) %>%
-
-            plotly::add_annotations(
-              x = 0, y = 0.98, showarrow = F, xanchor = "left",
-              xref = "paper", yref = "paper",
-              text = paste0("Charts the percentage of correctly identified defaults against the percentage of false alarms."),
-              font = list(family = "serif", size = 14, color = "#999999")
-            ) %>%
-            plotly::layout(
-              title = "ROC Curve", xaxis = list(
-                range = c(0, 1), zeroline = F, showgrid = F,
-                title = "1 - Specificity"
-              ),
-              yaxis = list(
-                range = c(0, 1), zeroline = F, showgrid = F,
-                domain = c(0, 0.9),
-                title = "Sensibility"
-              ),
-              plot_bgcolor = "#E8E2E2"
-            )
         }
+        roc_curve <- pROC::roc(x@disc.data$labels, predict(x@best.disc[[1]], x@disc.data %>% dplyr::mutate_if(is.numeric, as.factor), type = "response"))
+        plotly_plot <- plotly::plot_ly(data.frame(Specificity = roc_curve$specificities, Sensitivity = roc_curve$sensitivities),
+          x = ~ (1 - Specificity), y = ~Sensitivity, hoverinfo = "none",
+          height = 600, width = 800
+        ) %>%
+          plotly::add_lines(
+            name = "Model",
+            line = list(shape = "spline", color = "#737373", width = 7),
+            fill = "tozeroy", fillcolor = "#2A3356"
+          ) %>%
+          plotly::add_segments(
+            x = 0, y = 0, xend = 1, yend = 1,
+            line = list(dash = "7px", color = "#F35B25", width = 4),
+            name = "Random"
+          ) %>%
+          plotly::add_segments(
+            x = 0, y = 0, xend = 0, yend = 1,
+            line = list(dash = "10px", color = "black", width = 4),
+            showlegend = F
+          ) %>%
+          plotly::add_segments(
+            x = 0, y = 1, xend = 1, yend = 1,
+            line = list(dash = "10px", color = "black", width = 4),
+            showlegend = F
+          ) %>%
+          plotly::add_annotations(
+            x = 0.8, y = 0.2, showarrow = F,
+            text = paste0("Area Under Curve: ", round(roc_curve$auc, 3)),
+            font = list(family = "serif", size = 18, color = "#E8E2E2")
+          ) %>%
+          plotly::add_annotations(
+            x = 0, y = 0.98, showarrow = F, xanchor = "left",
+            xref = "paper", yref = "paper",
+            text = paste0("Charts the percentage of correctly identified defaults against the percentage of false alarms."),
+            font = list(family = "serif", size = 14, color = "#999999")
+          ) %>%
+          plotly::layout(
+            title = "ROC Curve", xaxis = list(
+              range = c(0, 1), zeroline = F, showgrid = F,
+              title = "1 - Specificity"
+            ),
+            yaxis = list(
+              range = c(0, 1), zeroline = F, showgrid = F,
+              domain = c(0, 0.9),
+              title = "Sensibility"
+            ),
+            plot_bgcolor = "#E8E2E2"
+          )
+        return(plotly_plot)
       }
     }
 
@@ -268,11 +163,12 @@ plot.discretization <- function(object, type, ...) {
 
     }
   } else {
-    for (j in 1:length(object@best.disc[[2]])) {
-      graphics::plot(object@best.disc[[1]]$data[j], object@best.disc[[1]][[j]]$data)
+    for (j in 1:length(x@best.disc[[2]])) {
+      graphics::plot(x@best.disc[[1]]$data[j], x@best.disc[[1]][[j]]$data)
     }
   }
 }
+methods::setMethod(f = "plot", signature = c(x = "discretization", y = "missing", type = "character"), definition = plot.discretization)
 
 #' Generic method "discretize" for discretization objects.
 #'
@@ -300,6 +196,6 @@ methods::setMethod("discretize", methods::signature(object = "discretization"), 
   # if (substr(object@method.name,1,3)=="sem") {
   #      discretize_link(object@best.disc[[2]],data)
   # } else {
-  discretize_cutp(data, object@best.disc[[2]]@Disc.data, object@parameters[[1]][object@parameters[[6]][[1]], ])
+  discretize_cutp(data, object@best.disc[[2]]$Disc.data, object@parameters[[1]][object@parameters[[6]][[1]], ])
   # }
 })

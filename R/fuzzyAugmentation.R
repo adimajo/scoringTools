@@ -38,7 +38,7 @@ fuzzy_augmentation <- function(xf, xnf, yf) {
 
   df[df$acc == 0, "labels"] <- predict(model_f, df[df$acc == 0, ], type = "response")
 
-  if (!requireNamespace("speedglm", quietly = TRUE)) {
+  if (!is_speedglm_installed()) {
     model_fuzzy <- stats::glm(labels ~ ., family = stats::binomial(link = "logit"), df[, -which(names(df) %in% c("acc"))])
   } else {
     model_fuzzy <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), df[, -which(names(df) %in% c("acc"))])

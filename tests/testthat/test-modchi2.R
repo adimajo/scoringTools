@@ -1,6 +1,6 @@
-context("test-chi2")
+context("test-modchi2")
 
-test_that("chi2 method works with speedglm", {
+test_that("modchi2 method works with speedglm", {
   x <- matrix(runif(600), nrow = 200, ncol = 3)
   cuts <- seq(0, 1, length.out = 4)
   xd <- apply(x, 2, function(col) as.numeric(cut(col, cuts)))
@@ -15,26 +15,26 @@ test_that("chi2 method works with speedglm", {
   for (test in c(TRUE, FALSE)) {
     for (validation in c(TRUE, FALSE)) {
       for (criterion in c("gini", "aic")) {
-        chi2_modele <- chi2_iter(x, y, test = test, validation = validation, criterion = criterion)
-        expect_s4_class(chi2_modele, "discretization")
-        expect_equal(chi2_modele@method.name, "chi2")
+        modchi2_modele <- modchi2_iter(x, y, test = test, validation = validation, criterion = criterion)
+        expect_s4_class(modchi2_modele, "discretization")
+        expect_equal(modchi2_modele@method.name, "modchi2")
         expect_equal(
-          chi2_modele@parameters[-length(chi2_modele@parameters)],
+          modchi2_modele@parameters[-length(modchi2_modele@parameters)],
           list(
             x,
             test,
             validation,
             criterion,
-            list(list(alp = 0.001, del = 0.5))
+            list(alp = 0.5)
           )
         )
-        expect_s3_class(chi2_modele@best.disc[[1]], "speedglm")
+        expect_s3_class(modchi2_modele@best.disc[[1]], "speedglm")
       }
     }
   }
 })
 
-test_that("chi2 method works with glm", {
+test_that("modchi2 method works with glm", {
   x <- matrix(runif(300), nrow = 100, ncol = 3)
   cuts <- seq(0, 1, length.out = 4)
   xd <- apply(x, 2, function(col) as.numeric(cut(col, cuts)))
@@ -51,28 +51,28 @@ test_that("chi2 method works with glm", {
       for (criterion in c("gini", "aic")) {
         with_mock(
           "scoringTools:::is_speedglm_installed" = function() FALSE,
-          expect_warning(chi2_modele <- chi2_iter(x, y, test = test, validation = validation, criterion = criterion))
+          expect_warning(modchi2_modele <- modchi2_iter(x, y, test = test, validation = validation, criterion = criterion))
         )
-        expect_s4_class(chi2_modele, "discretization")
-        expect_equal(chi2_modele@method.name, "chi2")
+        expect_s4_class(modchi2_modele, "discretization")
+        expect_equal(modchi2_modele@method.name, "modchi2")
         expect_equal(
-          chi2_modele@parameters[-length(chi2_modele@parameters)],
+          modchi2_modele@parameters[-length(modchi2_modele@parameters)],
           list(
             x,
             test,
             validation,
             criterion,
-            list(list(alp = 0.001, del = 0.5))
+            list(alp = 0.5)
           )
         )
-        expect_s3_class(chi2_modele@best.disc[[1]], "glm")
+        expect_s3_class(modchi2_modele@best.disc[[1]], "glm")
       }
     }
   }
 })
 
 
-test_that("chi2 method throws errors", {
+test_that("modchi2 method throws errors", {
   x <- matrix(runif(300), nrow = 100, ncol = 3)
   cuts <- seq(0, 1, length.out = 4)
   xd <- apply(x, 2, function(col) as.numeric(cut(col, cuts)))
@@ -84,6 +84,6 @@ test_that("chi2 method throws errors", {
     )
   })))
   y <- stats::rbinom(100, 1, 1 / (1 + exp(-log_odd)))
-  expect_error(chi2_iter(x, y, criterion = "toto"))
-  expect_error(chi2_iter(x, y[1:150], criterion = "gini"))
+  expect_error(modchi2_iter(x, y, criterion = "toto"))
+  expect_error(modchi2_iter(x, y[1:150], criterion = "gini"))
 })

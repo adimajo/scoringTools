@@ -90,6 +90,21 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/figure1.html">Supplementary material for ``Reject Inference in Credit Scoring: a rationale review'': Figure 1</a>
+    </li>
+    <li>
+      <a href="../articles/figure2.html">Supplementary material for ``Reject Inference in Credit Scoring: a rationale review'': Figure 2</a>
+    </li>
+  </ul>
+</li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -194,28 +209,7 @@ Kerber, R. (1992). ChiMerge : Discretization of numeric attributes, <em>In Proce
 })))
 <span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span>(<span class='fl'>100</span>, <span class='fl'>1</span>, <span class='fl'>1</span> / (<span class='fl'>1</span> + <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(-<span class='no'>log_odd</span>)))
 
-<span class='fu'>chiM_iter</span>(<span class='no'>x</span>, <span class='no'>y</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Speedglm not installed, using glm instead (slower).</span></div><div class='output co'>#&gt; <span class='warning'>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</span></div><div class='output co'>#&gt; 
-#&gt; Call:  stats::glm(formula = labels ~ ., family = stats::binomial(link = "logit"), 
-#&gt;     data = Filter(function(x) (length(unique(x)) &gt; 1), as.data.frame(sapply(disc[[i]]$Disc.data, 
-#&gt;         as.factor))))
-#&gt; 
-#&gt; Coefficients:
-#&gt; (Intercept)          V12          V13          V14          V15          V16  
-#&gt;      -0.531       22.176      -24.395       21.113       -2.292       22.856  
-#&gt;         V17          V18          V19         V210         V211          V22  
-#&gt;     -39.646       21.234      -41.330       38.970        1.973       40.177  
-#&gt;         V23          V24          V25          V26          V27          V28  
-#&gt;       0.532        1.172        1.241      -42.579        0.133      -41.867  
-#&gt;         V29         V310         V311         V312         V313         V314  
-#&gt;      63.743        2.331        1.535      -22.363      -38.255      -20.582  
-#&gt;         V32          V33          V34          V35          V36          V37  
-#&gt;      61.193      -22.937       20.548      -24.207       23.531      -19.833  
-#&gt;         V38          V39  
-#&gt;       1.369      -83.118  
-#&gt; 
-#&gt; Degrees of Freedom: 99 Total (i.e. Null);  68 Residual
-#&gt; Null Deviance:	    139 
-#&gt; Residual Deviance: 8.32 	AIC: 72.3</div></pre>
+<span class='fu'>chiM_iter</span>(<span class='no'>x</span>, <span class='no'>y</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='error'>Error in solve.default(XTX, XTz, tol = tol.solve): system is computationally singular: reciprocal condition number = 7.14559e-18</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

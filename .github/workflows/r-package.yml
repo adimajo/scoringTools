@@ -25,7 +25,7 @@ jobs:
       - name: Check code style
         run: Rscript inst/lint.R
       - name: Install dependencies
-        run: devtools::install_deps(dependencies = NA)
+        run: devtools::install_deps(dependencies = TRUE)
         shell: Rscript {0}
       - name: Check documentation
         run: Rscript inst/document.R

@@ -90,6 +90,21 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/figure1.html">Supplementary material for ``Reject Inference in Credit Scoring: a rationale review'': Figure 1</a>
+    </li>
+    <li>
+      <a href="../articles/figure2.html">Supplementary material for ``Reject Inference in Credit Scoring: a rationale review'': Figure 2</a>
+    </li>
+  </ul>
+</li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -181,18 +196,14 @@
 })))
 <span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span>(<span class='fl'>100</span>, <span class='fl'>1</span>, <span class='fl'>1</span> / (<span class='fl'>1</span> + <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(-<span class='no'>log_odd</span>)))
 
-<span class='fu'>chi2_iter</span>(<span class='no'>x</span>, <span class='no'>y</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Speedglm not installed, using glm instead (slower).</span></div><div class='output co'>#&gt; 
-#&gt; Call:  stats::glm(formula = labels ~ ., family = stats::binomial(link = "logit"), 
-#&gt;     data = Filter(function(x) (length(unique(x)) &gt; 1), as.data.frame(sapply(disc[[i]]$Disc.data, 
-#&gt;         as.factor))))
+<span class='fu'>chi2_iter</span>(<span class='no'>x</span>, <span class='no'>y</span>)</div><div class='output co'>#&gt; Generalized Linear Model of class 'speedglm':
+#&gt; 
+#&gt; Call:  speedglm::speedglm(formula = stats::formula("labels ~ ."), data = Filter(function(x) (length(unique(x)) &gt;      1), data.frame(sapply(disc[[i]]$Disc.data, as.factor), stringsAsFactors = TRUE)),      family = stats::binomial(link = "logit"), weights = NULL,      fitted = TRUE) 
 #&gt; 
 #&gt; Coefficients:
-#&gt; (Intercept)          V22          V23          V32  
-#&gt;       -1.27         2.99         0.61        -2.40  
-#&gt; 
-#&gt; Degrees of Freedom: 99 Total (i.e. Null);  96 Residual
-#&gt; Null Deviance:	    139 
-#&gt; Residual Deviance: 93.9 	AIC: 102</div></pre>
+#&gt; (Intercept)          X22          X23          X32  
+#&gt;       0.131        2.923       -1.565       -3.339  
+#&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

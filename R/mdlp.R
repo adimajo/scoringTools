@@ -46,34 +46,30 @@ mdlp_iter <- function(predictors, labels, test = F, validation = F, proportions 
   n <- length(labels)
   d <- length(predictors[1, ])
 
-  # Initialisation du critere de performance
-  if (criterion == "gini") ginidisc <- list() else aicdisc <- list()
-
   # Decoupage de l'ensemble
   ensemble <- cut_dataset(n, proportions = proportions, test = test, validation = validation)
 
-  data_train <- as.data.frame(cbind(predictors[ensemble[[1]], ], labels = labels[ensemble[[1]]]))
+  data_train <- data.frame(predictors[ensemble[[1]], ], labels = labels[ensemble[[1]]])
 
   # mdlp
   disc <- discretization::mdlp(data = data_train)
-  if (!requireNamespace("speedglm", quietly = TRUE)) {
+  if (!is_speedglm_installed()) {
     warning("Speedglm not installed, using glm instead (slower).", call. = FALSE)
     logit <- stats::glm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc$Disc.data, as.factor), stringsAsFactors = TRUE)))
   } else {
     logit <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc$Disc.data, as.factor), stringsAsFactors = TRUE)), fitted = TRUE)
-    # methods::setIs(class(logit), "glmORlogicalORspeedglm")
   }
 
   if (validation == TRUE) {
-    data_test <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[2]], ], disc[["Disc.data"]], predictors[ensemble[[1]], ])), as.factor), stringsAsFactors = TRUE)
+    data_validation <- data.frame(sapply(data.frame(discretize_cutp(predictors[ensemble[[2]], ], disc[["Disc.data"]], predictors[ensemble[[1]], ])), as.factor), stringsAsFactors = TRUE)
     if (criterion == "gini") {
-      ginidisc <- normalizedGini(labels[ensemble[[2]]], predict(logit, data_test, type = "response"))
+      ginidisc <- normalizedGini(labels[ensemble[[2]]], predict(logit, data_validation, type = "response"))
     } else {
       aicdisc <- logit$aic
     }
   } else {
     if (criterion == "gini") {
-      if (!requireNamespace("speedglm", quietly = TRUE)) {
+      if (!is_speedglm_installed()) {
         ginidisc <- normalizedGini(labels[ensemble[[1]]], logit$fitted.values)
       } else {
         ginidisc <- normalizedGini(labels[ensemble[[1]]], logit$linear.predictors)
@@ -88,23 +84,24 @@ mdlp_iter <- function(predictors, labels, test = F, validation = F, proportions 
     if (criterion == "gini") {
       best.disc <- list(logit, disc)
       if (validation == TRUE) {
-        data_validation <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[3]], ], disc[["Disc.data"]], predictors[ensemble[[1]], ])), as.factor), stringsAsFactors = TRUE)
-        performance <- normalizedGini(labels[ensemble[[3]]], predict(best.disc[[1]], data_validation, type = "response"))
+        data_test <- data.frame(sapply(data.frame(discretize_cutp(predictors[ensemble[[3]], ], disc[["Disc.data"]], predictors[ensemble[[1]], ])), as.factor), stringsAsFactors = TRUE)
+        performance <- normalizedGini(labels[ensemble[[3]]], predict(best.disc[[1]], data_test, type = "response"))
       } else {
+        data_test <- data.frame(sapply(data.frame(discretize_cutp(predictors[ensemble[[2]], ], disc[["Disc.data"]], predictors[ensemble[[1]], ])), as.factor), stringsAsFactors = TRUE)
         performance <- normalizedGini(labels[ensemble[[2]]], predict(best.disc[[1]], data_test, type = "response"))
       }
     } else {
       best.disc <- list(logit, disc)
-      if (validation == TRUE) performance <- 0 else performance <- best.disc[[1]]$aic
+      if (validation == TRUE) performance <- 0 else performance <- 0
     }
   } else {
     if (criterion == "gini") {
       best.disc <- list(logit, disc, 1)
       if (validation == TRUE) {
-        data_validation <- as.data.frame(sapply(as.data.frame(discretize_cutp(predictors[ensemble[[3]], ], disc[["Disc.data"]], predictors[ensemble[[1]], ])), as.factor), stringsAsFactors = TRUE)
-        performance <- normalizedGini(labels[ensemble[[3]]], predict(best.disc[[1]], data_validation, type = "response"))
+        data_validation <- data.frame(sapply(data.frame(discretize_cutp(predictors[ensemble[[2]], ], disc[["Disc.data"]], predictors[ensemble[[1]], ])), as.factor), stringsAsFactors = TRUE)
+        performance <- normalizedGini(labels[ensemble[[2]]], predict(best.disc[[1]], data_validation, type = "response"))
       } else {
-        if (!requireNamespace("speedglm", quietly = TRUE)) {
+        if (!is_speedglm_installed()) {
           performance <- normalizedGini(labels[ensemble[[1]]], best.disc[[1]]$fitted.values)
         } else {
           performance <- normalizedGini(labels[ensemble[[1]]], best.disc[[1]]$linear.predictors)
@@ -116,12 +113,11 @@ mdlp_iter <- function(predictors, labels, test = F, validation = F, proportions 
     }
   }
 
-
   if (test == TRUE) {
-    return(methods::new(Class = "discretization", method.name = "mdlp", parameters = list(predictors, test, validation, criterion, list(), ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_cutp(predictors[ensemble[[3]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels[ensemble[[3]]]), stringsAsFactors = TRUE), cont.data = data.frame(cbind(predictors[ensemble[[3]], ], labels[ensemble[[3]]]))))
+    return(methods::new(Class = "discretization", method.name = "mdlp", parameters = list(predictors, test, validation, criterion, ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(discretize_cutp(predictors[ensemble[[3]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels = labels[ensemble[[3]]], stringsAsFactors = TRUE), cont.data = data.frame(predictors[ensemble[[3]], ], labels = labels[ensemble[[3]]])))
   } else if (validation == TRUE) {
-    return(methods::new(Class = "discretization", method.name = "mdlp", parameters = list(predictors, test, validation, criterion, list(), ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_cutp(predictors[ensemble[[2]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels[ensemble[[2]]]), stringsAsFactors = TRUE), cont.data = data.frame(cbind(predictors[ensemble[[2]], ], labels[ensemble[[2]]]))))
+    return(methods::new(Class = "discretization", method.name = "mdlp", parameters = list(predictors, test, validation, criterion, ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(discretize_cutp(predictors[ensemble[[2]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels = labels[ensemble[[2]]], stringsAsFactors = TRUE), cont.data = data.frame(predictors[ensemble[[2]], ], labels = labels[ensemble[[2]]])))
   } else {
-    return(methods::new(Class = "discretization", method.name = "mdlp", parameters = list(predictors, test, validation, criterion, list(), ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(cbind(discretize_cutp(predictors[ensemble[[1]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels[ensemble[[1]]]), stringsAsFactors = TRUE), cont.data = data.frame(cbind(predictors[ensemble[[1]], ], labels[ensemble[[1]]]))))
+    return(methods::new(Class = "discretization", method.name = "mdlp", parameters = list(predictors, test, validation, criterion, ensemble), best.disc = best.disc, performance = list(performance), disc.data = data.frame(discretize_cutp(predictors[ensemble[[1]], ], best.disc[[2]][["Disc.data"]], predictors[ensemble[[1]], ]), labels = labels[ensemble[[1]]], stringsAsFactors = TRUE), cont.data = data.frame(predictors[ensemble[[1]], ], labels = labels[ensemble[[1]]])))
   }
 }
