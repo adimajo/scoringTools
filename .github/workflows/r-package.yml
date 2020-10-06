@@ -40,6 +40,7 @@ jobs:
         shell: Rscript {0}
       - name: Coverage devtools
         run: print(devtools::test_coverage())
+        shell: Rscript {0}
       - name: Check on Mac OS
         env:
           RHUB_TOKEN: ${{ secrets.RHUB_TOKEN }}

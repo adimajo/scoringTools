@@ -1,5 +1,4 @@
 #' Launch the Shiny demo app.
-#' @export
 runDemo <- function() {
   appDir <- system.file("shiny", "demo", package = "scoringTools")
   if (appDir == "") {
