@@ -20,6 +20,7 @@ Imports:
     dplyr,
     methods
 Suggests:
+    rpart,
     Rmixmod,
     mvtnorm,
     ggplot2,
@@ -31,7 +32,7 @@ Suggests:
     shiny,
     testthat,
     covr
-URL: https://adimajo.github.io
+URL: https://adimajo.github.io/scoringTools
 BugReports: https://github.com/adimajo/scoringTools/issues
 VignetteBuilder: knitr
 Collate: 

@@ -1,8 +1,8 @@
 context("test-methods")
 
-test_that("runDemo", {
-  runDemo()
-})
+# test_that("runDemo", {
+#   runDemo()
+# })
 
 test_that("normalizedGini errors", {
   expect_error(normalizedGini(c(0,1,0), c(0.1, 0.1)))
