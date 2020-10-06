@@ -5,7 +5,7 @@ context("test-methods")
 # })
 
 test_that("normalizedGini errors", {
-  expect_error(normalizedGini(c(0,1,0), c(0.1, 0.1)))
+  expect_error(normalizedGini(c(0, 1, 0), c(0.1, 0.1)))
 })
 
 test_that("show method for reject works", {

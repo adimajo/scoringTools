@@ -98,10 +98,16 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/appendix_tree_biasedness.html">Supplementary material for ``Reject Inference in Credit Scoring: a rationale review'': tree biasedness</a>
+    </li>
+    <li>
       <a href="../articles/figure1.html">Supplementary material for ``Reject Inference in Credit Scoring: a rationale review'': Figure 1</a>
     </li>
     <li>
       <a href="../articles/figure2.html">Supplementary material for ``Reject Inference in Credit Scoring: a rationale review'': Figure 2</a>
+    </li>
+    <li>
+      <a href="../articles/figure3.html">Supplementary material for ``Reject Inference in Credit Scoring: a rationale review'': Figure 3</a>
     </li>
   </ul>
 </li>
@@ -141,8 +147,8 @@
     <pre class="usage"><span class='fu'>chiM_iter</span>(
   <span class='no'>predictors</span>,
   <span class='no'>labels</span>,
-  <span class='kw'>test</span> <span class='kw'>=</span> <span class='no'>F</span>,
-  <span class='kw'>validation</span> <span class='kw'>=</span> <span class='no'>F</span>,
+  <span class='kw'>test</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>validation</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>proportions</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.3</span>, <span class='fl'>0.3</span>),
   <span class='kw'>criterion</span> <span class='kw'>=</span> <span class='st'>"gini"</span>,
   <span class='kw'>param</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.05</span>)
@@ -188,9 +194,9 @@ To do so, the <code>ChiMerge</code> alorithm starts by putting each unique value
 In the context of Credit Scoring, a logistic regression is fitted between the ‘‘discretized'' features \(E\) and the response feature \(Y\). As a consequence, the output of this function is the discretized features \(E\), the logistic regression model of \(E\) on \(Y\) and the parameters used to get this fit.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, <a href='https://CRAN.R-project.org/package=speedglm'>https://CRAN.R-project.org/package=speedglm</a>
-HyunJi Kim (2012). discretization: Data preprocessing, discretization for classification. R package version 1.0-1. <a href='https://CRAN.R-project.org/package=discretization'>https://CRAN.R-project.org/package=discretization</a>
-Kerber, R. (1992). ChiMerge : Discretization of numeric attributes, <em>In Proceedings of the Tenth National Conference on Artificial Intelligence</em>, 123–128.</p>
+    <p>Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, <a href='https://CRAN.R-project.org/package=speedglm'>https://CRAN.R-project.org/package=speedglm</a></p>
+<p>HyunJi Kim (2012). discretization: Data preprocessing, discretization for classification. R package version 1.0-1. <a href='https://CRAN.R-project.org/package=discretization'>https://CRAN.R-project.org/package=discretization</a></p>
+<p>Kerber, R. (1992). ChiMerge : Discretization of numeric attributes, <em>In Proceedings of the Tenth National Conference on Artificial Intelligence</em>, 123–128.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code>glm</code>, <code>speedglm</code>, <code>discretization</code></p></div>

@@ -99,10 +99,16 @@ of the produced credit score." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/appendix_tree_biasedness.html">Supplementary material for ``Reject Inference in Credit Scoring: a rationale review'': tree biasedness</a>
+    </li>
+    <li>
       <a href="../articles/figure1.html">Supplementary material for ``Reject Inference in Credit Scoring: a rationale review'': Figure 1</a>
     </li>
     <li>
       <a href="../articles/figure2.html">Supplementary material for ``Reject Inference in Credit Scoring: a rationale review'': Figure 2</a>
+    </li>
+    <li>
+      <a href="../articles/figure3.html">Supplementary material for ``Reject Inference in Credit Scoring: a rationale review'': Figure 3</a>
     </li>
   </ul>
 </li>
@@ -140,7 +146,12 @@ of the produced credit score." />
 of the produced credit score.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plot.discretization</span>(<span class='no'>x</span>, <span class='no'>type</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>plot</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='no'>...</span>)
+
+<span class='fu'>plot.discretization</span>(<span class='no'>x</span>, <span class='no'>type</span>)
+
+<span class='co'># S4 method for discretization</span>
+<span class='fu'>plot</span>(<span class='no'>x</span>, <span class='no'>type</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -150,21 +161,19 @@ of the produced credit score.</p>
       <td><p>S4 discretization object.</p></td>
     </tr>
     <tr>
-      <th>type</th>
-      <td><p>Type of plot. For now only "ROC" is supported.</p></td>
+      <th>y</th>
+      <td><p>(For standard plots only)</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Additional plot parameters.</p></td>
+      <td><p>(For standard plots only)</p></td>
+    </tr>
+    <tr>
+      <th>type</th>
+      <td><p>Type of plot. For now only "ROC" is supported.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
-
-    
-<ul>
-<li><p><code>plot.discretization</code>: plots for the S4 discretization object</p></li>
-</ul>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

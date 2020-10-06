@@ -67,7 +67,7 @@ methods::setMethod(f = "summary", signature = c(object = "discretization"), defi
 #' @param ... Other parameters to \code{predict}
 # if (!methods::isGeneric("predict")) {
 methods::setGeneric("predict")
-#}
+# }
 
 #' Prediction on a raw test set of the best logistic regression model on discretized data.
 #' @rdname predict
