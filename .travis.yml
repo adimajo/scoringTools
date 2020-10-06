@@ -2,6 +2,8 @@
 
 language: R
 sudo: false
-cache: packages
+install:
+  - R -e 'devtools::install_deps(dep = T)'
+  - R -e 'devtools::install()'
 after_success:
   - Rscript -e 'covr::codecov()'
