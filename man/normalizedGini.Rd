@@ -18,7 +18,4 @@ It is equal to 2 times the AUC (Area Under ROC Curve) minus 1.
 \examples{
 normalizedGini(c(1, 1, 1, 0, 0), c(0.7, 0.9, 0.5, 0.6, 0.3))
 }
-\author{
-Adrien Ehrhardt
-}
 \concept{gini index}

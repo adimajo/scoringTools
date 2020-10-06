@@ -28,7 +28,9 @@ test_that("chi2 method works with speedglm", {
             list(list(alp = 0.001, del = 0.5))
           )
         )
-        expect_s3_class(chi2_modele@best.disc[[1]], "speedglm")
+        if (is_speedglm_installed() & is_speedglm_predict_installed()) {
+          expect_s3_class(chi2_modele@best.disc[[1]], "speedglm")
+        }
       }
     }
   }

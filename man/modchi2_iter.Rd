@@ -7,8 +7,8 @@
 modchi2_iter(
   predictors,
   labels,
-  test = F,
-  validation = F,
+  test = FALSE,
+  validation = FALSE,
   proportions = c(0.3, 0.3),
   criterion = "gini",
   param = list(alp = 0.5)
@@ -39,7 +39,9 @@ In the context of Credit Scoring, a logistic regression is fitted between the â€
 }
 \references{
 Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, \url{https://CRAN.R-project.org/package=speedglm}
+
 HyunJi Kim (2012). discretization: Data preprocessing, discretization for classification. R package version 1.0-1. \url{https://CRAN.R-project.org/package=discretization}
+
 Tay, F. E. H. and Shen, L. (2002). Modified Chi2 Algorithm for Discretization, \emph{IEEE Transactions on knowledge and data engineering}, \strong{14}, 666â€“670.
 #' @examples
 # Simulation of a discretized logit model

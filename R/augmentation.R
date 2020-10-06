@@ -61,7 +61,7 @@ augmentation <- function(xf, xnf, yf) {
   poids_tot$count_rej <- NULL
 
   df_augmente <- merge(df_f, poids_tot, by = "classe_SCORE", all.x = TRUE, all.y = TRUE)
-  if (!is_speedglm_installed()) {
+  if (!(is_speedglm_installed() & is_speedglm_predict_installed())) {
     model_augmente <- stats::glm(labels ~ ., family = stats::binomial(link = "logit"), df_augmente[, -which(names(df_augmente) %in% c("poidsfinal", "classe_SCORE"))], weights = df_augmente$poidsfinal)
   } else {
     model_augmente <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), df_augmente[, -which(names(df_augmente) %in% c("poidsfinal", "classe_SCORE"))][!df_augmente$poidsfinal == 0, ], weights = df_augmente$poidsfinal[!df_augmente$poidsfinal == 0])

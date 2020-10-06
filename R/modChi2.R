@@ -19,7 +19,9 @@
 #' In the context of Credit Scoring, a logistic regression is fitted between the ‘‘discretized'' features \eqn{E} and the response feature \eqn{Y}. As a consequence, the output of this function is the discretized features \eqn{E}, the logistic regression model of \eqn{E} on \eqn{Y} and the parameters used to get this fit.
 #' @references
 #' Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, \url{https://CRAN.R-project.org/package=speedglm}
+#'
 #' HyunJi Kim (2012). discretization: Data preprocessing, discretization for classification. R package version 1.0-1. \url{https://CRAN.R-project.org/package=discretization}
+#'
 #' Tay, F. E. H. and Shen, L. (2002). Modified Chi2 Algorithm for Discretization, \emph{IEEE Transactions on knowledge and data engineering}, \strong{14}, 666–670.
 #' #' @examples
 #' # Simulation of a discretized logit model
@@ -32,7 +34,7 @@
 #' y = stats::rbinom(100,1,1/(1+exp(-log_odd)))
 #'
 #' modchi2_iter(x,y)
-modchi2_iter <- function(predictors, labels, test = F, validation = F, proportions = c(0.3, 0.3), criterion = "gini", param = list(alp = 0.5)) {
+modchi2_iter <- function(predictors, labels, test = FALSE, validation = FALSE, proportions = c(0.3, 0.3), criterion = "gini", param = list(alp = 0.5)) {
   if (!criterion %in% c("gini", "aic")) {
     stop(simpleError("Criterion must be either 'gini' or 'aic'"))
   }
@@ -55,7 +57,7 @@ modchi2_iter <- function(predictors, labels, test = F, validation = F, proportio
   # Chi2
   for (i in 1:length(param)) {
     disc[[i]] <- discretization::modChi2(data = data_train, alp = param[[i]])
-    if (!is_speedglm_installed()) {
+    if (!(is_speedglm_installed() & is_speedglm_predict_installed())) {
       warning("Speedglm not installed, using glm instead (slower).", call. = FALSE)
       logit[[i]] <- stats::glm(formula = stats::formula("labels ~ ."), family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), data.frame(sapply(disc[[i]]$Disc.data, as.factor), stringsAsFactors = TRUE)), weights = NULL)
     } else {
@@ -71,7 +73,7 @@ modchi2_iter <- function(predictors, labels, test = F, validation = F, proportio
       }
     } else {
       if (criterion == "gini") {
-        if (!is_speedglm_installed()) {
+        if (!(is_speedglm_installed() & is_speedglm_predict_installed())) {
           criterlist[[i]] <- normalizedGini(labels[ensemble[[1]]], logit[[i]]$fitted.values)
         } else {
           criterlist[[i]] <- normalizedGini(labels[ensemble[[1]]], logit[[i]]$linear.predictors)
@@ -102,7 +104,7 @@ modchi2_iter <- function(predictors, labels, test = F, validation = F, proportio
         data_validation <- data.frame(sapply(data.frame(discretize_cutp(predictors[ensemble[[2]], ], disc[[i]][["Disc.data"]], predictors[ensemble[[1]], ])), as.factor), stringsAsFactors = TRUE)
         performance <- normalizedGini(labels[ensemble[[2]]], predict(best.disc[[1]], data_validation, type = "response"))
       } else {
-        if (!is_speedglm_installed()) {
+        if (!(is_speedglm_installed() & is_speedglm_predict_installed())) {
           performance <- normalizedGini(labels[ensemble[[1]]], best.disc[[1]]$fitted.values)
         } else {
           performance <- normalizedGini(labels[ensemble[[1]]], best.disc[[1]]$linear.predictors)

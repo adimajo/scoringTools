@@ -18,7 +18,9 @@
 #' In the context of Credit Scoring, a logistic regression is fitted between the ‘‘discretized'' features \eqn{E} and the response feature \eqn{Y}. As a consequence, the output of this function is the discretized features \eqn{E}, the logistic regression model of \eqn{E} on \eqn{Y} and the parameters used to get this fit.
 #' @references
 #' Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, \url{https://CRAN.R-project.org/package=speedglm}
+#'
 #' HyunJi Kim (2012). discretization: Data preprocessing, discretization for classification. R package version 1.0-1. \url{https://CRAN.R-project.org/package=discretization}
+#'
 #' Fayyad, U. M. and Irani, K. B.(1993). Multi-interval discretization of continuous-valued attributes for classification learning, \emph{Artificial intelligence}, \strong{13}, 1022–1027.
 #' @examples
 #' # Simulation of a discretized logit model
@@ -35,7 +37,7 @@
 #' y <- stats::rbinom(100, 1, 1 / (1 + exp(-log_odd)))
 #'
 #' mdlp_iter(x, y)
-mdlp_iter <- function(predictors, labels, test = F, validation = F, proportions = c(0.3, 0.3), criterion = "gini") {
+mdlp_iter <- function(predictors, labels, test = FALSE, validation = FALSE, proportions = c(0.3, 0.3), criterion = "gini") {
   if (!criterion %in% c("gini", "aic")) {
     stop(simpleError("Criterion must be either 'gini' or 'aic'"))
   }
@@ -53,7 +55,7 @@ mdlp_iter <- function(predictors, labels, test = F, validation = F, proportions 
 
   # mdlp
   disc <- discretization::mdlp(data = data_train)
-  if (!is_speedglm_installed()) {
+  if (!(is_speedglm_installed() & is_speedglm_predict_installed())) {
     warning("Speedglm not installed, using glm instead (slower).", call. = FALSE)
     logit <- stats::glm(labels ~ ., family = stats::binomial(link = "logit"), data = Filter(function(x) (length(unique(x)) > 1), as.data.frame(sapply(disc$Disc.data, as.factor), stringsAsFactors = TRUE)))
   } else {
@@ -69,7 +71,7 @@ mdlp_iter <- function(predictors, labels, test = F, validation = F, proportions 
     }
   } else {
     if (criterion == "gini") {
-      if (!is_speedglm_installed()) {
+      if (!(is_speedglm_installed() & is_speedglm_predict_installed())) {
         ginidisc <- normalizedGini(labels[ensemble[[1]]], logit$fitted.values)
       } else {
         ginidisc <- normalizedGini(labels[ensemble[[1]]], logit$linear.predictors)
@@ -101,7 +103,7 @@ mdlp_iter <- function(predictors, labels, test = F, validation = F, proportions 
         data_validation <- data.frame(sapply(data.frame(discretize_cutp(predictors[ensemble[[2]], ], disc[["Disc.data"]], predictors[ensemble[[1]], ])), as.factor), stringsAsFactors = TRUE)
         performance <- normalizedGini(labels[ensemble[[2]]], predict(best.disc[[1]], data_validation, type = "response"))
       } else {
-        if (!is_speedglm_installed()) {
+        if (!(is_speedglm_installed() & is_speedglm_predict_installed())) {
           performance <- normalizedGini(labels[ensemble[[1]]], best.disc[[1]]$fitted.values)
         } else {
           performance <- normalizedGini(labels[ensemble[[1]]], best.disc[[1]]$linear.predictors)

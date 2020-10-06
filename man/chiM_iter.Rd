@@ -7,8 +7,8 @@
 chiM_iter(
   predictors,
   labels,
-  test = F,
-  validation = F,
+  test = FALSE,
+  validation = FALSE,
   proportions = c(0.3, 0.3),
   criterion = "gini",
   param = list(alpha = 0.05)
@@ -55,7 +55,9 @@ chiM_iter(x, y)
 }
 \references{
 Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, \url{https://CRAN.R-project.org/package=speedglm}
+
 HyunJi Kim (2012). discretization: Data preprocessing, discretization for classification. R package version 1.0-1. \url{https://CRAN.R-project.org/package=discretization}
+
 Kerber, R. (1992). ChiMerge : Discretization of numeric attributes, \emph{In Proceedings of the Tenth National Conference on Artificial Intelligence}, 123–128.
 }
 \seealso{

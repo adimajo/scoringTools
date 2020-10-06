@@ -14,6 +14,10 @@ get_cutp(disc_train_set, cont_train_set)
 \description{
 This function returns the cut-points
 }
+\author{
+Adrien Ehrhardt
+}
+\keyword{internal}
 \keyword{sample}
 \keyword{test}
 \keyword{train}

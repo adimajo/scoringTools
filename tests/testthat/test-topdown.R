@@ -1,7 +1,7 @@
 context("test-topdown")
 
 test_that("topdown method works with speedglm", {
-  x <- matrix(runif(600), nrow = 200, ncol = 3)
+  x <- matrix(runif(900), nrow = 300, ncol = 3)
   cuts <- seq(0, 1, length.out = 4)
   xd <- apply(x, 2, function(col) as.numeric(cut(col, cuts)))
   theta <- t(matrix(c(0, 0, 0, 2, 2, 2, -2, -2, -2), ncol = 3, nrow = 3))
@@ -11,7 +11,7 @@ test_that("topdown method works with speedglm", {
       function(element) theta[xd[row_id, element], element]
     )
   })))
-  y <- stats::rbinom(200, 1, 1 / (1 + exp(-log_odd)))
+  y <- stats::rbinom(300, 1, 1 / (1 + exp(-log_odd)))
   for (test in c(TRUE, FALSE)) {
     for (validation in c(TRUE, FALSE)) {
       for (criterion in c("gini", "aic")) {
@@ -28,7 +28,9 @@ test_that("topdown method works with speedglm", {
             list(1, 2, 3)
           )
         )
-        expect_s3_class(topdown_modele@best.disc[[1]], "speedglm")
+        if (is_speedglm_installed() & is_speedglm_predict_installed()) {
+          expect_s3_class(topdown_modele@best.disc[[1]], "speedglm")
+        }
       }
     }
   }

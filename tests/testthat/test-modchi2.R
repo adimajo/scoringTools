@@ -28,7 +28,9 @@ test_that("modchi2 method works with speedglm", {
             list(alp = 0.5)
           )
         )
-        expect_s3_class(modchi2_modele@best.disc[[1]], "speedglm")
+        if (is_speedglm_installed() & is_speedglm_predict_installed()) {
+          expect_s3_class(modchi2_modele@best.disc[[1]], "speedglm")
+        }
       }
     }
   }

@@ -19,7 +19,7 @@
 #' model_finances(df_f)
 #' }
 model_finances <- function(df_f) {
-  if (!is_speedglm_installed()) {
+  if (!(is_speedglm_installed() & is_speedglm_predict_installed())) {
     warning("Speedglm not installed, using glm instead (slower).", call. = FALSE)
     model_f <- stats::glm(labels ~ ., family = stats::binomial(link = "logit"), data = df_f)
   } else {

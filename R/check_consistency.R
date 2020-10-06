@@ -6,6 +6,8 @@
 #' @param yf The matrix of financed clients' labels
 #' @author Adrien Ehrhardt
 #' @seealso \code{glm}, \code{speedglm}
+#' @keywords internal
+#' @author Adrien Ehrhardt
 #' @examples
 #' \dontrun{
 #' # We simulate data from financed clients

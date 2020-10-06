@@ -7,8 +7,8 @@
 chi2_iter(
   predictors,
   labels,
-  test = F,
-  validation = F,
+  test = FALSE,
+  validation = FALSE,
   proportions = c(0.3, 0.3),
   criterion = "gini",
   param = list(list(alp = 0.001, del = 0.5))
@@ -47,6 +47,16 @@ log_odd <- rowSums(t(sapply(seq_along(xd[, 1]), function(row_id) {
 y <- stats::rbinom(100, 1, 1 / (1 + exp(-log_odd)))
 
 chi2_iter(x, y)
+}
+\references{
+Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, \url{https://CRAN.R-project.org/package=speedglm}
+
+HyunJi Kim (2012). discretization: Data preprocessing, discretization for classification. R package version 1.0-1. \url{https://CRAN.R-project.org/package=discretization}
+
+Liu, H. and Setiono, R. (1995). Chi2: Feature selection and discretization of numeric attributes, \emph{Tools with Artificial Intelligence}, 388–391.
+}
+\author{
+Adrien Ehrhardt
 }
 \keyword{chi2}
 \keyword{discretization}

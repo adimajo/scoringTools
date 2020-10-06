@@ -27,7 +27,9 @@ test_that("mdlp method works with speedglm", {
             criterion
           )
         )
-        expect_s3_class(mdlp_modele@best.disc[[1]], "speedglm")
+        if (is_speedglm_installed() & is_speedglm_predict_installed()) {
+          expect_s3_class(mdlp_modele@best.disc[[1]], "speedglm")
+        }
       }
     }
   }

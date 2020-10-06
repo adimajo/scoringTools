@@ -3,18 +3,20 @@
 \name{summary}
 \alias{summary}
 \alias{summary.discretization}
+\alias{summary,discretization-method}
 \title{Summary}
 \usage{
+summary(object, ...)
+
 summary.discretization(object)
+
+\S4method{summary}{discretization}(object)
 }
 \arguments{
 \item{object}{S4 discretization object.}
+
+\item{...}{Other parameters to \code{summary}}
 }
 \description{
 Summary generic.
 }
-\section{Functions}{
-\itemize{
-\item \code{summary.discretization}: Summary for the discretization class.
-}}
-

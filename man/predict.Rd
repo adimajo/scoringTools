@@ -3,12 +3,19 @@
 \name{predict}
 \alias{predict}
 \alias{predict.discretization}
+\alias{predict,discretization-method}
 \title{Prediction on a raw test set of the best logistic regression model on discretized data.}
 \usage{
+predict(object, ...)
+
 predict.discretization(object, newdata)
+
+\S4method{predict}{discretization}(object, newdata)
 }
 \arguments{
 \item{object}{The S4 discretization object.}
+
+\item{...}{Other parameters to \code{predict}}
 
 \item{newdata}{The test dataframe to discretize and for which we wish to have predictions.}
 }
@@ -16,8 +23,3 @@ predict.discretization(object, newdata)
 This function discretizes a user-provided test dataset given a discretization scheme provided by an S4 "discretization" object.
 It then applies the learnt logistic regression model and outputs its prediction (see predict.glm).
 }
-\section{Functions}{
-\itemize{
-\item \code{predict.discretization}: Prediction on a raw test set of the best logistic regression model on discretized data.
-}}
-

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Adrien Ehrhardt" />
+
+<meta name="date" content="2020-10-06" />
+
+<title>Supplementary material for ``Reject Inference in Credit Scoring: a rationale review’’: tree biasedness</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      code.sourceCode > span { display: inline-block; line-height: 1.25; }
+  code.sourceCode > span { color: inherit; text-decoration: inherit; }
+  code.sourceCode > span:empty { height: 1.2em; }
+  .sourceCode { overflow: visible; }
+  code.sourceCode { white-space: pre; position: relative; }
+  div.sourceCode { margin: 1em 0; }
+  pre.sourceCode { margin: 0; }
+  @media screen {
+  div.sourceCode { overflow: auto; }
+  }
+  @media print {
+  code.sourceCode { white-space: pre-wrap; }
+  code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+  }
+  pre.numberSource code
+    { counter-reset: source-line 0; }
+  pre.numberSource code > span
+    { position: relative; left: -4em; counter-increment: source-line; }
+  pre.numberSource code > span > a:first-child::before
+    { content: counter(source-line);
+      position: relative; left: -1em; text-align: right; vertical-align: baseline;
+      border: none; display: inline-block;
+      -webkit-touch-callout: none; -webkit-user-select: none;
+      -khtml-user-select: none; -moz-user-select: none;
+      -ms-user-select: none; user-select: none;
+      padding: 0 4px; width: 4em;
+      color: #aaaaaa;
+    }
+  pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+  div.sourceCode
+    {   }
+  @media screen {
+  code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+  }
+  code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+  code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+  code span.at { color: #7d9029; } /* Attribute */
+  code span.bn { color: #40a070; } /* BaseN */
+  code span.bu { } /* BuiltIn */
+  code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+  code span.ch { color: #4070a0; } /* Char */
+  code span.cn { color: #880000; } /* Constant */
+  code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+  code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+  code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+  code span.dt { color: #902000; } /* DataType */
+  code span.dv { color: #40a070; } /* DecVal */
+  code span.er { color: #ff0000; font-weight: bold; } /* Error */
+  code span.ex { } /* Extension */
+  code span.fl { color: #40a070; } /* Float */
+  code span.fu { color: #06287e; } /* Function */
+  code span.im { } /* Import */
+  code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+  code span.op { color: #666666; } /* Operator */
+  code span.ot { color: #007020; } /* Other */
+  code span.pp { color: #bc7a00; } /* Preprocessor */
+  code span.sc { color: #4070a0; } /* SpecialChar */
+  code span.ss { color: #bb6688; } /* SpecialString */
+  code span.st { color: #4070a0; } /* String */
+  code span.va { color: #19177c; } /* Variable */
+  code span.vs { color: #4070a0; } /* VerbatimString */
+  code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    </style>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Supplementary material for ``Reject Inference in Credit Scoring: a rationale review’’: tree biasedness</h1>
+<h4 class="author">Adrien Ehrhardt</h4>
+<h4 class="date">2020-10-06</h4>
+
+
+
+<div id="loading-required-libraries" class="section level1">
+<h1>Loading required libraries</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(MASS)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(scoringTools)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="kw">library</span>(rpart)</span></code></pre></div>
+</div>
+<div id="mean-vectors-and-variances-for-each-class" class="section level1">
+<h1>Mean vectors and variances for each class</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>d =<span class="st"> </span><span class="dv">2</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>mu0 =<span class="st"> </span><span class="kw">array</span>(<span class="dv">0</span>,<span class="kw">c</span>(<span class="dv">1</span>,d))</span>
+<span id="cb2-3"><a href="#cb2-3"></a>mu1 =<span class="st"> </span><span class="kw">array</span>(<span class="dv">1</span>,<span class="kw">c</span>(<span class="dv">1</span>,d))</span>
+<span id="cb2-4"><a href="#cb2-4"></a>sigma0 =<span class="st"> </span><span class="kw">diag</span>(<span class="dv">1</span>,d,d)</span>
+<span id="cb2-5"><a href="#cb2-5"></a>sigma1 =<span class="st"> </span><span class="kw">diag</span>(<span class="dv">1</span>,d,d)</span></code></pre></div>
+</div>
+<div id="data-generation" class="section level1">
+<h1>Data generation</h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>m=<span class="dv">10000</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="kw">set.seed</span>(<span class="dv">21</span>)</span>
+<span id="cb3-3"><a href="#cb3-3"></a>y =<span class="st"> </span><span class="kw">rbinom</span>(m,<span class="dv">1</span>,<span class="fl">0.5</span>)</span>
+<span id="cb3-4"><a href="#cb3-4"></a>data =<span class="st"> </span><span class="kw">array</span>(<span class="dv">0</span>,<span class="kw">c</span>(m,d<span class="op">+</span><span class="dv">1</span>))</span>
+<span id="cb3-5"><a href="#cb3-5"></a></span>
+<span id="cb3-6"><a href="#cb3-6"></a>x =<span class="st"> </span><span class="kw">array</span>(<span class="dv">0</span>,<span class="kw">c</span>(m,d))</span>
+<span id="cb3-7"><a href="#cb3-7"></a>x[y<span class="op">==</span><span class="dv">0</span>,] =<span class="st"> </span><span class="kw">mvrnorm</span>(<span class="dt">n =</span> <span class="kw">sum</span>(y<span class="op">==</span><span class="dv">0</span>), mu0, sigma0)</span>
+<span id="cb3-8"><a href="#cb3-8"></a>x[y<span class="op">==</span><span class="dv">1</span>,] =<span class="st"> </span><span class="kw">mvrnorm</span>(<span class="dt">n =</span> <span class="kw">sum</span>(y<span class="op">==</span><span class="dv">1</span>), mu1, sigma1)</span>
+<span id="cb3-9"><a href="#cb3-9"></a>data =<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">cbind.data.frame</span>(<span class="dt">y =</span> y,<span class="dt">x =</span> x))</span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="kw">rm</span>(x)</span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="kw">rm</span>(y)</span>
+<span id="cb3-12"><a href="#cb3-12"></a></span>
+<span id="cb3-13"><a href="#cb3-13"></a>train =<span class="st"> </span><span class="kw">as.data.frame</span>(data[<span class="dv">1</span><span class="op">:</span>(m<span class="op">/</span><span class="dv">2</span>),])</span>
+<span id="cb3-14"><a href="#cb3-14"></a>test =<span class="st"> </span><span class="kw">as.data.frame</span>(data[(m<span class="op">/</span><span class="dv">2</span><span class="op">+</span><span class="dv">1</span>)<span class="op">:</span>m,])</span>
+<span id="cb3-15"><a href="#cb3-15"></a></span>
+<span id="cb3-16"><a href="#cb3-16"></a>train[,<span class="st">&quot;y&quot;</span>] &lt;-<span class="st"> </span><span class="kw">as.factor</span>(train[,<span class="st">&quot;y&quot;</span>])</span></code></pre></div>
+</div>
+<div id="oracle" class="section level1">
+<h1>Oracle</h1>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>modele_complet_arbre =<span class="st"> </span><span class="kw">rpart</span>(y <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>train, <span class="dt">method =</span> <span class="st">&quot;class&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2"></a>modele_complet_reglog =<span class="st"> </span><span class="kw">glm</span>(y <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>train, <span class="dt">family =</span> <span class="kw">binomial</span>(<span class="dt">link=</span><span class="st">&quot;logit&quot;</span>))</span></code></pre></div>
+</div>
+<div id="loop-over-cut-off-values" class="section level1">
+<h1>Loop over cut-off values</h1>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>list_gini_arbre =<span class="st"> </span><span class="kw">list</span>()</span>
+<span id="cb5-2"><a href="#cb5-2"></a>list_gini_reglog =<span class="st"> </span><span class="kw">list</span>()</span>
+<span id="cb5-3"><a href="#cb5-3"></a></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="kw">seq</span>(<span class="fl">0.2</span>,<span class="fl">0.7</span>,<span class="fl">0.05</span>)) {</span>
+<span id="cb5-5"><a href="#cb5-5"></a>     ind_refuses_arbre =<span class="st"> </span><span class="kw">predict</span>(modele_complet_arbre,train)[,<span class="dv">1</span>] <span class="op">&lt;</span><span class="st"> </span>i</span>
+<span id="cb5-6"><a href="#cb5-6"></a>     ind_refuses_reglog =<span class="st"> </span><span class="kw">predict</span>(modele_complet_reglog,train,<span class="dt">type=</span><span class="st">&quot;response&quot;</span>) <span class="op">&lt;</span><span class="st"> </span>i</span>
+<span id="cb5-7"><a href="#cb5-7"></a>     </span>
+<span id="cb5-8"><a href="#cb5-8"></a>     train_partiel_arbre =<span class="st"> </span>train[<span class="op">!</span>ind_refuses_arbre,]</span>
+<span id="cb5-9"><a href="#cb5-9"></a>     train_partiel_reglog =<span class="st"> </span>train[<span class="op">!</span>ind_refuses_reglog,]</span>
+<span id="cb5-10"><a href="#cb5-10"></a>     </span>
+<span id="cb5-11"><a href="#cb5-11"></a>     modele_partiel_arbre &lt;-<span class="st"> </span><span class="kw">rpart</span>(y <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>train_partiel_arbre, <span class="dt">method =</span> <span class="st">&quot;class&quot;</span>)</span>
+<span id="cb5-12"><a href="#cb5-12"></a>     modele_partiel_reglog &lt;-<span class="st"> </span><span class="kw">glm</span>(y <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>train_partiel_reglog, <span class="dt">family =</span> <span class="kw">binomial</span>(<span class="dt">link=</span><span class="st">&quot;logit&quot;</span>))</span>
+<span id="cb5-13"><a href="#cb5-13"></a></span>
+<span id="cb5-14"><a href="#cb5-14"></a>     list_gini_arbre &lt;-<span class="st"> </span><span class="kw">append</span>(list_gini_arbre,<span class="kw">normalizedGini</span>(test[,<span class="st">&quot;y&quot;</span>],<span class="kw">predict</span>(modele_partiel_arbre,test)[,<span class="dv">2</span>]))</span>
+<span id="cb5-15"><a href="#cb5-15"></a>     list_gini_reglog &lt;-<span class="st"> </span><span class="kw">append</span>(list_gini_reglog,<span class="kw">normalizedGini</span>(test[,<span class="st">&quot;y&quot;</span>],<span class="kw">predict</span>(modele_partiel_reglog,test,<span class="dt">type=</span><span class="st">&quot;response&quot;</span>)))</span>
+<span id="cb5-16"><a href="#cb5-16"></a>}</span></code></pre></div>
+</div>
+<div id="figures" class="section level1">
+<h1>Figures</h1>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">plot</span>(<span class="kw">seq</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(list_gini_arbre)),list_gini_arbre,<span class="dt">ylim=</span><span class="kw">c</span>(<span class="fl">0.35</span>,<span class="fl">0.7</span>),<span class="dt">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="kw">lines</span>(<span class="kw">seq</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(list_gini_reglog)),list_gini_reglog,<span class="dt">ylim=</span><span class="kw">c</span>(<span class="fl">0.35</span>,<span class="fl">0.7</span>),<span class="dt">type =</span> <span class="st">&quot;p&quot;</span>,<span class="dt">col=</span><span class="st">&quot;blue&quot;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3"></a></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="kw">legend</span>(<span class="dv">1</span>,<span class="fl">0.45</span>,</span>
+<span id="cb6-5"><a href="#cb6-5"></a>       <span class="dt">pch =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>), <span class="dt">lty=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),</span>
+<span id="cb6-6"><a href="#cb6-6"></a>       <span class="dt">col=</span><span class="kw">c</span>(<span class="st">&#39;red&#39;</span>,<span class="st">&#39;blue&#39;</span>),</span>
+<span id="cb6-7"><a href="#cb6-7"></a>       <span class="dt">legend=</span><span class="kw">c</span>(<span class="st">&quot;Arbre de d?cision&quot;</span>,<span class="st">&quot;R?gression logistique&quot;</span>),</span>
+<span id="cb6-8"><a href="#cb6-8"></a>       <span class="dt">cex=</span><span class="dv">1</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

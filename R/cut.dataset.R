@@ -5,7 +5,8 @@
 #' @param test TRUE if a test dataset is wanted, FALSE otherwise (default=TRUE).
 #' @param validation TRUE if a test dataset is wanted, FALSE otherwise (default=TRUE).
 #' @param proportions The list of the (2) proportions wanted for test and validation set. Only the first is used when there is only one of either test or validation that is set to TRUE. Produces an error when the sum is greater to one. Useless if both test and validation are set to FALSE. Default: list(0.2,0.2).
-#' @keywords sample test train validation
+#' @keywords internal sample test train validation
+#' @author Adrien Ehrhardt
 # #' @examples
 # #' # We randomly separate 30 observations in 40\% of training, 30\% of test and 30\% of validation.
 # #' cut_dataset(n=30, proportions=c(0.3,0.3), test=TRUE, validation=TRUE)

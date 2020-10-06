@@ -38,8 +38,10 @@ jobs:
       - name: Testthat
         run: devtools::test()
         shell: Rscript {0}
-      - name: Coverage
+      - name: Coverage devtools
         run: print(devtools::test_coverage())
+      - name: Coverage codecov
+        run: covr::codecov()
         shell: Rscript {0}
       - name: Check on Mac OS
         env:

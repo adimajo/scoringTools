@@ -63,7 +63,7 @@ parcelling <- function(xf, xnf, yf, probs = seq(0, 1, 0.25), alpha = rep(1, leng
 
   df_parceling[df_parceling$acc == 0, "labels"] <- sapply(df_parceling[df_parceling$acc == 0, "poids_final"], function(x) (stats::rbinom(1, 1, 1 - x)))
 
-  if (!is_speedglm_installed()) {
+  if (!(is_speedglm_installed() & is_speedglm_predict_installed())) {
     model_parcelling <- stats::glm(labels ~ ., family = stats::binomial(link = "logit"), df_parceling[, -which(names(df_parceling) %in% c("poids_final", "classe_SCORE", "acc"))])
   } else {
     model_parcelling <- speedglm::speedglm(labels ~ ., family = stats::binomial(link = "logit"), df_parceling[, -which(names(df_parceling) %in% c("poids_final", "classe_SCORE", "acc"))])

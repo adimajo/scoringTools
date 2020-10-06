@@ -3,19 +3,19 @@ NULL
 
 is_speedglm_installed <- function() {
   installed <- requireNamespace("speedglm", quietly = TRUE)
-  # if (installed) {
-  #   les_methodes <- methods::findMethods("predict")@signatures
-  #   for (j in length(les_methodes)) {
-  #     present <- FALSE
-  #     if ("speedglm" %in% les_methodes[[j]]) {
-  #       present <- TRUE
-  #     }
-  #   }
-  #   if (!present) {
-  #     methods::setMethod(f = "predict", signature = c(object = "speedglm", newdata = "data.frame"), definition = speedglm:::predict.speedglm)
+  return(installed)
+}
+
+is_speedglm_predict_installed <- function() {
+  # les_methodes <- methods::findMethods("predict")@signatures
+  # for (j in length(les_methodes)) {
+  #   present <- FALSE
+  #   if ("speedglm" %in% les_methodes[[j]]) {
+  #     present <- TRUE
   #   }
   # }
-  return(installed)
+  # return(present)
+  return(TRUE)
 }
 
 methods::setMethod("show", methods::signature(object = "reject_infered"), function(object) {
@@ -38,43 +38,49 @@ print.discretization <- function(object) {
 
 #' Summary
 #'
+#' @exportMethod summary
 #' @name summary
 #' @description Summary generic.
 #' @param object S4 discretization object.
-if (!isGeneric("summary")) {
-  methods::setGeneric("summary", function(object, ...) standardGeneric("summary"))
-}
+#' @param ... Other parameters to \code{summary}
+methods::setGeneric("summary")
 
-#' @describeIn summary Summary for the discretization class.
+#' Summary for the discretization class.
+#' @rdname summary
+#' @param object S4 discretization object.
 summary.discretization <- function(object) {
   summary(object@best.disc[[1]])
 }
+#' Summary for the discretization class.
+#' @rdname summary
 methods::setMethod(f = "summary", signature = c(object = "discretization"), definition = summary.discretization)
 
 
 #' Prediction on a raw test set of the best logistic regression model on discretized data.
 #'
+#' @exportMethod predict
 #' @name predict
 #' @description This function discretizes a user-provided test dataset given a discretization scheme provided by an S4 "discretization" object.
 #' It then applies the learnt logistic regression model and outputs its prediction (see predict.glm).
 #' @param object The S4 discretization object.
 #' @param newdata The test dataframe to discretize and for which we wish to have predictions.
-if (!isGeneric("predict")) {
-  methods::setGeneric("predict", function(object, newdata, ...) standardGeneric("predict"))
-}
+#' @param ... Other parameters to \code{predict}
+# if (!methods::isGeneric("predict")) {
+methods::setGeneric("predict")
+#}
 
-#' @describeIn predict Prediction on a raw test set of the best logistic regression model on discretized data.
+#' Prediction on a raw test set of the best logistic regression model on discretized data.
+#' @rdname predict
+#' @param object The S4 discretization object.
+#' @param newdata The test dataframe to discretize and for which we wish to have predictions.
 predict.discretization <- function(object, newdata) {
   predict(object = object@best.disc[[1]], newdata = data.frame(discretize_cutp(object@parameters[[1]][object@parameters[[6]][[1]], ], object@best.disc[[2]][["Disc.data"]], newdata)) %>%
     dplyr::mutate_if(is.numeric, as.factor), type = "response")
 }
-methods::setMethod(f = "predict", signature = c(object = "discretization", newdata = "data.frame"), definition = predict.discretization)
-methods::setMethod(f = "predict", signature = c(object = "discretization", newdata = "matrix"), definition = predict.discretization)
-methods::setMethod(f = "predict", signature = c(object = "glmORlogicalORspeedglm"), definition = stats::predict)
-methods::setMethod(f = "predict", signature = c(object = "glmORlogicalORspeedglm"), definition = stats::predict)
-if (is_speedglm_installed()) {
-  methods::setMethod(f = "predict", signature = c(object = "speedglm", newdata = "data.frame"), definition = speedglm:::predict.speedglm)
-}
+
+#' Prediction on a raw test set of the best logistic regression model on discretized data.
+#' @rdname predict
+methods::setMethod(f = "predict", signature = c(object = "discretization"), definition = predict.discretization)
 
 #' Pipe operator
 #'
@@ -89,21 +95,22 @@ NULL
 #' Different kinds of plots using either plotly (if available) or the standard plot (graphics package).
 #'
 #' @name plot
+#' @exportMethod plot
 #' @description This function aims at producing useful graphs in the context of credit scoring in order to simplify the validation process
 #' of the produced credit score.
 #' @param x S4 discretization object.
+#' @param y (For standard plots only)
+#' @param ... (For standard plots only)
 #' @param type Type of plot. For now only "ROC" is supported.
-#'
-if (!isGeneric("plot")) {
-  methods::setGeneric("plot", function(x, y, type, ...) standardGeneric("plot"))
-}
+methods::setGeneric("plot")
 
-#' @describeIn plot plots for the S4 discretization object
+#' Different kinds of plots using either plotly (if available) or the standard plot (graphics package).
+#'
+#' @rdname plot
 #' @param x S4 discretization object.
 #' @param type Type of plot. For now only "ROC" is supported.
-#' @param ... Additional plot parameters.
 #' @importFrom magrittr "%>%"
-plot.discretization <- function(x, type, ...) {
+plot.discretization <- function(x, type) {
   if (requireNamespace("plotly", quietly = TRUE)) {
 
     # The produced graph depends on the 'type' variable
@@ -183,7 +190,11 @@ plot.discretization <- function(x, type, ...) {
     }
   }
 }
-methods::setMethod(f = "plot", signature = c(x = "discretization", y = "missing", type = "character"), definition = plot.discretization)
+
+#' Different kinds of plots using either plotly (if available) or the standard plot (graphics package).
+#'
+#' @rdname plot
+methods::setMethod("plot", "discretization", plot.discretization)
 
 #' Generic method "discretize" for discretization objects.
 #'

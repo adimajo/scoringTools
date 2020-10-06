@@ -1,35 +1,16 @@
----
-title: "Supplementary material for ``Reject Inference in Credit Scoring: a rationale review'': tree biasedness"
-author: "Adrien Ehrhardt"
-date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Appendix: tree biasedness}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-# Loading required libraries
-
-```{r}
+## -----------------------------------------------------------------------------
 library(MASS)
 library(scoringTools)
 library(rpart)
-```
 
-# Mean vectors and variances for each class
-
-```{r mean_vectors}
+## ----mean_vectors-------------------------------------------------------------
 d = 2
 mu0 = array(0,c(1,d))
 mu1 = array(1,c(1,d))
 sigma0 = diag(1,d,d)
 sigma1 = diag(1,d,d)
-```
 
-# Data generation
-
-```{r data_generation}
+## ----data_generation----------------------------------------------------------
 m=10000
 set.seed(21)
 y = rbinom(m,1,0.5)
@@ -46,18 +27,12 @@ train = as.data.frame(data[1:(m/2),])
 test = as.data.frame(data[(m/2+1):m,])
 
 train[,"y"] <- as.factor(train[,"y"])
-```
 
-# Oracle
-
-```{r oracle}
+## ----oracle-------------------------------------------------------------------
 modele_complet_arbre = rpart(y ~ ., data=train, method = "class")
 modele_complet_reglog = glm(y ~ ., data=train, family = binomial(link="logit"))
-```
 
-# Loop over cut-off values
-
-```{r cutoffvalues}
+## ----cutoffvalues-------------------------------------------------------------
 list_gini_arbre = list()
 list_gini_reglog = list()
 
@@ -74,11 +49,8 @@ for (i in seq(0.2,0.7,0.05)) {
      list_gini_arbre <- append(list_gini_arbre,normalizedGini(test[,"y"],predict(modele_partiel_arbre,test)[,2]))
      list_gini_reglog <- append(list_gini_reglog,normalizedGini(test[,"y"],predict(modele_partiel_reglog,test,type="response")))
 }
-```
 
-# Figures
-
-```{r plot}
+## ----plot---------------------------------------------------------------------
 plot(seq(1:length(list_gini_arbre)),list_gini_arbre,ylim=c(0.35,0.7),col="red")
 lines(seq(1:length(list_gini_reglog)),list_gini_reglog,ylim=c(0.35,0.7),type = "p",col="blue")
 
@@ -87,4 +59,4 @@ legend(1,0.45,
        col=c('red','blue'),
        legend=c("Arbre de d?cision","R?gression logistique"),
        cex=1)
-```
+

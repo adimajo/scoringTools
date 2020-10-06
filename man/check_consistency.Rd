@@ -32,4 +32,7 @@ check_consistency(xf, xnf, yf)
 }
 \author{
 Adrien Ehrhardt
+
+Adrien Ehrhardt
 }
+\keyword{internal}

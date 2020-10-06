@@ -7,8 +7,8 @@
 mdlp_iter(
   predictors,
   labels,
-  test = F,
-  validation = F,
+  test = FALSE,
+  validation = FALSE,
   proportions = c(0.3, 0.3),
   criterion = "gini"
 )
@@ -52,7 +52,9 @@ mdlp_iter(x, y)
 }
 \references{
 Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, \url{https://CRAN.R-project.org/package=speedglm}
+
 HyunJi Kim (2012). discretization: Data preprocessing, discretization for classification. R package version 1.0-1. \url{https://CRAN.R-project.org/package=discretization}
+
 Fayyad, U. M. and Irani, K. B.(1993). Multi-interval discretization of continuous-valued attributes for classification learning, \emph{Artificial intelligence}, \strong{13}, 1022–1027.
 }
 \seealso{

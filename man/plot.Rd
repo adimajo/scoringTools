@@ -3,23 +3,25 @@
 \name{plot}
 \alias{plot}
 \alias{plot.discretization}
+\alias{plot,discretization-method}
 \title{Different kinds of plots using either plotly (if available) or the standard plot (graphics package).}
 \usage{
-plot.discretization(x, type, ...)
+plot(x, y, ...)
+
+plot.discretization(x, type)
+
+\S4method{plot}{discretization}(x, type)
 }
 \arguments{
 \item{x}{S4 discretization object.}
 
-\item{type}{Type of plot. For now only "ROC" is supported.}
+\item{y}{(For standard plots only)}
 
-\item{...}{Additional plot parameters.}
+\item{...}{(For standard plots only)}
+
+\item{type}{Type of plot. For now only "ROC" is supported.}
 }
 \description{
 This function aims at producing useful graphs in the context of credit scoring in order to simplify the validation process
 of the produced credit score.
 }
-\section{Functions}{
-\itemize{
-\item \code{plot.discretization}: plots for the S4 discretization object
-}}
-
