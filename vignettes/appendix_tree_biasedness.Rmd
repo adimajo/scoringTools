@@ -79,12 +79,13 @@ for (i in seq(0.2, 0.7, 0.05)) {
 # Figures
 
 ```{r plot}
-plot(seq(0.2, 0.7, 0.05), 
-     list_gini_arbre, 
-     ylim = c(0.35, 0.7), 
-     xlab = "Rejection rate",
-     ylab = "Gini",
-     col = "red")
+plot(seq(0.2, 0.7, 0.05),
+  list_gini_arbre,
+  ylim = c(0.35, 0.7),
+  xlab = "Rejection rate",
+  ylab = "Gini",
+  col = "red"
+)
 lines(seq(0.2, 0.7, 0.05), list_gini_reglog, ylim = c(0.35, 0.7), type = "p", col = "blue")
 
 legend(1, 0.45,

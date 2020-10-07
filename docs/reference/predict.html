@@ -150,8 +150,13 @@ It then applies the learnt logistic regression model and outputs its prediction 
 
 <span class='fu'>predict.discretization</span>(<span class='no'>object</span>, <span class='no'>newdata</span>)
 
+<span class='fu'>predict.reject_infered</span>(<span class='no'>object</span>, <span class='no'>newdata</span>, <span class='no'>...</span>)
+
 <span class='co'># S4 method for discretization</span>
-<span class='fu'>predict</span>(<span class='no'>object</span>, <span class='no'>newdata</span>)</pre>
+<span class='fu'>predict</span>(<span class='no'>object</span>, <span class='no'>newdata</span>)
+
+<span class='co'># S4 method for reject_infered</span>
+<span class='fu'>predict</span>(<span class='no'>object</span>, <span class='no'>newdata</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -162,7 +167,7 @@ It then applies the learnt logistic regression model and outputs its prediction 
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Other parameters to <code>predict</code></p></td>
+      <td><p>Additional parameters to pass on to base predict.</p></td>
     </tr>
     <tr>
       <th>newdata</th>

@@ -1,10 +1,10 @@
 context("test-topdown")
 
 test_that("topdown method works with speedglm", {
-  x <- matrix(runif(900), nrow = 300, ncol = 3)
+  x <- matrix(runif(600), nrow = 300, ncol = 2)
   cuts <- seq(0, 1, length.out = 4)
   xd <- apply(x, 2, function(col) as.numeric(cut(col, cuts)))
-  theta <- t(matrix(c(0, 0, 0, 2, 2, 2, -2, -2, -2), ncol = 3, nrow = 3))
+  theta <- t(matrix(c(0, 0, 2, 2, -2, -2), ncol = 3, nrow = 2))
   log_odd <- rowSums(t(sapply(seq_along(xd[, 1]), function(row_id) {
     sapply(
       seq_along(xd[row_id, ]),
@@ -72,17 +72,17 @@ test_that("topdown method works with speedglm", {
 
 
 test_that("topdown method throws errors", {
-  x <- matrix(runif(300), nrow = 100, ncol = 3)
+  x <- matrix(runif(50), nrow = 25, ncol = 2)
   cuts <- seq(0, 1, length.out = 4)
   xd <- apply(x, 2, function(col) as.numeric(cut(col, cuts)))
-  theta <- t(matrix(c(0, 0, 0, 2, 2, 2, -2, -2, -2), ncol = 3, nrow = 3))
+  theta <- t(matrix(c(0, 0, 2, 2, -2, -2), ncol = 3, nrow = 2))
   log_odd <- rowSums(t(sapply(seq_along(xd[, 1]), function(row_id) {
     sapply(
       seq_along(xd[row_id, ]),
       function(element) theta[xd[row_id, element], element]
     )
   })))
-  y <- stats::rbinom(100, 1, 1 / (1 + exp(-log_odd)))
+  y <- stats::rbinom(25, 1, 1 / (1 + exp(-log_odd)))
   expect_error(topdown_iter(x, y, criterion = "toto"))
-  expect_error(topdown_iter(x, y[1:150], criterion = "gini"))
+  expect_error(topdown_iter(x, y[1:12], criterion = "gini"))
 })

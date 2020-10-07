@@ -78,9 +78,22 @@ predict.discretization <- function(object, newdata) {
     dplyr::mutate_if(is.numeric, as.factor), type = "response")
 }
 
+#' Prediction on a raw test set of the logistic regression model after reject inference.
+#' @rdname predict
+#' @param object The S4 discretization object.
+#' @param newdata The test dataframe to discretize and for which we wish to have predictions.
+#' @param ... Additional parameters to pass on to base predict.
+predict.reject_infered <- function(object, newdata, ...) {
+  predict(object = object@infered_model, newdata = data.frame(x = newdata), ...)
+}
+
 #' Prediction on a raw test set of the best logistic regression model on discretized data.
 #' @rdname predict
 methods::setMethod(f = "predict", signature = c(object = "discretization"), definition = predict.discretization)
+
+#' Prediction on a raw test set of the logistic regression model after reject inference.
+#' @rdname predict
+methods::setMethod(f = "predict", signature = c(object = "reject_infered"), definition = predict.reject_infered)
 
 #' Pipe operator
 #'
@@ -104,6 +117,16 @@ NULL
 #' @param type Type of plot. For now only "ROC" is supported.
 methods::setGeneric("plot")
 
+is_plotly_installed <- function() {
+  installed <- requireNamespace("plotly", quietly = TRUE)
+  return(installed)
+}
+
+is_pROC_installed <- function() {
+  installed <- requireNamespace("pROC", quietly = TRUE)
+  return(installed)
+}
+
 #' Different kinds of plots using either plotly (if available) or the standard plot (graphics package).
 #'
 #' @rdname plot
@@ -111,15 +134,17 @@ methods::setGeneric("plot")
 #' @param type Type of plot. For now only "ROC" is supported.
 #' @importFrom magrittr "%>%"
 plot.discretization <- function(x, type) {
-  if (requireNamespace("plotly", quietly = TRUE)) {
+  if (is_plotly_installed()) {
 
     # The produced graph depends on the 'type' variable
     if (type == "ROC") {
-      if (requireNamespace("pROC", quietly = TRUE)) {
-        if (x@parameters[[3]] == TRUE) {
+      if (is_pROC_installed()) {
+        if (x@parameters[[2]] == FALSE & x@parameters[[3]] == TRUE) {
           warning("No test data, using validation data might provide an overly optimist estimate of the algorithm's performance.")
         } else {
-          warning("No test data, no validation data, using train data will provide an overly optimist estimate of the algorithm's performance.")
+          if (x@parameters[[2]] == FALSE & x@parameters[[3]] == FALSE) {
+            warning("No test data, no validation data, using train data will provide an overly optimist estimate of the algorithm's performance.")
+          }
         }
         roc_curve <- pROC::roc(x@disc.data$labels, predict(x@best.disc[[1]], x@disc.data %>% dplyr::mutate_if(is.numeric, as.factor), type = "response"))
         plotly_plot <- plotly::plot_ly(data.frame(Specificity = roc_curve$specificities, Sensitivity = roc_curve$sensitivities),
@@ -170,6 +195,8 @@ plot.discretization <- function(x, type) {
             plot_bgcolor = "#E8E2E2"
           )
         return(plotly_plot)
+      } else {
+        stop(simpleError("Package 'pROC' suggested but not installed, cannot use type='ROC'."))
       }
     }
 
@@ -185,8 +212,33 @@ plot.discretization <- function(x, type) {
       stop(simpleError("Not implemented."))
     }
   } else {
-    for (j in 1:length(x@best.disc[[2]])) {
-      graphics::plot(x@best.disc[[1]]$data[j], x@best.disc[[1]][[j]]$data)
+    warning("Package 'plotly' suggested but not installed, falling back to 'graphics' package.")
+    if (type == "ROC") {
+      if (is_pROC_installed()) {
+        if (x@parameters[[2]] == FALSE & x@parameters[[3]] == TRUE) {
+          warning("No test data, using validation data might provide an overly optimist estimate of the algorithm's performance.")
+        } else {
+          if (x@parameters[[2]] == FALSE & x@parameters[[3]] == FALSE) {
+            warning("No test data, no validation data, using train data will provide an overly optimist estimate of the algorithm's performance.")
+          }
+        }
+        roc_curve <- pROC::roc(x@disc.data$labels, predict(x@best.disc[[1]], x@disc.data %>% dplyr::mutate_if(is.numeric, as.factor), type = "response"))
+        return(roc_curve)
+      } else {
+        stop(simpleError("Package 'pROC' suggested but not installed, cannot use type='ROC'."))
+      }
+    }
+
+    if (type == "lift") {
+      stop(simpleError("Not implemented."))
+    }
+
+    if (type == "discretization") {
+      stop(simpleError("Not implemented."))
+    }
+
+    if (type == "glm") {
+      graphics::plot(x@best.disc[[1]])
     }
   }
 }

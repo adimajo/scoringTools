@@ -312,7 +312,7 @@ log_odd <- rowSums(t(sapply(seq_along(xd[, 1]), function(row_id) {
 })))
 y <- stats::rbinom(100, 1, 1 / (1 + exp(-log_odd)))
 
-discrete_modele = chi2_iter(x, y)
+discrete_modele <- chi2_iter(x, y)
 ```
 
 ### Methods
@@ -342,7 +342,7 @@ predict(discrete_modele, x)
 
 The plot method corresponds to the glm plot method for the infered model:
 ```{r, echo=FALSE, results='asis'}
-plot(discrete_modele, type="ROC")
+plot(discrete_modele, type = "ROC")
 ```
 
 <!-- ## Added constraints -->

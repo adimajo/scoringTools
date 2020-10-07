@@ -3,19 +3,25 @@
 \name{predict}
 \alias{predict}
 \alias{predict.discretization}
+\alias{predict.reject_infered}
 \alias{predict,discretization-method}
+\alias{predict,reject_infered-method}
 \title{Prediction on a raw test set of the best logistic regression model on discretized data.}
 \usage{
 predict(object, ...)
 
 predict.discretization(object, newdata)
 
+predict.reject_infered(object, newdata, ...)
+
 \S4method{predict}{discretization}(object, newdata)
+
+\S4method{predict}{reject_infered}(object, newdata, ...)
 }
 \arguments{
 \item{object}{The S4 discretization object.}
 
-\item{...}{Other parameters to \code{predict}}
+\item{...}{Additional parameters to pass on to base predict.}
 
 \item{newdata}{The test dataframe to discretize and for which we wish to have predictions.}
 }

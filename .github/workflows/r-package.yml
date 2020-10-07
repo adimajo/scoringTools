@@ -27,6 +27,9 @@ jobs:
       - name: Install dependencies
         run: devtools::install_deps(dependencies = TRUE)
         shell: Rscript {0}
+      - name: Install webshot
+        run: install.packages("webshot")
+        shell: Rscript {0}
       - name: Check documentation
         run: Rscript inst/document.R
       - name: Check package (as CRAN)

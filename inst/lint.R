@@ -3,7 +3,7 @@ if (!require(styler, quietly = TRUE)) {
      install.packages("styler")
 }
 docOrg <- lapply(dir("R", pattern="*.R", recursive = TRUE, full.names = TRUE), readLines)
-styler::style_pkg()
+styler::style_pkg(filetype = c("R", "Rmd"))
 docNew <- lapply(dir("R", pattern="*.R", recursive = TRUE, full.names = TRUE), readLines)
 # Test
 if (!identical(docOrg, docNew)) {

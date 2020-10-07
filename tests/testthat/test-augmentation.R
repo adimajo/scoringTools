@@ -1,6 +1,6 @@
 context("test-augmentation")
 
-test_that("augmentation method works with speedglm", {
+test_that("augmentation method works with speedglm and glm", {
   xf <- matrix(runif(100 * 2), nrow = 100, ncol = 2)
   theta <- c(2, -2)
   log_odd <- apply(xf, 1, function(row) theta %*% row)
@@ -12,21 +12,15 @@ test_that("augmentation method works with speedglm", {
   expect_s3_class(modele_rejected@financed_model, "glmORlogicalORspeedglm")
   expect_true(is.na(modele_rejected@acceptance_model))
   expect_s3_class(modele_rejected@infered_model, "glmORlogicalORspeedglm")
-})
-
-test_that("augmentation method works with glm", {
-  xf <- matrix(runif(100 * 2), nrow = 100, ncol = 2)
-  theta <- c(2, -2)
-  log_odd <- apply(xf, 1, function(row) theta %*% row)
-  yf <- rbinom(100, 1, 1 / (1 + exp(-log_odd)))
-  xnf <- matrix(runif(100 * 2), nrow = 100, ncol = 2)
   with_mock(
     "scoringTools:::is_speedglm_installed" = function() FALSE,
-    modele_rejected <- augmentation(xf, xnf, yf)
+    {
+      expect_warning(modele_rejected <- augmentation(xf, xnf, yf))
+      expect_s4_class(modele_rejected, "reject_infered")
+      expect_equal(modele_rejected@method_name, "augmentation")
+      expect_s3_class(modele_rejected@financed_model, "glmORlogicalORspeedglm")
+      expect_true(is.na(modele_rejected@acceptance_model))
+      expect_s3_class(modele_rejected@infered_model, "glmORlogicalORspeedglm")
+    }
   )
-  expect_s4_class(modele_rejected, "reject_infered")
-  expect_equal(modele_rejected@method_name, "augmentation")
-  expect_s3_class(modele_rejected@financed_model, "glmORlogicalORspeedglm")
-  expect_true(is.na(modele_rejected@acceptance_model))
-  expect_s3_class(modele_rejected@infered_model, "glmORlogicalORspeedglm")
 })

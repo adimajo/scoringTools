@@ -28,4 +28,4 @@ Two other packages were made public during this PhD, which tackle more specifica
 
 * A Shiny app explaining all aspects of this work is also accessible by running `runDemo()`.
 
-* predict and plot methods for reject_infered class
+* plot methods for reject_infered class
