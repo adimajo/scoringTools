@@ -78,8 +78,8 @@ Two problems have been tackled so far in the Credit Scoring framework:
 
 We released two other packages:
 
-1. Package [glmdisc](https://cran.r-project.org/web/packages/glmdisc/index.html) for ‘‘Quantization'' of continuous (discretization) and qualitative (grouping) features **and** interactions among covariates,
-2. Package [glmtree](https://cran.r-project.org/web/packages/glmtree/index.html) for ‘‘Segmentation'' of clients into subpopulations with different scorecards: logistic regression trees.
+1. Package [glmdisc](https://cran.r-project.org/package=glmdisc) for ‘‘Quantization'' of continuous (discretization) and qualitative (grouping) features **and** interactions among covariates,
+2. Package [glmtree](https://cran.r-project.org/package=glmtree) for ‘‘Segmentation'' of clients into subpopulations with different scorecards: logistic regression trees.
 
 Other packages focus on Credit Scoring, see e.g. [this review paper](https://arxiv.org/abs/2006.11835).
 
@@ -297,7 +297,7 @@ The approach is implemented in the `glmdisc` package and **is not part of this p
 
 ### The discretization package
 
-In this package, we wrapped functions of the [discretization](https://cran.r-project.org/web/packages/discretization/index.html) package in a unified S4 class `discretization`.
+In this package, we wrapped functions of the [discretization](https://cran.r-project.org/package=discretization) package in a unified S4 class `discretization`.
 
 ```{r}
 x <- matrix(runif(300), nrow = 100, ncol = 3)

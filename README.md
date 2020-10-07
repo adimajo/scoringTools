@@ -21,8 +21,8 @@ The package's website (obtained from `pkgdown`) is available respectively at:
 
 Two other packages were made public during this PhD, which tackle more specifically:
 
-* Quantization (discretization and grouping of levels) and interaction screening: package [glmdisc](https://cran.r-project.org/web/packages/glmdisc/index.html) (see [adimajo.github.io/glmdisc](https://adimajo.github.io/glmdisc))
-* Logistic regression trees: package [glmdisc](https://cran.r-project.org/web/packages/glmtree/index.html) (see [adimajo.github.io/glmtree](https://adimajo.github.io/glmtree))
+* Quantization (discretization and grouping of levels) and interaction screening: package [glmdisc](https://cran.r-project.org/package=glmdisc) (see [adimajo.github.io/glmdisc](https://adimajo.github.io/glmdisc))
+* Logistic regression trees: package [glmdisc](https://cran.r-project.org/package=glmdtree) (see [adimajo.github.io/glmtree](https://adimajo.github.io/glmtree))
 
 ## TODO: 
 
