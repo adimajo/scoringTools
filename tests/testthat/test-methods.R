@@ -101,7 +101,7 @@ test_that("plot method for discretization works", {
   with_mock(
     "scoringTools:::is_pROC_installed" = function() FALSE,
     {
-      expect_warning(plotly_plot <- plot(x = chi2_modele, type = "ROC"))
+      expect_error(plotly_plot <- plot(x = chi2_modele, type = "ROC"))
     }
   )
 
