@@ -22,7 +22,7 @@ In order to accept / reject loan applications more efficiently (both quicker and
 In practice, the statistical modeler has historical data about each customer's characteristics. For obvious reasons, only data available at the time of inquiry must be used to build a future application scorecard. Those data often take the form of a well-structured table with one line per client alongside their performance (did they pay back their loan or not?) as can be seen in the following table:
 
 ```{r, echo=FALSE, results='asis'}
-knitr::kable(data.frame(Job=c("Craftsman","Technician","Executive","Office employee"),Habitation = c("Owner","Renter","Starter","By family"),Time_in_job = c(10,20,5,2), Children = c(0,1,2,3), Family_status=  c("Divorced","Widower","Single","Married"),Default = c("No","No","Yes","No")))
+knitr::kable(data.frame(Job = c("Craftsman", "Technician", "Executive", "Office employee"), Habitation = c("Owner", "Renter", "Starter", "By family"), Time_in_job = c(10, 20, 5, 2), Children = c(0, 1, 2, 3), Family_status = c("Divorced", "Widower", "Single", "Married"), Default = c("No", "No", "Yes", "No")))
 ```
 
 ## Formulation
@@ -69,14 +69,19 @@ Nevertheless, there are a few theoretical limitations of the current approach, e
 
 ## Problems tackled in this package
 
-At the time of this writing, four problems have been tackled so far in the Credit Scoring framework:
+Two problems have been tackled so far in the Credit Scoring framework:
 
 1. Reject Inference,
 2. ‘‘Quantization'' of continuous (discretization) and qualitative (grouping) features,
-3. Interactions among covariates,
-4. ‘‘Segmentation'' of clients into subpopulations with different scorecards: logistic regression trees.
 
-This package is about the first two subjects on which we'll go deeper in the next two sections.
+## Other packages
+
+We released two other packages:
+
+1. Package [glmdisc](https://cran.r-project.org/web/packages/glmdisc/index.html) for ‘‘Quantization'' of continuous (discretization) and qualitative (grouping) features **and** interactions among covariates,
+2. Package [glmtree](https://cran.r-project.org/web/packages/glmtree/index.html) for ‘‘Segmentation'' of clients into subpopulations with different scorecards: logistic regression trees.
+
+Other packages focus on Credit Scoring, see e.g. [this review paper](https://arxiv.org/abs/2006.11835).
 
 # Reject Inference
 
@@ -105,57 +110,57 @@ Our theoretical findings on this subject is discussed in [Ehrhardt et al. (2017)
 In short, using only financed clients' characteristics to learn a logistic regression model is asymptotically correct when the missingness mechanism is MAR and the model is true. We can easily show this by simulating data:
 
 ```{r, fig.show='hold'}
-data_cont_simu <- function(n,d,k) {
-    set.seed(k)
-    x = matrix(runif(n*d), nrow = n, ncol = d)
-    theta = c(1,-1)
-    log_odd = x %*% theta
-    
-    y = rbinom(n,1,1/(1+exp(-log_odd)))
-    
-    return(list(x,y))
+data_cont_simu <- function(n, d, k) {
+  set.seed(k)
+  x <- matrix(runif(n * d), nrow = n, ncol = d)
+  theta <- c(1, -1)
+  log_odd <- x %*% theta
+
+  y <- rbinom(n, 1, 1 / (1 + exp(-log_odd)))
+
+  return(list(x, y))
 }
 
 if (require(ggplot2, quietly = TRUE)) {
+  data <- data_cont_simu(100, 2, 1)
+  x <- data[[1]]
+  y <- data[[2]]
+  df <- data.frame(x = x, y = y)
+  ggplot(df, aes(x = x.1, y = x.2, colour = factor(y))) +
+    geom_point()
 
-     data = data_cont_simu(100,2,1)
-     x = data[[1]]
-     y = data[[2]]
-     df = data.frame(x = x, y = y)
-     ggplot(df, aes(x = x.1, y = x.2, colour = factor(y))) +
-         geom_point()
-     
-     data = data_cont_simu(1000,2,1)
-     x = data[[1]]
-     y = data[[2]]
-     df = data.frame(x = x, y = y)
-     hat_theta = glm(y ~ . -1, data = df, family = binomial(link = "logit"))
-     df$decision = factor(ifelse(predict(hat_theta, df, type="response")>0.7, "reject", "accept"))
-     ggplot(df, aes(x = x.1, y = x.2, colour = decision)) +
-         geom_point()
+  data <- data_cont_simu(1000, 2, 1)
+  x <- data[[1]]
+  y <- data[[2]]
+  df <- data.frame(x = x, y = y)
+  hat_theta <- glm(y ~ . - 1, data = df, family = binomial(link = "logit"))
+  df$decision <- factor(ifelse(predict(hat_theta, df, type = "response") > 0.7, "reject", "accept"))
+  ggplot(df, aes(x = x.1, y = x.2, colour = decision)) +
+    geom_point()
 
-     theta_1 = matrix(NA, ncol = 1, nrow = 1000)
-     theta_2 = matrix(NA, ncol = 1, nrow = 1000)
-     theta_1_f = matrix(NA, ncol = 1, nrow = 1000)
-     theta_2_f = matrix(NA, ncol = 1, nrow = 1000)
-     for (k in 1:1000) {
-         
-         data = data_cont_simu(1000,2,k)
-         x = data[[1]]
-         y = data[[2]]
-         df = data.frame(x = x, y = y)
-         hat_theta = glm(y ~ . -1, data = df, family = binomial(link = "logit"))
-         
-         theta_1[k] = hat_theta$coefficients[1]
-         theta_2[k] = hat_theta$coefficients[2]
-         
-         df$decision = factor(ifelse(predict(hat_theta, df, type="response")>0.6, "reject", "accept"))
-         hat_theta_f = glm(y ~ . -1, data = df[df$decision == "accept",-ncol(df)], family = binomial(link = "logit"))
-         
-         theta_1_f[k] = hat_theta_f$coefficients[1]
-         theta_2_f[k] = hat_theta_f$coefficients[2]
-     }
-     ggplot(data.frame(theta_1), aes(x=theta_1)) + geom_histogram() + geom_vline(xintercept = 1)
+  theta_1 <- matrix(NA, ncol = 1, nrow = 1000)
+  theta_2 <- matrix(NA, ncol = 1, nrow = 1000)
+  theta_1_f <- matrix(NA, ncol = 1, nrow = 1000)
+  theta_2_f <- matrix(NA, ncol = 1, nrow = 1000)
+  for (k in 1:1000) {
+    data <- data_cont_simu(1000, 2, k)
+    x <- data[[1]]
+    y <- data[[2]]
+    df <- data.frame(x = x, y = y)
+    hat_theta <- glm(y ~ . - 1, data = df, family = binomial(link = "logit"))
+
+    theta_1[k] <- hat_theta$coefficients[1]
+    theta_2[k] <- hat_theta$coefficients[2]
+
+    df$decision <- factor(ifelse(predict(hat_theta, df, type = "response") > 0.6, "reject", "accept"))
+    hat_theta_f <- glm(y ~ . - 1, data = df[df$decision == "accept", -ncol(df)], family = binomial(link = "logit"))
+
+    theta_1_f[k] <- hat_theta_f$coefficients[1]
+    theta_2_f[k] <- hat_theta_f$coefficients[2]
+  }
+  ggplot(data.frame(theta_1), aes(x = theta_1)) +
+    geom_histogram() +
+    geom_vline(xintercept = 1)
 }
 ```
 
@@ -172,42 +177,42 @@ To deal with the possible bias of fitting a logistic regression to the financed 
 In this package, we implemented Reject Inference methods which were described for example in and were supposed to enable credit risk modelers to use not-financed clients' characteristics in the logistic regression learning process. We demonstrated that these methods are not statistically grounded. We nevertheless implemented these methods to show these results numerically.
 
 The first method is Fuzzy Augmentation as described in the Appendix of [my PhD thesis](https://github.com/adimajo/manuscrit_these).
-```{r, echo=FALSE, results='asis'}
-xf = as.matrix(df[df$decision == "accept", c("x.1", "x.2")])
-xnf = as.matrix(df[df$decision == "reject", c("x.1", "x.2")])
-yf = df[df$decision == "accept", "y"]
-hat_theta_fuzzy = fuzzy_augmentation(xf,xnf,yf)
+```{r}
+xf <- as.matrix(df[df$decision == "accept", c("x.1", "x.2")])
+xnf <- as.matrix(df[df$decision == "reject", c("x.1", "x.2")])
+yf <- df[df$decision == "accept", "y"]
+hat_theta_fuzzy <- fuzzy_augmentation(xf, xnf, yf)
 ```
 
 The second method is Reclassification as described in the Appendix of [my PhD thesis](https://github.com/adimajo/manuscrit_these).
-```{r, echo=FALSE, results='asis'}
-hat_theta_reclassification = reclassification(xf,xnf,yf)
+```{r}
+hat_theta_reclassification <- reclassification(xf, xnf, yf)
 ```
 
 The third method is Augmentation as described in the Appendix of [my PhD thesis](https://github.com/adimajo/manuscrit_these).
-```{r, echo=FALSE, results='asis'}
-hat_theta_augmentation = augmentation(xf,xnf,yf)
+```{r}
+hat_theta_augmentation <- augmentation(xf, xnf, yf)
 ```
 
 The fourth method is Parcelling as described in the Appendix of [my PhD thesis](https://github.com/adimajo/manuscrit_these).
-```{r, echo=FALSE, results='asis'}
-hat_theta_parcelling = parcelling(xf,xnf,yf)
+```{r}
+hat_theta_parcelling <- parcelling(xf, xnf, yf)
 ```
 
 The fifth method is Twins as described in the Appendix of [my PhD thesis](https://github.com/adimajo/manuscrit_these).
-```{r, echo=FALSE, results='asis'}
-hat_theta_twins = twins(xf,xnf,yf)
+```{r}
+hat_theta_twins <- twins(xf, xnf, yf)
 ```
 
 Each of these functions output an S4 object named ‘‘reject_infered''. This object has slots:
 
-- method: the Reject Inference method used;
+- method_name: the Reject Inference method used;
 - financed_model: the logistic regression using only financed clients' characteristics;
 - acceptance_model: the logistic regression modeling the financing decision (empty for all methods except Augmentation and Twins);
 - infered_model: the logistic regression obtained using a given reject inference technique.
 
-```{r, echo=FALSE, results='asis'}
-# hat_theta_augmentation@method
+```{r}
+hat_theta_augmentation@method_name
 hat_theta_reclassification@financed_model
 hat_theta_twins@acceptance_model
 hat_theta_fuzzy@infered_model
@@ -229,20 +234,6 @@ print(hat_theta_reclassification)
 The summary method shows the method used alongside the coefficients of the financed model, eventually the acceptance model and the infered model with AIC values, much like you would get from doing a summary on a \code{glm} object:
 ```{r, echo=FALSE, results='asis'}
 summary(hat_theta_reclassification)
-```
-
-#### predict method
-
-The predict method corresponds to the glm predict method for the infered model:
-```{r, echo=FALSE, results='asis'}
-# predict(hat_theta_reclassification, xf)
-```
-
-#### plot method
-
-The plot method allows the modeler to compare each coefficient's values in the financed model and the infered model.
-```{r, fig.show='hold'}
-# plot(hat_theta_reclassification)
 ```
 
 # Quantization
@@ -292,29 +283,6 @@ The criterion developed in the previous part cannot be optimized directly becaus
 
 By doing so, we reduce elements of $\mathbf{\mathfrak{Q}}_{\boldsymbol{m}}$ to the generated candidates which is a considerably smaller set, with most existing methods outputing only one discretization scheme. We go through a few of them in the next section.
 
-## Existing methods
-
-### The discretization package
-
-### Chi-2 based methods
-
-### Entropy based methods
-
-
-## Added constraints
-
-### Few values
-
-### Interpretability of the intervals
-
-### Feature selection
-
-### Automatic creation of interaction terms
-
-## Proposed method
-
-### General idea
-
 We proposed a discretization algorithm that meets these criteria and naturally . It was described in <arxiv:>.
 
 In short, the algorithm considers the discretized features $\boldsymbol{\mathfrak{q}}$ as latent variables which we will generate from its estimated a posteriori density function as part of an SEM-algorithm (see ). The algorithm alternates between:
@@ -323,11 +291,72 @@ In short, the algorithm considers the discretized features $\boldsymbol{\mathfra
 2. Fitting polytomous logistic regression functions between each pair of $(x_j,\mathfrak{q}_j)$;
 3. Generate new discretized features $E$ by sampling them, as $p(\mathfrak{q}_j|\mathfrak{q}_{-\{j\}},\boldsymbol{x},y) \propto p(\mathfrak{q}_j|x_j) p(y|\boldsymbol{\mathfrak{q}})$.
 
-### Implementation
+The approach is implemented in the `glmdisc` package and **is not part of this package**. Please refer to its vignette (by typing `vignette("glmdisc")`).
 
-The approach is implemented in the `glmdisc` package Please refer to its vignette (by typing `vignette("glmdisc")`).
+## Existing methods
+
+### The discretization package
+
+In this package, we wrapped functions of the [discretization](https://cran.r-project.org/web/packages/discretization/index.html) package in a unified S4 class `discretization`.
+
+```{r}
+x <- matrix(runif(300), nrow = 100, ncol = 3)
+cuts <- seq(0, 1, length.out = 4)
+xd <- apply(x, 2, function(col) as.numeric(cut(col, cuts)))
+theta <- t(matrix(c(0, 0, 0, 2, 2, 2, -2, -2, -2), ncol = 3, nrow = 3))
+log_odd <- rowSums(t(sapply(seq_along(xd[, 1]), function(row_id) {
+  sapply(
+    seq_along(xd[row_id, ]),
+    function(element) theta[xd[row_id, element], element]
+  )
+})))
+y <- stats::rbinom(100, 1, 1 / (1 + exp(-log_odd)))
+
+discrete_modele = chi2_iter(x, y)
+```
+
+### Methods
+
+#### print method
+
+The print method shows the method used and the coefficients of infered_model, much like you would get from printing a \code{glm} object:
+```{r, echo=FALSE, results='asis'}
+print(discrete_modele)
+```
+
+#### summary method
+
+The summary method shows the method used alongside the coefficients of the financed model, eventually the acceptance model and the infered model with AIC values, much like you would get from doing a summary on a \code{glm} object:
+```{r, echo=FALSE, results='asis'}
+summary(discrete_modele)
+```
+
+#### predict method
+
+The predict method corresponds to the glm predict method for the infered model:
+```{r, echo=FALSE, results='asis'}
+predict(discrete_modele, x)
+```
+
+#### plot method
+
+The plot method corresponds to the glm plot method for the infered model:
+```{r, echo=FALSE, results='asis'}
+plot(discrete_modele, type="ROC")
+```
+
+<!-- ## Added constraints -->
+
+<!-- ### Few values -->
+
+<!-- ### Interpretability of the intervals -->
+
+<!-- ### Feature selection -->
+
+<!-- ### Automatic creation of interaction terms -->
 
 # Segmentation: logistic regression trees
 
-The approach is implemented in the `glmtree` package required by this package. Please refer to its vignette (by typing `vignette("glmtree")`).
+Classically, Credit Scoring practioners perform ‘‘segmentation'' before learning a scorecard, i.e. they try to find homogeneous segments of clients, e.g. ‘‘young clients'', ``home owners'', and combine them. They then perform scoring locally, on the resulting leaves of this decision tree. We thus proposed an algorithm to fit this tree and the logistic regressions at its leaves, which we call glmtree. The resulting model mixes non parametric VS parametric and stepwise VS linear approaches to have the best predictive results, yet maintaining interpretability.
 
+The approach is implemented in the `glmtree` package required by this package. Please refer to its vignette (by typing `vignette("glmtree")`).

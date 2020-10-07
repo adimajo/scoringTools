@@ -13,9 +13,9 @@ In order to accept / reject loan applications more efficiently (both quicker and
 Two subjects are tackled in this package:
 
 * Reject Inference: using not financed clients' information to build a scorecard (see `vignette("scoringTools")`)
-* Quantization (discretization and grouping of levels) and interaction screening (see `vignette("glmdisc")`)
+* Quantization (discretization and grouping of levels)
 
-The package's website (obtained from `pkgdown`) are available respectively at:
+The package's website (obtained from `pkgdown`) is available respectively at:
 
 * [adimajo.github.io/scoringTools](https://adimajo.github.io/scoringTools)
 
@@ -24,4 +24,8 @@ Two other packages were made public during this PhD, which tackle more specifica
 * Quantization (discretization and grouping of levels) and interaction screening: package [glmdisc](https://cran.r-project.org/web/packages/glmdisc/index.html) (see [adimajo.github.io/glmdisc](https://adimajo.github.io/glmdisc))
 * Logistic regression trees: package [glmdisc](https://cran.r-project.org/web/packages/glmtree/index.html) (see [adimajo.github.io/glmtree](https://adimajo.github.io/glmtree))
 
-TODO: A Shiny app explaining all aspects of this work is also accessible by running `runDemo()`.
+## TODO: 
+
+* A Shiny app explaining all aspects of this work is also accessible by running `runDemo()`.
+
+* predict and plot methods for reject_infered class

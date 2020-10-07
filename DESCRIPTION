@@ -6,7 +6,7 @@ Date: 2020-10-06
 Authors@R: c(person("Adrien", "Ehrhardt", email = "adrien.ehrhardt@centraliens-lille.org",
                   role = c("aut", "cre")))
 Maintainer: Adrien Ehrhardt <adrien.ehrhardt@centraliens-lille.org>
-Description: Grouping essential tools for credit scoring. These statistical tools may be useful for other use-cases as well but were primarly designed for it. First, there are Reject Inference methods <arXiv:1903.10855>. Second, we build upon the already CRAN-available package "discretization" to automize discretization of continuous features.
+Description: Grouping essential tools for credit scoring. These statistical tools may be useful for other use-cases as well but were primarily designed for it. First, there are Reject Inference methods <arXiv:1903.10855>. Second, we build upon the already CRAN-available package "discretization" to automate discretization of continuous features.
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
@@ -31,7 +31,7 @@ Suggests:
     shiny,
     testthat,
     covr
-URL: https://adimajo.github.io/scoringTools
+URL: https://adimajo.github.io/scoringTools/
 BugReports: https://github.com/adimajo/scoringTools/issues
 VignetteBuilder: knitr
 Collate: 

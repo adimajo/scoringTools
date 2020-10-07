@@ -11,7 +11,7 @@ Refer to the package's vignette.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://adimajo.github.io/scoringTools}
+  \item \url{https://adimajo.github.io/scoringTools/}
   \item Report bugs at \url{https://github.com/adimajo/scoringTools/issues}
 }
 
