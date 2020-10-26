@@ -341,7 +341,8 @@ predict(discrete_modele, x)
 #### plot method
 
 The plot method corresponds to the glm plot method for the infered model:
-```{r, echo=FALSE, results='asis'}
+```{r, eval=FALSE, echo=FALSE, results='asis'}
+# NOT RUN since re-building this vignette fails on some distros (Mac OS and Solaris) of CRAN (because plot uses plotly).
 plot(discrete_modele, type = "ROC")
 ```
 

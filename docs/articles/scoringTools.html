@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">scoringTools</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
       </span>
     </div>
 
@@ -91,15 +91,13 @@
 
       
 
-      </header><script src="scoringTools_files/htmlwidgets-1.5.1/htmlwidgets.js"></script><script src="scoringTools_files/plotly-binding-4.9.2.1/plotly.js"></script><script src="scoringTools_files/typedarray-0.1/typedarray.min.js"></script><script src="scoringTools_files/jquery-1.11.3/jquery.min.js"></script><link href="scoringTools_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet">
-<script src="scoringTools_files/crosstalk-1.0.0/js/crosstalk.min.js"></script><link href="scoringTools_files/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet">
-<script src="scoringTools_files/plotly-main-1.52.2/plotly-latest.min.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Credit Scoring Tools: the <code>scoringTools</code> package</h1>
                         <h4 class="author">Adrien Ehrhardt</h4>
             
-            <h4 class="date">2020-10-14</h4>
+            <h4 class="date">2020-10-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/adimajo/scoringTools/blob/master/vignettes/scoringTools.Rmd"><code>vignettes/scoringTools.Rmd</code></a></small>
       <div class="hidden name"><code>scoringTools.Rmd</code></div>
@@ -627,22 +625,11 @@
 <h4 class="hasAnchor">
 <a href="#plot-method" class="anchor"></a>plot method</h4>
 <p>The plot method corresponds to the glm plot method for the infered model:</p>
-<pre><code>## Warning in .local(x, ...): No test data, no validation data, using train data
-## will provide an overly optimist estimate of the algorithm's performance.</code></pre>
-<pre><code>## Setting levels: control = 0, case = 1</code></pre>
-<pre><code>## Setting direction: controls &lt; cases</code></pre>
-<pre><code>## Warning: `arrange_()` is deprecated as of dplyr 0.7.0.
-## Please use `arrange()` instead.
-## See vignette('programming') for more help
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
-<pre><code>## Warning: `group_by_()` is deprecated as of dplyr 0.7.0.
-## Please use `group_by()` instead.
-## See vignette('programming') for more help
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
-<div id="htmlwidget-839df4fa38c90058bb2c" style="width:800px;height:600px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-839df4fa38c90058bb2c">{"x":{"visdat":{"3407552e7e83":["function () ","plotlyVisDat"]},"cur_data":"3407552e7e83","attrs":{"3407552e7e83":{"x":{},"y":{},"hoverinfo":"none","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","name":"Model","line":{"shape":"spline","color":"#737373","width":7},"fill":"tozeroy","fillcolor":"#2A3356","inherit":true},"3407552e7e83.1":{"x":0,"y":0,"hoverinfo":"none","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"xend":1,"yend":1,"type":"scatter","mode":"lines","line":{"dash":"7px","color":"#F35B25","width":4},"name":"Random","inherit":true},"3407552e7e83.2":{"x":0,"y":0,"hoverinfo":"none","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"xend":0,"yend":1,"type":"scatter","mode":"lines","line":{"dash":"10px","color":"black","width":4},"showlegend":false,"inherit":true},"3407552e7e83.3":{"x":0,"y":1,"hoverinfo":"none","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"xend":1,"yend":1,"type":"scatter","mode":"lines","line":{"dash":"10px","color":"black","width":4},"showlegend":false,"inherit":true}},"layout":{"width":800,"height":600,"margin":{"b":40,"l":60,"t":25,"r":10},"annotations":[{"text":"Area Under Curve: 0.858","x":0.8,"y":0.2,"showarrow":false,"font":{"family":"serif","size":18,"color":"#E8E2E2"}},{"text":"Area Under Curve: 0.858","x":0.8,"y":0.2,"showarrow":false,"font":{"family":"serif","size":18,"color":"#E8E2E2"}},{"text":"Area Under Curve: 0.858","x":0.8,"y":0.2,"showarrow":false,"font":{"family":"serif","size":18,"color":"#E8E2E2"}},{"text":"Charts the percentage of correctly identified defaults against the percentage of false alarms.","x":0,"y":0.98,"showarrow":false,"xanchor":"left","xref":"paper","yref":"paper","font":{"family":"serif","size":14,"color":"#999999"}},{"text":"Charts the percentage of correctly identified defaults against the percentage of false alarms.","x":0,"y":0.98,"showarrow":false,"xanchor":"left","xref":"paper","yref":"paper","font":{"family":"serif","size":14,"color":"#999999"}},{"text":"Charts the percentage of correctly identified defaults against the percentage of false alarms.","x":0,"y":0.98,"showarrow":false,"xanchor":"left","xref":"paper","yref":"paper","font":{"family":"serif","size":14,"color":"#999999"}}],"title":"ROC Curve","xaxis":{"domain":[0,1],"automargin":true,"range":[0,1],"zeroline":false,"showgrid":false,"title":"1 - Specificity"},"yaxis":{"domain":[0,0.9],"automargin":true,"range":[0,1],"zeroline":false,"showgrid":false,"title":"Sensibility"},"plot_bgcolor":"#E8E2E2","hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"fillcolor":"#2A3356","x":[0,0.0508474576271186,0.0847457627118644,0.254237288135593,0.491525423728814,0.728813559322034,1],"y":[0,0.51219512195122,0.585365853658537,0.853658536585366,0.926829268292683,0.975609756097561,1],"hoverinfo":["none","none","none","none","none","none","none"],"type":"scatter","mode":"lines","name":"Model","line":{"color":"#737373","shape":"spline","width":7},"fill":"tozeroy","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0,1],"y":[0,1],"hoverinfo":["none","none"],"type":"scatter","mode":"lines","line":{"color":"#F35B25","dash":"7px","width":4},"name":"Random","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0,0],"y":[0,1],"hoverinfo":["none","none"],"type":"scatter","mode":"lines","line":{"color":"black","dash":"10px","width":4},"showlegend":false,"marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0,1],"y":[1,1],"hoverinfo":["none","none"],"type":"scatter","mode":"lines","line":{"color":"black","dash":"10px","width":4},"showlegend":false,"marker":{"color":"rgba(214,39,40,1)","line":{"color":"rgba(214,39,40,1)"}},"error_y":{"color":"rgba(214,39,40,1)"},"error_x":{"color":"rgba(214,39,40,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script><!-- ## Added constraints --><!-- ### Few values --><!-- ### Interpretability of the intervals --><!-- ### Feature selection --><!-- ### Automatic creation of interaction terms -->
+<!-- ## Added constraints -->
+<!-- ### Few values -->
+<!-- ### Interpretability of the intervals -->
+<!-- ### Feature selection -->
+<!-- ### Automatic creation of interaction terms -->
 </div>
 </div>
 </div>
