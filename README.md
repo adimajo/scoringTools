@@ -1,3 +1,5 @@
+![CRAN package](https://www.r-pkg.org/badges/version-ago/scoringTools)
+![CRAN downloads](https://cranlogs.r-pkg.org/badges/scoringTools)
 ![R package](https://github.com/adimajo/scoringTools/workflows/R%20package/badge.svg)
 [![Travis build status](https://travis-ci.org/adimajo/scoringTools.svg?branch=master)](https://travis-ci.org/adimajo/scoringTools)
 [![Coverage status](https://codecov.io/gh/adimajo/scoringTools/branch/master/graph/badge.svg)](https://codecov.io/github/adimajo/scoringTools?branch=master)
