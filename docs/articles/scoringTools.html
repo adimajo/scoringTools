@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">scoringTools</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.2</span>
       </span>
     </div>
 
@@ -97,7 +97,7 @@
       <h1 data-toc-skip>Credit Scoring Tools: the <code>scoringTools</code> package</h1>
                         <h4 class="author">Adrien Ehrhardt</h4>
             
-            <h4 class="date">2020-10-26</h4>
+            <h4 class="date">2020-11-02</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/adimajo/scoringTools/blob/master/vignettes/scoringTools.Rmd"><code>vignettes/scoringTools.Rmd</code></a></small>
       <div class="hidden name"><code>scoringTools.Rmd</code></div>
@@ -166,7 +166,7 @@
 <a href="#formulation" class="anchor"></a>Formulation</h2>
 <p>The variable to predict, here denoted by , is an active research field and we will not discuss it here. We suppose we already have a binary random variable <span class="math inline">\(Y\)</span> from which we have <span class="math inline">\(n\)</span> observations <span class="math inline">\(\mathbf{y} = (y_i)_1^n\)</span>.</p>
 <p>The <span class="math inline">\(d\)</span> predictive features, here for example the job, habitation situation, etc., are usually socio-demographic features asked by the financial institutions at the time of application. They are denoted by the random vector <span class="math inline">\(\boldsymbol{X} = (X_j)_1^d\)</span> and as for <span class="math inline">\(Y\)</span> we have <span class="math inline">\(n\)</span> observations <span class="math inline">\(\mathbf{x}=(x_i)_1^n\)</span>.</p>
-<p>We suppose that observations <span class="math inline">\((\mathbf{x},\mathbf{y})\)</span> come from an unknown distribution <span class="math inline">\(p(x,y)\)</span> which is not directly of interest. Our interest lies in the conditional probability of a client with characteristics <span class="math inline">\(\boldsymbol{x}\)</span> of paying back his loan, i.e. <span class="math inline">\(p(y|\boldsymbol{x})\)</span>, also unknown.</p>
+<p>We suppose that observations <span class="math inline">\((\mathbf{x},\mathbf{y})\)</span> come from an unknown distribution <span class="math inline">\(p(x,y)\)</span> which is not directly of interest. Our interest lies in the conditional probability of a client with characteristics <span class="math inline">\(\boldsymbol{x}\)</span> of paying back his loan, i.e. <span class="math inline">\(p(y|\boldsymbol{x})\)</span>, also unknown.</p>
 <p>In the context of Credit Scoring, we historically stick to logistic regression, for various reasons out of the scope of this vignette. The logistic regression model assumes the following relation between <span class="math inline">\(\boldsymbol{X}\)</span> (supposed continuous here) and <span class="math inline">\(Y\)</span>: <span class="math display">\[\ln \left( \frac{p_{\boldsymbol{\theta}}(Y=1|\boldsymbol{x})}{p_{\boldsymbol{\theta}}(Y=0|\boldsymbol{x})} \right) = (1, \boldsymbol{x})'{\boldsymbol{\theta}}\]</span></p>
 <p>We would like to have the ‘‘best’’ model compared to the true <span class="math inline">\(p(y|\boldsymbol{x})\)</span> from which we only have samples. Had we access to the true underlying model, we would like to minimize, w.r.t. <span class="math inline">\({\boldsymbol{\theta}}\)</span>, <span class="math inline">\(H_{\boldsymbol{\theta}} = \mathbb(E)_{(X,Y) \sim p}[\ln(p_{\boldsymbol{\theta}}(Y|\boldsymbol{X}))]\)</span>. Since this is not possible, we approximate this criterion by maximizing, w.r.t. <span class="math inline">\(\theta\)</span>, the likelihood <span class="math inline">\(\ell({\boldsymbol{\theta}};\mathbf{x},\mathbf{y}) = \sum_{i=1}^n \ln(p_{\boldsymbol{\theta}}(y_i|\boldsymbol{x}_i))\)</span>.</p>
 <p>In R, this is done by fitting a  model to the data:</p>
@@ -323,7 +323,7 @@
 <li>Package <a href="https://cran.r-project.org/package=glmdisc">glmdisc</a> for ‘‘Quantization’’ of continuous (discretization) and qualitative (grouping) features <strong>and</strong> interactions among covariates,</li>
 <li>Package <a href="https://cran.r-project.org/package=glmtree">glmtree</a> for ‘‘Segmentation’’ of clients into subpopulations with different scorecards: logistic regression trees.</li>
 </ol>
-<p>Other packages focus on Credit Scoring, see e.g. <a href="https://arxiv.org/abs/2006.11835">this review paper</a>.</p>
+<p>Other packages focus on Credit Scoring, see e.g. <a href="https://arxiv.org/abs/2006.11835">this review paper</a>.</p>
 </div>
 </div>
 <div id="reject-inference" class="section level1">
@@ -353,7 +353,7 @@
 <div id="theoretical-findings" class="section level2">
 <h2 class="hasAnchor">
 <a href="#theoretical-findings" class="anchor"></a>Theoretical findings</h2>
-<p>Our theoretical findings on this subject is discussed in <a href="https://arxiv.org/abs/1903.10855">Ehrhardt et al. (2017)</a>.</p>
+<p>Our theoretical findings on this subject is discussed in <a href="https://arxiv.org/abs/1903.10855">Ehrhardt et al. (2017)</a>.</p>
 <p>In short, using only financed clients’ characteristics to learn a logistic regression model is asymptotically correct when the missingness mechanism is MAR and the model is true. We can easily show this by simulating data:</p>
 <div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">data_cont_simu</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">n</span>, <span class="no">d</span>, <span class="no">k</span>) {
   <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="no">k</span>)
@@ -521,7 +521,7 @@
 <h3 class="hasAnchor">
 <a href="#model" class="anchor"></a>Model</h3>
 <p>We consider a random vector <span class="math inline">\(\boldsymbol{X}=(X_1,X_d)\)</span> where <span class="math inline">\(X_j\)</span> can be either continuous or qualitative (with <span class="math inline">\(o_j\)</span> distinct values). We denote by <span class="math inline">\(\boldsymbol{\mathfrak{q}}=(\mathfrak{q}_1,\mathfrak{q}_d)\)</span> the quantized random vector where <span class="math inline">\(\mathfrak{q}_j\)</span> is the quantization of <span class="math inline">\(X_j\)</span>, i.e. qualitative with <span class="math inline">\(m_j\)</span> values corresponding either to unique intervals of <span class="math inline">\(X_j\)</span> (continuous case) or to unique regroupments of <span class="math inline">\(X_j\)</span>’s <span class="math inline">\(o_j\)</span> values (which implies <span class="math inline">\(m_j \leq o_j\)</span>).</p>
-<p>We suppose that by quantizing features <span class="math inline">\(\boldsymbol{X}\)</span>, we preserve all information about the target feature, i.e. <span class="math inline">\(p(y|\boldsymbol{x},\boldsymbol{\mathfrak{q}}) = p(y|\boldsymbol{\mathfrak{q}})\)</span>.</p>
+<p>We suppose that by quantizing features <span class="math inline">\(\boldsymbol{X}\)</span>, we preserve all information about the target feature, i.e. <span class="math inline">\(p(y|\boldsymbol{x},\boldsymbol{\mathfrak{q}}) = p(y|\boldsymbol{\mathfrak{q}})\)</span>.</p>
 </div>
 <div id="hard-optimization-problem" class="section level3">
 <h3 class="hasAnchor">
@@ -637,7 +637,7 @@
 <div id="segmentation-logistic-regression-trees" class="section level1">
 <h1 class="hasAnchor">
 <a href="#segmentation-logistic-regression-trees" class="anchor"></a>Segmentation: logistic regression trees</h1>
-<p>Classically, Credit Scoring practioners perform ‘‘segmentation’’ before learning a scorecard, i.e. they try to find homogeneous segments of clients, e.g. ‘‘young clients’‘, ``home owners’’, and combine them. They then perform scoring locally, on the resulting leaves of this decision tree. We thus proposed an algorithm to fit this tree and the logistic regressions at its leaves, which we call glmtree. The resulting model mixes non parametric VS parametric and stepwise VS linear approaches to have the best predictive results, yet maintaining interpretability.</p>
+<p>Classically, Credit Scoring practioners perform ‘‘segmentation’’ before learning a scorecard, i.e. they try to find homogeneous segments of clients, e.g. ‘‘young clients’‘, ``home owners’’, and combine them. They then perform scoring locally, on the resulting leaves of this decision tree. We thus proposed an algorithm to fit this tree and the logistic regressions at its leaves, which we call glmtree. The resulting model mixes non parametric VS parametric and stepwise VS linear approaches to have the best predictive results, yet maintaining interpretability.</p>
 <p>The approach is implemented in the <code>glmtree</code> package required by this package. Please refer to its vignette (by typing <code>vignette("glmtree")</code>).</p>
 </div>
   </div>

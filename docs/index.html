@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">scoringTools</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.2</span>
       </span>
     </div>
 
@@ -119,8 +119,31 @@
 <h2 class="hasAnchor">
 <a href="#todo" class="anchor"></a>TODO:</h2>
 <ul>
-<li><p>A Shiny app explaining all aspects of this work is also accessible by running <code><a href="reference/runDemo.html">runDemo()</a></code>.</p></li>
-<li><p>plot methods for reject_infered class</p></li>
+<li>A Shiny app explaining all aspects of this work is also accessible by running <code><a href="reference/runDemo.html">runDemo()</a></code>.
+<ul>
+<li>allow column selection? + target selection</li>
+<li>allow custom model + text input for call</li>
+<li>parameters of model in reject inference panel (as blocks for vectors)</li>
+<li>single ROC Curve for all selected models</li>
+<li>Gini tab with confidence intervals</li>
+<li>Quantization
+<ul>
+<li>which algorithms? (check glmdisc installed) + their parameters</li>
+<li>Histogram of each feature with default rate</li>
+<li>Histogram of quantized features with default rate</li>
+</ul>
+</li>
+<li>Logistic regression trees
+<ul>
+<li>check packages are installed (mob, party, glmtree)</li>
+<li>which algorithms + their parameters</li>
+<li>show tree structure</li>
+<li>tabpanel for each segment</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>plot methods for reject_infered class</li>
 </ul>
 </div>
 </div>

@@ -6,3 +6,6 @@
 ^\.Rproj\.user$
 ^.github/.*$
 README.md
+^inst/document.R
+^inst/lint.R
+^inst/rhubcheck.R

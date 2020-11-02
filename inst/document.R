@@ -1,15 +1,15 @@
 # Documentation
-docOrg <- lapply(c(dir("man", pattern="*.md", recursive=TRUE, full.names = TRUE), "NAMESPACE"), readLines)
+docOrg <- lapply(c(dir("man", pattern = "*.md", recursive = TRUE, full.names = TRUE), "NAMESPACE"), readLines)
 devtools::document()
-docNew <- lapply(c(dir("man", pattern="*.md", recursive=TRUE, full.names = TRUE), "NAMESPACE"), readLines)
+docNew <- lapply(c(dir("man", pattern = "*.md", recursive = TRUE, full.names = TRUE), "NAMESPACE"), readLines)
 if (!identical(docOrg, docNew)) {
-     stop("Documentation was not updated, try running devtools::document().")
+  stop("Documentation was not updated, try running devtools::document().")
 }
 # Pkgdown
 # if (!require(pkgdown, quietly = TRUE)) {
 #     install.packages("pkgdown")
 # }
-# 
+#
 # list_files = c(dir("docs", recursive=TRUE, full.names = TRUE), "NAMESPACE")
 # list_files = list_files[!list_files=="docs/pkgdown.yml"]  # contains datetime
 # list_files = list_files[!list_files=="docs/reference/index.html"]  # contains datetime

@@ -1,174 +1,278 @@
-ui <- fluidPage(navbarPage("Statistical problems in Credit Scoring",
-                           tabPanel("Data import",
-                                    sidebarPanel(
-                                         fileInput('file1', 'Choose CSV File',
-                                                   multiple = TRUE,
-                                                   accept=c('text/csv',
-                                                            'text/comma-separated-values,text/plain',
-                                                            '.csv')),
-                                         # Horizontal line ----
-                                         tags$hr(),
-
-                                         # Input: Checkbox if file has header ----
-                                         checkboxInput("header", "Header", TRUE),
-
-                                         # Input: Select separator ----
-                                         radioButtons("sep", "Separator",
-                                                      choices = c(Comma = ",",
-                                                                  Semicolon = ";",
-                                                                  Tab = "\t"),
-                                                      selected = ","),
-
-                                         # Input: Select quotes ----
-                                         radioButtons("quote", "Quote",
-                                                      choices = c(None = "",
-                                                                  "Double Quote" = '"',
-                                                                  "Single Quote" = "'"),
-                                                      selected = '"'),
-
-                                         # Input: Select number of rows to display ----
-                                         radioButtons("disp", "Display",
-                                                      choices = c(Head = "head",
-                                                                  All = "all"),
-                                                      selected = "head")
+ui <- fluidPage(
+  navbarPage(
+    "Statistical problems in Credit Scoring",
+    tabPanel(
+      "Data import",
+      sidebarPanel(
+        fileInput(
+          "imported_files",
+          "Choose CSV File(s)",
+          multiple = TRUE,
+          accept = c(
+            "text/csv",
+            "text/comma-separated-values,text/plain",
+            ".csv"
+          )
+        ),
+        checkboxInput(
+          "use_lendingClub",
+          "Use lendingClub dataset?",
+          TRUE
+        ),
+        shiny::uiOutput("data_import_options")
+      ),
+      shiny::mainPanel(shiny::uiOutput("contents"))
+    ),
 
 
+    shiny::tabPanel(
+      "Reject Inference",
 
-                                    ),
-                                    mainPanel(
-                                         tableOutput('contents')
-                                    )
+      # Sidebar with a slider input for number of bins
+      shiny::sidebarLayout(
+        shiny::sidebarPanel(
+          # Input: Select fraction of rejected applications to simulate ----
 
-                           ),
+          shiny::sliderInput(
+            "bins",
+            "Fraction of rejected applications:",
+            min = 0,
+            max = 100,
+            value = 30
+          ),
 
+          # Input: Select data ----
 
-                           tabPanel("Reject Inference",
-
-                                    # Sidebar with a slider input for number of bins
-                                    sidebarLayout(
-                                         sidebarPanel(
-                                              # Input: Select fraction of rejected applications to simulate ----
-
-                                              sliderInput("bins",
-                                                          "Fraction of rejected applications:",
-                                                          min = 0,
-                                                          max = 100,
-                                                          value = 30),
-
-                                              # Input: Select data ----
-
-                                              selectInput("selectedData", "Data selection",
-                                                          list("lendingClub", "Imported Data")),
+          shiny::selectInput(
+            "selectedDataRejectInference",
+            "Data selection",
+            list("lendingClub")
+          ),
 
 
-                                              # Input: Select models to compute ----
-                                              selectInput("models", "Modèles",
-                                                          multiple = TRUE,
-                                                          choices = c(Logistique = "log",
-                                                                      Arbre = "tree",
-                                                                      RandomForest = "rforest",
-                                                                      SVM = "svm",
-                                                                      Neurones = "nnet"),
-                                                          selected = "log"),
+          # Input: Select models to compute ----
+          shiny::selectInput(
+            "models",
+            "Models",
+            multiple = TRUE,
+            choices = c(
+              Logistique = "log",
+              Arbre = "tree",
+              RandomForest = "rforest",
+              SVM = "svm",
+              Neurones = "nnet"
+            ),
+            selected = "log"
+          ),
 
 
-                                              # Input: Select reject inference models to compute ----
+          # Input: Select reject inference models to compute ----
 
-                                              selectInput("reject", "Méthodes de réintégration",
-                                                          multiple = TRUE,
-                                                          choices = c(Augmentation = "augmentation",
-                                                                      FuzzyAugmentation = "fuzzy",
-                                                                      Parcelling = "parcelling",
-                                                                      Reclassification = "reclassification",
-                                                                      Twins = "twins"),
-                                                          selected = NULL),
+          shiny::selectInput(
+            "reject",
+            "Reject Inference methods",
+            multiple = TRUE,
+            choices = c(
+              Augmentation = "augmentation",
+              FuzzyAugmentation = "fuzzy",
+              Parcelling = "parcelling",
+              Reclassification = "reclassification",
+              Twins = "twins"
+            ),
+            selected = NULL
+          ),
 
-                                              # Input: Conditional panels for parameters of selected models ----
+          # Input: Conditional panels for parameters of selected models ----
 
-                                              conditionalPanel(
-                                                   condition = "input.models.includes('rforest')",
-                                                   selectInput("rforestParam", "Random Forest-specific parameters",
-                                                               list("ntree", "mtry", "replace", "maxnodes"))
-                                              ),
+          # Parameters for rforest
+          shiny::conditionalPanel(
+            condition = "input.models.includes('rforest')",
+            shiny::numericInput(
+              "rforestParam_ntree",
+              "Random Forest: ntree",
+              100
+            )
+          ),
+          shiny::conditionalPanel(
+            condition = "input.models.includes('rforest')",
+            shiny::numericInput(
+              "rforestParam_mtry",
+              "Random Forest: mtry",
+              5
+            )
+          ),
+          shiny::conditionalPanel(
+            condition = "input.models.includes('rforest')",
+            shiny::checkboxInput(
+              "rforestParam_replace",
+              "Random Forest: replace",
+              TRUE
+            )
+          ),
+          shiny::conditionalPanel(
+            condition = "input.models.includes('rforest')",
+            shiny::selectInput(
+              "rforestParam_maxnodes",
+              "Random Forest: maxnodes",
+              10
+            )
+          ),
 
-                                              conditionalPanel(
-                                                   condition = "input.models.includes('svm')",
-                                                   selectInput("svmParam", "SVM-specific parameters",
-                                                               list("kernel", "degree", "gamma", "coef0"))
-                                              ),
+          # Parameters for svm
+          shiny::conditionalPanel(
+            condition = "input.models.includes('svm')",
+            shiny::selectInput(
+              "svmParam_kernel",
+              "SVM: kernel",
+              list(
+                "linear",
+                "polynomial",
+                "radial basis",
+                "gaussian"
+              )
+            )
+          ),
+          shiny::conditionalPanel(
+            condition = "input.models.includes('svm') & input.svmParam_kernel == 'polynomial'",
+            shiny::numericInput(
+              "svmParam_degree",
+              "SVM: degree",
+              3
+            )
+          ),
+          shiny::conditionalPanel(
+            condition = "input.models.includes('svm') & input.svmParam_kernel != 'linear'",
+            shiny::numericInput(
+              "svmParam_gamma",
+              "SVM: gamma",
+              1
+            )
+          ),
+          shiny::conditionalPanel(
+            condition = "input.models.includes('svm') & (input.svmParam_kernel == 'polynomial' |  input.svmParam_kernel != 'sigmoid')",
+            shiny::selectInput(
+              "svmParam_coef0",
+              "SVM: coef0",
+              0
+            )
+          ),
 
-                                              conditionalPanel(
-                                                   condition = "input.models.includes('nnet')",
-                                                   selectInput("nnetParam", "Neural network-specific parameters",
-                                                               list("size", "decay", "maxit"))
-                                              ),
+          # Parameters for nnet
+          shiny::conditionalPanel(
+            condition = "input.models.includes('nnet')",
+            shiny::numericInput(
+              "nnetParam_nnet",
+              "Neural network: size",
+              10
+            )
+          ),
+          shiny::conditionalPanel(
+            condition = "input.models.includes('nnet')",
+            shiny::numericInput(
+              "nnetParam_decay",
+              "Neural network: decay",
+              0
+            )
+          ),
+          shiny::conditionalPanel(
+            condition = "input.models.includes('nnet')",
+            shiny::numericInput(
+              "nnetParam_maxit",
+              "Neural network: maxit",
+              100
+            )
+          ),
 
-                                              conditionalPanel(
-                                                   condition = "input.reject.includes('parcelling')",
-                                                   selectInput("parcellingParam", "Parcelling hyperparameters",
-                                                               list("probs", "alpha"))
-                                              ),
+          # Parameters for Parcelling
+          shiny::conditionalPanel(
+            condition = "input.reject.includes('parcelling') & input.parcellingParam.includes('probs')",
+            shiny::selectizeInput(
+              "parcellingParam_probs",
+              "Parcelling hyperparameter probs (a numeric vector is expected - default: seq(0, 1, 0.25))",
+              choices = NULL,
+              multiple = TRUE,
+              options = list(create = TRUE)
+            )
+          ),
+          shiny::conditionalPanel(
+            condition = "input.reject.includes('parcelling') & input.parcellingParam.includes('alpha')",
+            shiny::selectizeInput(
+              "parcellingParam_alpha",
+              "Parcelling hyperparameter alpha (a numeric vector is expected - default: rep(1, length(probs) - 1))",
+              choices = NULL,
+              multiple = TRUE,
+              options = list(create = TRUE)
+            )
+          ),
 
-                                              conditionalPanel(
-                                                   condition = "input.parcellingParam.includes('probs')",
-                                                   textInput("parcellingParamProbs", "Parcelling hyperparameter probs (a numeric vector is expected)",
-                                                             seq(0, 1, 0.25))
-                                              ),
+          # Parameters for reclassification
+          shiny::conditionalPanel(
+            condition = "input.reject.includes('reclassification')",
+            shiny::numericInput(
+              "reclassificationParam_thresh",
+              "Reclassification hyperparameter: threshold at which hard classification is done",
+              0.5
+            )
+          )
+        ),
 
-                                              conditionalPanel(
-                                                   condition = "input.parcellingParam.includes('alpha')",
-                                                   textInput("parcellingParamAlpha", "Parcelling hyperparameter alpha (a numeric vector is expected)",
-                                                             rep(1,length(probs)-1))
-                                              ),
-
-                                              conditionalPanel(
-                                                   condition = "input.reject.includes('reclassification')",
-                                                   selectInput("reclassificationParam", "Reclassification hyperparameter",
-                                                               list("thresh"))
-                                              )
-
-                                         ),
-
-                                         # Show a plot of the generated distribution
-                                         mainPanel(
-                                              tabsetPanel(
-                                                   tabPanel("ROC curves",
-                                                            fluidRow(
-                                                                 splitLayout(cellWidths = c("50%", "50%"), plotOutput("distPlot1"), plotOutput("distPlot2"))
-                                                            )),
-                                                   tabPanel("Gini indices", tableOutput("gini_reject"))
-                                              )
-                                         )
-                                    )
-                           ),
-
-
-
-                           tabPanel("Quantization",
-                                    # Sidebar with a slider input for number of bins
-                                    sidebarLayout(
-                                         sidebarPanel(
-                                              # Input: Select data ----
-
-                                              selectInput("selectedData", "Data selection",
-                                                          list("lendingClub"))
-                                         ),
-
-                                         # Show a plot of the generated distribution
-                                         mainPanel())),
+        # Show a plot of the generated distribution
+        shiny::mainPanel(tabsetPanel(
+          shiny::tabPanel(
+            "ROC curves",
+            fluidRow(
+              splitLayout(
+                cellWidths = c("50%", "50%"),
+                plotOutput("distPlot1"),
+                plotOutput("distPlot2")
+              )
+            )
+          ),
+          shiny::tabPanel("Gini indices", tableOutput("gini_reject"))
+        ))
+      )
+    ),
 
 
 
-                           tabPanel("Logistic Regression Trees",
-                                    # Sidebar with a slider input for number of bins
-                                    sidebarLayout(
-                                         sidebarPanel(
-                                              # Input: Select data ----
+    shiny::tabPanel(
+      "Quantization",
+      # Sidebar with a slider input for number of bins
+      shiny::sidebarLayout(
+        sidebarPanel(
+          # Input: Select data ----
 
-                                              selectInput("selectedData", "Data selection",
-                                                          list("lendingClub"))
-                                         ),
+          shiny::selectInput(
+            "selectedDataQuantization",
+            "Data selection",
+            list("lendingClub")
+          )
+        ),
 
-                                         # Show a plot of the generated distribution
-                                         mainPanel()))
-))
+        # Show a plot of the generated distribution
+        shiny::mainPanel()
+      )
+    ),
+
+
+
+    shiny::tabPanel(
+      "Logistic Regression Trees",
+      # Sidebar with a slider input for number of bins
+      shiny::sidebarLayout(
+        sidebarPanel(
+          # Input: Select data ----
+
+          shiny::selectInput(
+            "selectedDataLogisticRegressionTrees", "
+                                Data selection",
+            list("lendingClub")
+          )
+        ),
+
+        # Show a plot of the generated distribution
+        shiny::mainPanel()
+      )
+    )
+  )
+)

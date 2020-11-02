@@ -1,8 +1,8 @@
 Package: scoringTools
 Type: Package
 Title: Credit Scoring Tools
-Version: 0.1.1
-Date: 2020-10-26
+Version: 0.1.2
+Date: 2020-11-02
 Authors@R: c(person("Adrien", "Ehrhardt", email = "adrien.ehrhardt@centraliens-lille.org",
                   role = c("aut", "cre")))
 Maintainer: Adrien Ehrhardt <adrien.ehrhardt@centraliens-lille.org>

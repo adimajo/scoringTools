@@ -27,5 +27,19 @@ Two other packages were made public during this PhD, which tackle more specifica
 ## TODO: 
 
 * A Shiny app explaining all aspects of this work is also accessible by running `runDemo()`.
+     * allow column selection? + target selection
+     * allow custom model + text input for call
+     * parameters of model in reject inference panel (as blocks for vectors)
+     * single ROC Curve for all selected models
+     * Gini tab with confidence intervals
+     * Quantization
+          * which algorithms? (check glmdisc installed) + their parameters
+          * Histogram of each feature with default rate
+          * Histogram of quantized features with default rate
+     * Logistic regression trees
+          * check packages are installed (mob, party, glmtree)
+          * which algorithms + their parameters
+          * show tree structure
+          * tabpanel for each segment
 
 * plot methods for reject_infered class
