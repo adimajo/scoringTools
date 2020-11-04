@@ -4,7 +4,9 @@
 \name{lendingClub}
 \alias{lendingClub}
 \title{Lending Club mortgages.}
-\format{A data frame with 2167 rows and 16 variables.}
+\format{
+A data frame with 2167 rows and 16 variables.
+}
 \source{
 \url{https://www.lendingclub.com/}
 }
