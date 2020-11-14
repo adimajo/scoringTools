@@ -1,24 +1,20 @@
 ui <- shiny::fluidPage(
-     shiny::navbarPage(
+  shiny::navbarPage(
     "Statistical problems in Credit Scoring",
     shiny::tabPanel(
       "Data import",
       shiny::sidebarPanel(
-           shiny::fileInput(
+        shiny::fileInput(
           "imported_files",
           "Choose CSV File(s)",
           multiple = TRUE,
-          accept = c(
-            "text/csv",
-            "text/comma-separated-values,text/plain",
-            ".csv"
-          )
+          accept = c("text/csv",
+                     "text/comma-separated-values,text/plain",
+                     ".csv")
         ),
-        shiny::checkboxInput(
-          "use_lendingClub",
-          "Use lendingClub dataset?",
-          TRUE
-        ),
+        shiny::checkboxInput("use_lendingClub",
+                             "Use lendingClub dataset?",
+                             TRUE),
         shiny::uiOutput("data_import_options")
       ),
       shiny::mainPanel(shiny::uiOutput("contents"))
@@ -44,23 +40,19 @@ ui <- shiny::fluidPage(
           # Input: Select data ----
 
           shiny::selectInput(
-               "selectedDataRejectInference",
-               "Data selection",
-               list("lendingClub")
+            "selectedDataRejectInference",
+            "Data selection",
+            list("lendingClub")
           ),
 
-          shiny::selectInput(
-               "var_cible",
-               "Good / bad feature",
-               list()
-          ),
+          shiny::selectInput("var_cible",
+                             "Good / bad feature",
+                             list()),
           "If there are NAs, these observations will count as 'not financed'",
 
-          shiny::selectInput(
-               "var_reject",
-               "Accept / Reject feature",
-               list()
-          ),
+          shiny::selectInput("var_reject",
+                             "Accept / Reject feature",
+                             list()),
           "If a 'score', the fraction defined above will depend on it directly.",
           "If a 0/1 feature, an Accept / Reject model (logistic regression) will be learnt.",
 
@@ -103,26 +95,18 @@ ui <- shiny::fluidPage(
             condition = "input.modelsRejectInference.includes('rforest')",
             tags$hr(),
             "randomForest options",
-            shiny::numericInput(
-              "rforestParam_ntree",
-              "Random Forest: ntree",
-              100
-            ),
-            shiny::numericInput(
-              "rforestParam_mtry",
-              "Random Forest: mtry",
-              5
-            ),
-            shiny::checkboxInput(
-              "rforestParam_replace",
-              "Random Forest: replace",
-              TRUE
-            ),
-            shiny::selectInput(
-              "rforestParam_maxnodes",
-              "Random Forest: maxnodes",
-              10
-            )
+            shiny::numericInput("rforestParam_ntree",
+                                "Random Forest: ntree",
+                                100),
+            shiny::numericInput("rforestParam_mtry",
+                                "Random Forest: mtry",
+                                5),
+            shiny::checkboxInput("rforestParam_replace",
+                                 "Random Forest: replace",
+                                 TRUE),
+            shiny::selectInput("rforestParam_maxnodes",
+                               "Random Forest: maxnodes",
+                               10)
           ),
 
           # Parameters for svm
@@ -133,37 +117,29 @@ ui <- shiny::fluidPage(
             shiny::selectInput(
               "svmParam_kernel",
               "SVM: kernel",
-              list(
-                "linear",
-                "polynomial",
-                "radial basis",
-                "sigmoid"
-              )
+              list("linear",
+                   "polynomial",
+                   "radial basis",
+                   "sigmoid")
             )
           ),
           shiny::conditionalPanel(
             condition = "input.modelsRejectInference.includes('svm') & input.svmParam_kernel == 'polynomial'",
-            shiny::numericInput(
-              "svmParam_degree",
-              "SVM: degree",
-              3
-            )
+            shiny::numericInput("svmParam_degree",
+                                "SVM: degree",
+                                3)
           ),
           shiny::conditionalPanel(
             condition = "input.modelsRejectInference.includes('svm') & input.svmParam_kernel != 'linear'",
-            shiny::numericInput(
-              "svmParam_gamma",
-              "SVM: gamma",
-              1
-            )
+            shiny::numericInput("svmParam_gamma",
+                                "SVM: gamma",
+                                1)
           ),
           shiny::conditionalPanel(
             condition = "input.modelsRejectInference.includes('svm') & (input.svmParam_kernel == 'polynomial' |  input.svmParam_kernel != 'sigmoid')",
-            shiny::selectInput(
-              "svmParam_coef0",
-              "SVM: coef0",
-              0
-            )
+            shiny::selectInput("svmParam_coef0",
+                               "SVM: coef0",
+                               0)
           ),
 
           # Parameters for nnet
@@ -171,21 +147,16 @@ ui <- shiny::fluidPage(
             condition = "input.modelsRejectInference.includes('nnet')",
             tags$hr(),
             "nnet options",
-            shiny::numericInput(
-              "nnetParam_nnet",
-              "Neural network: size",
-              10
-            ),
-            shiny::numericInput(
-              "nnetParam_decay",
-              "Neural network: decay",
-              0
-            ),
-            shiny::numericInput(
-              "nnetParam_maxit",
-              "Neural network: maxit",
-              100
-            )),
+            shiny::numericInput("nnetParam_nnet",
+                                "Neural network: size",
+                                10),
+            shiny::numericInput("nnetParam_decay",
+                                "Neural network: decay",
+                                0),
+            shiny::numericInput("nnetParam_maxit",
+                                "Neural network: maxit",
+                                100)
+          ),
 
           # Parameters for Parcelling
           shiny::conditionalPanel(
@@ -223,15 +194,10 @@ ui <- shiny::fluidPage(
 
         # Show a plot of the generated distribution
         shiny::mainPanel(tabsetPanel(
-          shiny::tabPanel(
-            "ROC curves",
-            shiny::fluidRow(
-                 shiny::splitLayout(
-                cellWidths = c("50%", "50%"),
-                shiny::plotOutput("distPlot1"),
-                shiny::plotOutput("distPlot2")
-              )
-            )
+          shiny::tabPanel("ROC curves",
+                          plotly::plotlyOutput(
+                            "roc_tous_reject_inference"
+                          )
           ),
           shiny::tabPanel("Gini indices", tableOutput("gini_reject"))
         ))
@@ -244,16 +210,30 @@ ui <- shiny::fluidPage(
       "Quantization",
       # Sidebar with a slider input for number of bins
       shiny::sidebarLayout(
-           shiny::sidebarPanel(
+        shiny::sidebarPanel(
           # Input: Select data ----
 
           shiny::selectInput(
             "selectedDataQuantization",
             "Data selection",
             list("lendingClub")
+          ),
+          shiny::selectInput(
+            "modelsQuantization",
+            "Models",
+            multiple = TRUE,
+            choices = c(
+              glmdisc = "glmdisc",
+              chi2 = "chi2",
+              chiMerge = "chiM",
+              echi2 = "extended chi2",
+              modchi2 = "modified chi2",
+              mdlp = "mdlp",
+              topdown = "topdown"
+            ),
+            selected = "glmtree"
           )
         ),
-
         # Show a plot of the generated distribution
         shiny::mainPanel()
       )
@@ -265,28 +245,27 @@ ui <- shiny::fluidPage(
       "Logistic Regression Trees",
       # Sidebar with a slider input for number of bins
       shiny::sidebarLayout(
-           shiny::sidebarPanel(
+        shiny::sidebarPanel(
           # Input: Select data ----
 
           shiny::selectInput(
-            "selectedDataLogisticRegressionTrees", "
-                                Data selection",
+            "selectedDataLogisticRegressionTrees",
+            "Data selection",
             list("lendingClub")
           ),
 
           shiny::selectInput(
-               "modelsLogisticRegressionTrees",
-               "Models",
-               multiple = TRUE,
-               choices = c(
-                    glmtree = "glmtree",
-                    tree = "tree",
-                    mob = "mob",
-                    lmt = "lmt"
-               ),
-               selected = "glmtree"
-          ),
-
+            "modelsLogisticRegressionTrees",
+            "Models",
+            multiple = TRUE,
+            choices = c(
+              glmtree = "glmtree",
+              tree = "tree",
+              mob = "mob",
+              lmt = "lmt"
+            ),
+            selected = "glmtree"
+          )
         ),
 
         # Show a plot of the generated distribution
