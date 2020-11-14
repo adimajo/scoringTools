@@ -238,7 +238,9 @@ server <- function(input, output, session) {
                }
                list_models[[model]] = rpart::rpart(as.formula(paste(input$var_cible, "~ .")),
                                          data = data,
-                                         type = "class")
+                                         method = "class")
+               roc_curves[[model]] = pROC::roc(list_models[[model]]$y, predict(list_models[[model]], data)[, 1])
+
              },
              rforest =
              {
@@ -275,18 +277,20 @@ server <- function(input, output, session) {
 
     }
 
-    df_roc_curve = data.frame(unname(lapply(roc_curves, function(roc_curve) roc_curve$specificities)),
-                              unname(lapply(roc_curves, function(roc_curve) roc_curve$sensitivities)),
-                              unname(lapply(1:length(roc_curves), function(index) rep(names(roc_curves[index]), length(roc_curves[[index]]$specificities)))))
+    df_roc_curve = data.frame(unlist(unname(lapply(roc_curves, function(roc_curve) roc_curve$specificities))),
+                              unlist(unname(lapply(roc_curves, function(roc_curve) roc_curve$sensitivities))),
+                              unlist(unname(lapply(1:length(roc_curves), function(index) rep(names(roc_curves[index]), length(roc_curves[[index]]$specificities))))))
 
     colnames(df_roc_curve) = c("Specificity", "Sensitivity", "Model")
 
     plotly_plot <- plotly::plot_ly(df_roc_curve,
-                                   x = ~ (1 - Specificity), y = ~Sensitivity, hoverinfo = "none",
-                                   height = 600, width = 800
+                                   x = ~ (1 - Specificity),
+                                   y = ~Sensitivity,
+                                   linetype = ~as.factor(Model),
+                                   hoverinfo = "none"
     ) %>%
       plotly::add_lines(
-        name = "Model",
+        name = ~as.factor(Model),
         line = list(shape = "spline", color = "#737373", width = 7),
         fill = "tozeroy", fillcolor = "#2A3356"
       ) %>%
@@ -305,11 +309,6 @@ server <- function(input, output, session) {
         line = list(dash = "10px", color = "black", width = 4),
         showlegend = F
       ) %>%
-      # plotly::add_annotations(
-      #   x = 0.8, y = 0.2, showarrow = F,
-      #   text = paste0("Area Under Curve: ", round(roc_curve$auc, 3)),
-      #   font = list(family = "serif", size = 18, color = "#E8E2E2")
-      # ) %>%
       plotly::add_annotations(
         x = 0, y = 0.98, showarrow = F, xanchor = "left",
         xref = "paper", yref = "paper",
@@ -325,8 +324,7 @@ server <- function(input, output, session) {
           range = c(0, 1), zeroline = F, showgrid = F,
           domain = c(0, 0.9),
           title = "Sensibility"
-        ),
-        plot_bgcolor = "#E8E2E2"
+        )
       )
     plotly_plot
   })

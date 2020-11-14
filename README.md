@@ -30,19 +30,16 @@ Two other packages were made public during this PhD, which tackle more specifica
 
 * A Shiny app explaining all aspects of this work is also accessible by running `runDemo()`.
      * add MAR well specified, MAR misspecified, MNAR with nrow as parameter
-     * allow column selection? + target selection
      * allow custom model + text input for call
-     * single ROC Curve for all selected models
      * Gini tab with confidence intervals
      * Quantization
-          * which algorithms? (check glmdisc installed) + their parameters
+          * missing some parameters
           * Histogram of each feature with default rate
           * Histogram of quantized features with default rate
           * ROC curve
           * gini
      * Logistic regression trees
-          * check packages are installed (mob, party, glmtree)
-          * which algorithms + their parameters
+          * their parameters
           * show tree structure
           * ROC curve
           * gini
