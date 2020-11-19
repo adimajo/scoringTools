@@ -46,6 +46,7 @@ Collate:
     'discretize.cutp.R'
     'echi2.R'
     'fuzzyAugmentation.R'
+    'generate_data.R'
     'get_cutp.R'
     'mdlp.R'
     'modChi2.R'

@@ -91,13 +91,14 @@
 
       
 
-      </header><div class="row">
+      </header><script src="figure2_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="figure2_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+<script src="figure2_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Supplementary material for ``Reject Inference in Credit Scoring: a rationale review’’: Figure 2</h1>
                         <h4 class="author">Adrien Ehrhardt</h4>
             
-            <h4 class="date">2020-11-02</h4>
+            <h4 class="date">2020-11-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/adimajo/scoringTools/blob/master/vignettes/figure2.Rmd"><code>vignettes/figure2.Rmd</code></a></small>
       <div class="hidden name"><code>figure2.Rmd</code></div>
@@ -109,288 +110,294 @@
 <div id="loading-required-libraries" class="section level1">
 <h1 class="hasAnchor">
 <a href="#loading-required-libraries" class="anchor"></a>Loading required libraries</h1>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">MASS</span>)
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/">MASS</a></span><span class="op">)</span>
 <span class="co"># library(tikzDevice)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">Rmixmod</span>)</pre></body></html></div>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://www.mixmod.org">Rmixmod</a></span><span class="op">)</span></code></pre></div>
 <pre><code>## Loading required package: Rcpp</code></pre>
 <pre><code>## Rmixmod v. 2.1.5 / URI: www.mixmod.org</code></pre>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">mvtnorm</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">scoringTools</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">123</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://mvtnorm.R-forge.R-project.org">mvtnorm</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://adimajo.github.io/scoringTools/">scoringTools</a></span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="mean-vectors-and-variances-for-each-class" class="section level1">
 <h1 class="hasAnchor">
 <a href="#mean-vectors-and-variances-for-each-class" class="anchor"></a>Mean vectors and variances for each class</h1>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">mu0</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span>(<span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">8</span>, <span class="fl">1</span>))
-<span class="no">mu1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span>(<span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">8</span>, <span class="fl">1</span>))
-<span class="no">sigma0</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span>(<span class="fl">2</span>, <span class="fl">8</span>, <span class="fl">8</span>)
-<span class="no">sigma1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span>(<span class="fl">2</span>, <span class="fl">8</span>, <span class="fl">8</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">mu0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
+<span class="va">mu1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
+<span class="va">sigma0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">8</span>, <span class="fl">8</span><span class="op">)</span>
+<span class="va">sigma1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">8</span>, <span class="fl">8</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="data-generation" class="section level1">
 <h1 class="hasAnchor">
 <a href="#data-generation" class="anchor"></a>Data generation</h1>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">m_test</span> <span class="kw">&lt;-</span> <span class="fl">100000</span>
-<span class="no">m</span> <span class="kw">&lt;-</span> <span class="fl">10000</span>
-<span class="no">nbvar</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">4</span>, <span class="fl">8</span>, <span class="fl">15</span>, <span class="fl">30</span>)
-<span class="no">p0</span> <span class="kw">&lt;-</span> <span class="fl">0.5</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">21</span>)
-<span class="no">y</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span>(<span class="no">m_test</span>, <span class="fl">1</span>, <span class="no">p0</span>)
-<span class="no">data_test_pred</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span>(<span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">4</span>, <span class="no">m_test</span>, <span class="fl">51</span>))
-<span class="no">data_test_gen</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span>(<span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">4</span>, <span class="no">m_test</span>, <span class="fl">51</span>))
-<span class="no">data_test_bayes</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span>(<span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">4</span>, <span class="fl">3</span>))
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">m_test</span> <span class="op">&lt;-</span> <span class="fl">100000</span>
+<span class="va">m</span> <span class="op">&lt;-</span> <span class="fl">10000</span>
+<span class="va">nbvar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">8</span>, <span class="fl">15</span>, <span class="fl">30</span><span class="op">)</span>
+<span class="va">p0</span> <span class="op">&lt;-</span> <span class="fl">0.5</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">21</span><span class="op">)</span>
+<span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span><span class="va">m_test</span>, <span class="fl">1</span>, <span class="va">p0</span><span class="op">)</span>
+<span class="va">data_test_pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="va">m_test</span>, <span class="fl">51</span><span class="op">)</span><span class="op">)</span>
+<span class="va">data_test_gen</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="va">m_test</span>, <span class="fl">51</span><span class="op">)</span><span class="op">)</span>
+<span class="va">data_test_bayes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>
 
-<span class="kw">for</span> (<span class="no">n</span> <span class="kw">in</span> <span class="fl">2</span>:<span class="fl">2</span>) {
-  <span class="no">x</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span>(<span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">m_test</span>, <span class="no">nbvar</span>[<span class="no">n</span>]))
-  <span class="no">x</span>[<span class="no">y</span> <span class="kw">==</span> <span class="fl">0</span>, ] <span class="kw">&lt;-</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html">mvrnorm</a></span>(<span class="kw">n</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">y</span> <span class="kw">==</span> <span class="fl">0</span>), <span class="no">mu0</span>[<span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>]], <span class="no">sigma0</span>[<span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>], <span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>]])
-  <span class="no">x</span>[<span class="no">y</span> <span class="kw">==</span> <span class="fl">1</span>, ] <span class="kw">&lt;-</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html">mvrnorm</a></span>(<span class="kw">n</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">y</span> <span class="kw">==</span> <span class="fl">1</span>), <span class="no">mu1</span>[<span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>]], <span class="no">sigma1</span>[<span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>], <span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>]])
-  <span class="no">data_test_pred</span>[<span class="no">n</span>, , <span class="fl">1</span>:(<span class="no">nbvar</span>[<span class="no">n</span>] + <span class="fl">1</span>)] <span class="kw">&lt;-</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind.data.frame</a></span>(<span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>, <span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>))
-  <span class="no">data_test_gen</span>[<span class="no">n</span>, , ] <span class="kw">&lt;-</span> <span class="no">data_test_pred</span>[<span class="no">n</span>, , ]
-  <span class="no">data_test_gen</span>[<span class="no">n</span>, , <span class="fl">1</span>] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span>(<span class="no">data_test_pred</span>[<span class="no">n</span>, , <span class="fl">1</span>] <span class="kw">==</span> <span class="fl">0</span>, <span class="fl">2</span>, <span class="fl">1</span>)
+<span class="kw">for</span> <span class="op">(</span><span class="va">n</span> <span class="kw">in</span> <span class="fl">2</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">m_test</span>, <span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
+  <span class="va">x</span><span class="op">[</span><span class="va">y</span> <span class="op">==</span> <span class="fl">0</span>, <span class="op">]</span> <span class="op">&lt;-</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html">mvrnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">y</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span>, <span class="va">mu0</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">]</span>, <span class="va">sigma0</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span>, <span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
+  <span class="va">x</span><span class="op">[</span><span class="va">y</span> <span class="op">==</span> <span class="fl">1</span>, <span class="op">]</span> <span class="op">&lt;-</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html">mvrnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">y</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>, <span class="va">mu1</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">]</span>, <span class="va">sigma1</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span>, <span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
+  <span class="va">data_test_pred</span><span class="op">[</span><span class="va">n</span>, , <span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind.data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span>
+  <span class="va">data_test_gen</span><span class="op">[</span><span class="va">n</span>, , <span class="op">]</span> <span class="op">&lt;-</span> <span class="va">data_test_pred</span><span class="op">[</span><span class="va">n</span>, , <span class="op">]</span>
+  <span class="va">data_test_gen</span><span class="op">[</span><span class="va">n</span>, , <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">data_test_pred</span><span class="op">[</span><span class="va">n</span>, , <span class="fl">1</span><span class="op">]</span> <span class="op">==</span> <span class="fl">0</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span>
 
-  <span class="no">e0</span> <span class="kw">&lt;-</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="no">p0</span>) + <span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html">dmvnorm</a></span>(<span class="no">x</span>[<span class="no">y</span> <span class="kw">==</span> <span class="fl">0</span>, ], <span class="no">mu0</span>[<span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>]], <span class="no">sigma0</span>[<span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>], <span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>]], <span class="kw">log</span> <span class="kw">=</span> <span class="fl">TRUE</span>) <span class="kw">&lt;</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="fl">1</span> - <span class="no">p0</span>) + <span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html">dmvnorm</a></span>(<span class="no">x</span>[<span class="no">y</span> <span class="kw">==</span> <span class="fl">0</span>, ], <span class="no">mu1</span>[<span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>]], <span class="no">sigma1</span>[<span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>], <span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>]], <span class="kw">log</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
-  <span class="no">e1</span> <span class="kw">&lt;-</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="no">p0</span>) + <span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html">dmvnorm</a></span>(<span class="no">x</span>[<span class="no">y</span> <span class="kw">==</span> <span class="fl">1</span>, ], <span class="no">mu0</span>[<span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>]], <span class="no">sigma0</span>[<span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>], <span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>]], <span class="kw">log</span> <span class="kw">=</span> <span class="fl">TRUE</span>) <span class="kw">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="fl">1</span> - <span class="no">p0</span>) + <span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html">dmvnorm</a></span>(<span class="no">x</span>[<span class="no">y</span> <span class="kw">==</span> <span class="fl">1</span>, ], <span class="no">mu1</span>[<span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>]], <span class="no">sigma1</span>[<span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>], <span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>]], <span class="kw">log</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
-  <span class="no">eb</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">e0</span>, <span class="no">e1</span>))
-  <span class="no">ebconf</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/prop.test.html">prop.test</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">e0</span>, <span class="no">e1</span>)), <span class="no">m_test</span>)$<span class="no">conf.int</span>[<span class="fl">1</span>:<span class="fl">2</span>]
-  <span class="no">data_test_bayes</span>[<span class="no">n</span>, ] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">eb</span>, <span class="no">ebconf</span>[<span class="fl">1</span>], <span class="no">ebconf</span>[<span class="fl">2</span>])
-  <span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span>(<span class="no">x</span>)
-}
+  <span class="va">e0</span> <span class="op">&lt;-</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">p0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html">dmvnorm</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">y</span> <span class="op">==</span> <span class="fl">0</span>, <span class="op">]</span>, <span class="va">mu0</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">]</span>, <span class="va">sigma0</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span>, <span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">]</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">p0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html">dmvnorm</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">y</span> <span class="op">==</span> <span class="fl">0</span>, <span class="op">]</span>, <span class="va">mu1</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">]</span>, <span class="va">sigma1</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span>, <span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">]</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+  <span class="va">e1</span> <span class="op">&lt;-</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">p0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html">dmvnorm</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">y</span> <span class="op">==</span> <span class="fl">1</span>, <span class="op">]</span>, <span class="va">mu0</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">]</span>, <span class="va">sigma0</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span>, <span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">]</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">p0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html">dmvnorm</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">y</span> <span class="op">==</span> <span class="fl">1</span>, <span class="op">]</span>, <span class="va">mu1</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">]</span>, <span class="va">sigma1</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span>, <span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">]</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+  <span class="va">eb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">e0</span>, <span class="va">e1</span><span class="op">)</span><span class="op">)</span>
+  <span class="va">ebconf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/prop.test.html">prop.test</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">e0</span>, <span class="va">e1</span><span class="op">)</span><span class="op">)</span>, <span class="va">m_test</span><span class="op">)</span><span class="op">$</span><span class="va">conf.int</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>
+  <span class="va">data_test_bayes</span><span class="op">[</span><span class="va">n</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">eb</span>, <span class="va">ebconf</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">ebconf</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
+<span class="op">}</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span>(<span class="no">y</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span>
 
-<span class="no">cut</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="fl">0</span>, <span class="fl">.9</span>, <span class="kw">by</span> <span class="kw">=</span> <span class="fl">0.02</span>)
-<span class="no">tx_erreur</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span>(<span class="fl">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">4</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">cut</span>), <span class="fl">5</span>, <span class="fl">20</span>))
-<span class="no">gini</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span>(<span class="fl">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">4</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">cut</span>), <span class="fl">5</span>, <span class="fl">20</span>))
+<span class="va">cut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">.9</span>, by <span class="op">=</span> <span class="fl">0.02</span><span class="op">)</span>
+<span class="va">tx_erreur</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">cut</span><span class="op">)</span>, <span class="fl">5</span>, <span class="fl">20</span><span class="op">)</span><span class="op">)</span>
+<span class="va">gini</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">cut</span><span class="op">)</span>, <span class="fl">5</span>, <span class="fl">20</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span>(<span class="no">ebconf</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span>(<span class="no">eb</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span>(<span class="no">e0</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span>(<span class="no">e1</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/gc.html">gc</a></span>()</pre></body></html></div>
-<pre><code>##            used  (Mb) gc trigger  (Mb) limit (Mb) max used  (Mb)
-## Ncells  1842807  98.5    2970688 158.7         NA  2970688 158.7
-## Vcells 43966637 335.5   97761905 745.9      16384 79050292 603.2</code></pre>
+<span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span><span class="va">ebconf</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span><span class="va">eb</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span><span class="va">e0</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span><span class="va">e1</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/gc.html">gc</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>##            used  (Mb) gc trigger (Mb) max used  (Mb)
+## Ncells  1895521 101.3    3593468  192  2769051 147.9
+## Vcells 44066681 336.3   97906191  747 79149658 603.9</code></pre>
 </div>
 <div id="loop-over-cut-off-values" class="section level1">
 <h1 class="hasAnchor">
 <a href="#loop-over-cut-off-values" class="anchor"></a>Loop over cut-off values</h1>
 <p>Not run: takes roughly 10 to 30 minutes.</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="kw">for</span> (<span class="no">random</span> <span class="kw">in</span> <span class="fl">1</span>:<span class="fl">20</span>) {
-  <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="no">random</span>)
-  <span class="no">y</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span>(<span class="no">m</span>, <span class="fl">1</span>, <span class="no">p0</span>)
-  <span class="no">data_learn_pred</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span>(<span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">4</span>, <span class="no">m</span>, <span class="fl">51</span>))
-  <span class="no">data_learn_gen</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span>(<span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">4</span>, <span class="no">m</span>, <span class="fl">51</span>))
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw">for</span> <span class="op">(</span><span class="va">random</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="va">random</span><span class="op">)</span>
+  <span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span><span class="va">m</span>, <span class="fl">1</span>, <span class="va">p0</span><span class="op">)</span>
+  <span class="va">data_learn_pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="va">m</span>, <span class="fl">51</span><span class="op">)</span><span class="op">)</span>
+  <span class="va">data_learn_gen</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="va">m</span>, <span class="fl">51</span><span class="op">)</span><span class="op">)</span>
 
-  <span class="kw">for</span> (<span class="no">n</span> <span class="kw">in</span> <span class="fl">2</span>:<span class="fl">2</span>) {
-    <span class="no">x</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span>(<span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">m</span>, <span class="no">nbvar</span>[<span class="no">n</span>]))
-    <span class="no">x</span>[<span class="no">y</span> <span class="kw">==</span> <span class="fl">0</span>, ] <span class="kw">&lt;-</span>
-      <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html">mvrnorm</a></span>(<span class="kw">n</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">y</span> <span class="kw">==</span> <span class="fl">0</span>), <span class="no">mu0</span>[<span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>]], <span class="no">sigma0</span>[<span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>], <span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>]])
-    <span class="no">x</span>[<span class="no">y</span> <span class="kw">==</span> <span class="fl">1</span>, ] <span class="kw">&lt;-</span>
-      <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html">mvrnorm</a></span>(<span class="kw">n</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">y</span> <span class="kw">==</span> <span class="fl">1</span>), <span class="no">mu1</span>[<span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>]], <span class="no">sigma1</span>[<span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>], <span class="fl">1</span>:<span class="no">nbvar</span>[<span class="no">n</span>]])
-    <span class="no">data_learn_pred</span>[<span class="no">n</span>, , <span class="fl">1</span>:(<span class="no">nbvar</span>[<span class="no">n</span>] + <span class="fl">1</span>)] <span class="kw">&lt;-</span>
-      <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind.data.frame</a></span>(<span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>, <span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>))
-    <span class="no">data_learn_gen</span>[<span class="no">n</span>, , ] <span class="kw">&lt;-</span> <span class="no">data_learn_pred</span>[<span class="no">n</span>, , ]
-    <span class="no">data_learn_gen</span>[<span class="no">n</span>, , <span class="fl">1</span>] <span class="kw">&lt;-</span>
-      <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span>(<span class="no">data_learn_gen</span>[<span class="no">n</span>, , <span class="fl">1</span>] <span class="kw">==</span> <span class="fl">0</span>, <span class="fl">2</span>, <span class="fl">1</span>)
-    <span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span>(<span class="no">x</span>)
-  }
+  <span class="kw">for</span> <span class="op">(</span><span class="va">n</span> <span class="kw">in</span> <span class="fl">2</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span> <span class="op">{</span>
+    <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">m</span>, <span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
+    <span class="va">x</span><span class="op">[</span><span class="va">y</span> <span class="op">==</span> <span class="fl">0</span>, <span class="op">]</span> <span class="op">&lt;-</span>
+      <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html">mvrnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">y</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span>, <span class="va">mu0</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">]</span>, <span class="va">sigma0</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span>, <span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
+    <span class="va">x</span><span class="op">[</span><span class="va">y</span> <span class="op">==</span> <span class="fl">1</span>, <span class="op">]</span> <span class="op">&lt;-</span>
+      <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html">mvrnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">y</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>, <span class="va">mu1</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">]</span>, <span class="va">sigma1</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span>, <span class="fl">1</span><span class="op">:</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
+    <span class="va">data_learn_pred</span><span class="op">[</span><span class="va">n</span>, , <span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">nbvar</span><span class="op">[</span><span class="va">n</span><span class="op">]</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span>
+      <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind.data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span>
+    <span class="va">data_learn_gen</span><span class="op">[</span><span class="va">n</span>, , <span class="op">]</span> <span class="op">&lt;-</span> <span class="va">data_learn_pred</span><span class="op">[</span><span class="va">n</span>, , <span class="op">]</span>
+    <span class="va">data_learn_gen</span><span class="op">[</span><span class="va">n</span>, , <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span>
+      <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">data_learn_gen</span><span class="op">[</span><span class="va">n</span>, , <span class="fl">1</span><span class="op">]</span> <span class="op">==</span> <span class="fl">0</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
+  <span class="op">}</span>
 
-  <span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span>(<span class="no">y</span>)
-  <span class="fu"><a href="https://rdrr.io/r/base/gc.html">gc</a></span>()
+  <span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/gc.html">gc</a></span><span class="op">(</span><span class="op">)</span>
 
   <span class="co">#### Eventual loop on number of featuers (frozen to 8) ####</span>
 
-  <span class="kw">for</span> (<span class="no">j</span> <span class="kw">in</span> <span class="fl">2</span>:<span class="fl">2</span>) {
+  <span class="kw">for</span> <span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fl">2</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span> <span class="op">{</span>
     <span class="co"># On convertit l'ensemble d'apprentissage en dataframe</span>
-    <span class="no">learn_pred</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">data_learn_pred</span>[<span class="no">j</span>, , <span class="fl">1</span>:(<span class="no">nbvar</span>[<span class="no">j</span>] + <span class="fl">1</span>)])
-    <span class="no">learn_gen</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">data_learn_gen</span>[<span class="no">j</span>, , <span class="fl">1</span>:(<span class="no">nbvar</span>[<span class="no">j</span>] + <span class="fl">1</span>)])
+    <span class="va">learn_pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">data_learn_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">nbvar</span><span class="op">[</span><span class="va">j</span><span class="op">]</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
+    <span class="va">learn_gen</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">data_learn_gen</span><span class="op">[</span><span class="va">j</span>, , <span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">nbvar</span><span class="op">[</span><span class="va">j</span><span class="op">]</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 
     <span class="co"># On construit la formule appliquee a glm (elle depend du nombre de variables dans le modele)</span>
-    <span class="no">PredictorVariables</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"X"</span>, <span class="fl">2</span>:(<span class="no">nbvar</span>[<span class="no">j</span>] + <span class="fl">1</span>), <span class="kw">sep</span> <span class="kw">=</span> <span class="st">""</span>)
-    <span class="no">Formula</span> <span class="kw">&lt;-</span>
-      <span class="fu"><a href="https://rdrr.io/r/stats/formula.html">formula</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"X1 ~ "</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="no">PredictorVariables</span>, <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">" + "</span>)))
-    <span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span>(<span class="no">PredictorVariables</span>)
-    <span class="fu"><a href="https://rdrr.io/r/base/gc.html">gc</a></span>()
+    <span class="va">PredictorVariables</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="fl">2</span><span class="op">:</span><span class="op">(</span><span class="va">nbvar</span><span class="op">[</span><span class="va">j</span><span class="op">]</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
+    <span class="va">Formula</span> <span class="op">&lt;-</span>
+      <span class="fu"><a href="https://rdrr.io/r/stats/formula.html">formula</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"X1 ~ "</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="va">PredictorVariables</span>, collapse <span class="op">=</span> <span class="st">" + "</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span><span class="va">PredictorVariables</span><span class="op">)</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/gc.html">gc</a></span><span class="op">(</span><span class="op">)</span>
 
     <span class="co"># On entraine un modele glm sur toutes les donnees pour simuler les refuses</span>
-    <span class="no">model_pred_tot</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span>(<span class="no">Formula</span>, <span class="st">"binomial"</span>, <span class="no">learn_pred</span>)
+    <span class="va">model_pred_tot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">Formula</span>, <span class="st">"binomial"</span>, <span class="va">learn_pred</span><span class="op">)</span>
 
     <span class="co">#### Boucle sur le cut ####</span>
 
-    <span class="kw">for</span> (<span class="no">i</span> <span class="kw">in</span> <span class="fl">1</span>:<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">cut</span>)) {
+    <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">cut</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
       <span class="co"># On calcule les acceptes et rejetes en fonction du cut et du premier modele</span>
-      <span class="no">accepte</span> <span class="kw">&lt;-</span> (<span class="no">model_pred_tot</span>$<span class="no">fitted.values</span> <span class="kw">&gt;</span> <span class="no">cut</span>[<span class="no">i</span>])
-      <span class="no">rejete</span> <span class="kw">&lt;-</span> (<span class="no">model_pred_tot</span>$<span class="no">fitted.values</span> <span class="kw">&lt;=</span> <span class="no">cut</span>[<span class="no">i</span>])
+      <span class="va">accepte</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">model_pred_tot</span><span class="op">$</span><span class="va">fitted.values</span> <span class="op">&gt;</span> <span class="va">cut</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>
+      <span class="va">rejete</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">model_pred_tot</span><span class="op">$</span><span class="va">fitted.values</span> <span class="op">&lt;=</span> <span class="va">cut</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>
 
       <span class="co"># On controle qu'il reste des acceptes et des mauvais payeurs parmi les acceptes</span>
-      <span class="kw">if</span> (<span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">accepte</span>) <span class="kw">&gt;</span> <span class="fl">0</span> <span class="kw">&amp;</span>
-        !(<span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">learn_pred</span>[<span class="no">accepte</span>, <span class="fl">1</span>]) <span class="kw">==</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">learn_pred</span>[<span class="no">accepte</span>, ]))) {
+      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">accepte</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">&amp;</span>
+        <span class="op">!</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">learn_pred</span><span class="op">[</span><span class="va">accepte</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">learn_pred</span><span class="op">[</span><span class="va">accepte</span>, <span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
         <span class="co"># On construit l'ensemble d'apprentissage partiel</span>
-        <span class="no">learn_pred_part</span> <span class="kw">&lt;-</span> <span class="no">learn_pred</span>[<span class="no">accepte</span>, ]
-        <span class="no">learn_gen_part</span> <span class="kw">&lt;-</span> <span class="no">learn_gen</span>
-        <span class="no">learn_gen_part</span>[<span class="no">rejete</span>, <span class="fl">1</span>] <span class="kw">&lt;-</span> <span class="fl">NA</span>
+        <span class="va">learn_pred_part</span> <span class="op">&lt;-</span> <span class="va">learn_pred</span><span class="op">[</span><span class="va">accepte</span>, <span class="op">]</span>
+        <span class="va">learn_gen_part</span> <span class="op">&lt;-</span> <span class="va">learn_gen</span>
+        <span class="va">learn_gen_part</span><span class="op">[</span><span class="va">rejete</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span>
 
         <span class="co"># On entra?ne les modeles</span>
-        <span class="no">model_pred_part</span> <span class="kw">&lt;-</span>
-          <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span>(<span class="no">Formula</span>, <span class="kw">family</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span>(<span class="kw">link</span> <span class="kw">=</span> <span class="st">"logit"</span>), <span class="no">learn_pred_part</span>)
-        <span class="no">model_gen_part</span> <span class="kw">&lt;-</span>
-          <span class="fu"><a href="https://rdrr.io/pkg/Rmixmod/man/mixmodCluster.html">mixmodCluster</a></span>(
-            <span class="kw">data</span> <span class="kw">=</span> <span class="no">learn_gen_part</span>[, <span class="fl">2</span>:(<span class="no">nbvar</span>[<span class="no">j</span>] + <span class="fl">1</span>)],
-            <span class="kw">knownLabels</span> <span class="kw">=</span> <span class="no">learn_gen_part</span>[, <span class="fl">1</span>],
-            <span class="kw">nbCluster</span> <span class="kw">=</span> <span class="fl">2</span>
-          )
+        <span class="va">model_pred_part</span> <span class="op">&lt;-</span>
+          <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">Formula</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"logit"</span><span class="op">)</span>, <span class="va">learn_pred_part</span><span class="op">)</span>
+        <span class="va">model_gen_part</span> <span class="op">&lt;-</span>
+          <span class="fu"><a href="https://rdrr.io/pkg/Rmixmod/man/mixmodCluster.html">mixmodCluster</a></span><span class="op">(</span>
+            data <span class="op">=</span> <span class="va">learn_gen_part</span><span class="op">[</span>, <span class="fl">2</span><span class="op">:</span><span class="op">(</span><span class="va">nbvar</span><span class="op">[</span><span class="va">j</span><span class="op">]</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">]</span>,
+            knownLabels <span class="op">=</span> <span class="va">learn_gen_part</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>,
+            nbCluster <span class="op">=</span> <span class="fl">2</span>
+          <span class="op">)</span>
 
         <span class="co"># On predit leur resultat sur l'ensemble de test et on enregistre le taux d'erreur</span>
-        <span class="no">model_pred_part.pred</span> <span class="kw">&lt;-</span>
-          <span class="fu"><a href="../reference/predict.html">predict</a></span>(<span class="no">model_pred_part</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">data_test_pred</span>[<span class="no">j</span>, , ]), <span class="kw">type</span> <span class="kw">=</span> <span class="st">"response"</span>) <span class="kw">&gt;=</span> <span class="fl">0.5</span>
-        <span class="no">model_pred_part.erreur</span> <span class="kw">&lt;-</span>
-          <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(<span class="no">data_test_pred</span>[<span class="no">j</span>, , <span class="fl">1</span>] - <span class="no">model_pred_part.pred</span>)) / <span class="no">m_test</span>
-        <span class="no">model_pred_part.gini</span> <span class="kw">&lt;-</span>
-          <span class="fu"><a href="../reference/normalizedGini.html">normalizedGini</a></span>(
-            <span class="no">data_test_pred</span>[<span class="no">j</span>, , <span class="fl">1</span>],
-            <span class="fu"><a href="../reference/predict.html">predict</a></span>(<span class="no">model_pred_part</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">data_test_pred</span>[<span class="no">j</span>, , ]), <span class="kw">type</span> <span class="kw">=</span> <span class="st">"response"</span>)
-          )
+        <span class="va">model_pred_part.pred</span> <span class="op">&lt;-</span>
+          <span class="fu"><a href="../reference/predict.html">predict</a></span><span class="op">(</span><span class="va">model_pred_part</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">data_test_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="op">]</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">0.5</span>
+        <span class="va">model_pred_part.erreur</span> <span class="op">&lt;-</span>
+          <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">data_test_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="fl">1</span><span class="op">]</span> <span class="op">-</span> <span class="va">model_pred_part.pred</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="va">m_test</span>
+        <span class="va">model_pred_part.gini</span> <span class="op">&lt;-</span>
+          <span class="fu"><a href="../reference/normalizedGini.html">normalizedGini</a></span><span class="op">(</span>
+            <span class="va">data_test_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="fl">1</span><span class="op">]</span>,
+            <span class="fu"><a href="../reference/predict.html">predict</a></span><span class="op">(</span><span class="va">model_pred_part</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">data_test_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="op">]</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
+          <span class="op">)</span>
 
-        <span class="no">model_gen_res</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Rmixmod/man/mixmodPredict.html">mixmodPredict</a></span>(
-          <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">data_test_gen</span>[<span class="no">j</span>, , <span class="fl">2</span>:(<span class="no">nbvar</span>[<span class="no">j</span>] + <span class="fl">1</span>)]),
-          <span class="no">model_gen_part</span>@<span class="kw">bestResult</span>
-        )
-        <span class="no">model_gen_part.pred</span> <span class="kw">&lt;-</span>
-          <span class="no">model_gen_res</span>@<span class="kw">partition</span>
-        <span class="no">model_gen_part.erreur</span> <span class="kw">&lt;-</span>
-          <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(<span class="no">data_test_gen</span>[<span class="no">j</span>, , <span class="fl">1</span>] - <span class="no">model_gen_part.pred</span>)) / <span class="no">m_test</span>
-        <span class="no">model_gen_part.gini</span> <span class="kw">&lt;-</span>
-          <span class="fu"><a href="../reference/normalizedGini.html">normalizedGini</a></span>(
-            <span class="no">data_test_pred</span>[<span class="no">j</span>, , <span class="fl">1</span>],
-            <span class="no">model_gen_res</span>@<span class="kw">proba</span>[, <span class="fl">1</span>]
-          )
+        <span class="va">model_gen_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Rmixmod/man/mixmodPredict.html">mixmodPredict</a></span><span class="op">(</span>
+          <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">data_test_gen</span><span class="op">[</span><span class="va">j</span>, , <span class="fl">2</span><span class="op">:</span><span class="op">(</span><span class="va">nbvar</span><span class="op">[</span><span class="va">j</span><span class="op">]</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>,
+          <span class="va">model_gen_part</span><span class="op">@</span><span class="va">bestResult</span>
+        <span class="op">)</span>
+        <span class="va">model_gen_part.pred</span> <span class="op">&lt;-</span>
+          <span class="va">model_gen_res</span><span class="op">@</span><span class="va">partition</span>
+        <span class="va">model_gen_part.erreur</span> <span class="op">&lt;-</span>
+          <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">data_test_gen</span><span class="op">[</span><span class="va">j</span>, , <span class="fl">1</span><span class="op">]</span> <span class="op">-</span> <span class="va">model_gen_part.pred</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="va">m_test</span>
+        <span class="va">model_gen_part.gini</span> <span class="op">&lt;-</span>
+          <span class="fu"><a href="../reference/normalizedGini.html">normalizedGini</a></span><span class="op">(</span>
+            <span class="va">data_test_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="fl">1</span><span class="op">]</span>,
+            <span class="va">model_gen_res</span><span class="op">@</span><span class="va">proba</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>
+          <span class="op">)</span>
 
         <span class="co">## Augmentation ##</span>
-        <span class="kw">if</span> (<span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">rejete</span>) <span class="kw">&gt;</span> <span class="fl">0</span>) {
-          <span class="no">model_pred_augmente</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/augmentation.html">augmentation</a></span>(
-            <span class="no">learn_pred_part</span>[, -<span class="fl">1</span>],
-            <span class="no">learn_pred</span>[<span class="no">rejete</span>, -<span class="fl">1</span>],
-            <span class="no">learn_pred_part</span>[, <span class="fl">1</span>]
-          )
+        <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">rejete</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
+          <span class="va">model_pred_augmente</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/augmentation.html">augmentation</a></span><span class="op">(</span>
+            <span class="va">learn_pred_part</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span>,
+            <span class="va">learn_pred</span><span class="op">[</span><span class="va">rejete</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span>,
+            <span class="va">learn_pred_part</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>
+          <span class="op">)</span>
 
-          <span class="no">model_pred_augmente.pred</span> <span class="kw">&lt;-</span>
-            <span class="fu"><a href="../reference/predict.html">predict</a></span>(<span class="no">model_pred_augmente</span>@<span class="kw">infered_model</span>,
-              <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">data_test_pred</span>[<span class="no">j</span>, , ])),
-              <span class="kw">type</span> <span class="kw">=</span> <span class="st">"response"</span>
-            ) <span class="kw">&gt;=</span> <span class="fl">0.5</span>
-          <span class="no">model_pred_augmente.erreur</span> <span class="kw">&lt;-</span>
-            <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(<span class="no">data_test_pred</span>[<span class="no">j</span>, , <span class="fl">1</span>] - <span class="no">model_pred_augmente.pred</span>)) / <span class="no">m_test</span>
-          <span class="no">model_pred_augmente.gini</span> <span class="kw">&lt;-</span>
-            <span class="fu"><a href="../reference/normalizedGini.html">normalizedGini</a></span>(
-              <span class="no">data_test_pred</span>[<span class="no">j</span>, , <span class="fl">1</span>],
-              <span class="fu"><a href="../reference/predict.html">predict</a></span>(<span class="no">model_pred_augmente</span>@<span class="kw">infered_model</span>,
-                <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">data_test_pred</span>[<span class="no">j</span>, , ])),
-                <span class="kw">type</span> <span class="kw">=</span> <span class="st">"response"</span>
-              )
-            )
+          <span class="va">model_pred_augmente.pred</span> <span class="op">&lt;-</span>
+            <span class="fu"><a href="../reference/predict.html">predict</a></span><span class="op">(</span><span class="va">model_pred_augmente</span><span class="op">@</span><span class="va">infered_model</span>,
+              <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">data_test_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="op">]</span><span class="op">)</span><span class="op">)</span>,
+              type <span class="op">=</span> <span class="st">"response"</span>
+            <span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">0.5</span>
+          <span class="va">model_pred_augmente.erreur</span> <span class="op">&lt;-</span>
+            <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">data_test_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="fl">1</span><span class="op">]</span> <span class="op">-</span> <span class="va">model_pred_augmente.pred</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="va">m_test</span>
+          <span class="va">model_pred_augmente.gini</span> <span class="op">&lt;-</span>
+            <span class="fu"><a href="../reference/normalizedGini.html">normalizedGini</a></span><span class="op">(</span>
+              <span class="va">data_test_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="fl">1</span><span class="op">]</span>,
+              <span class="fu"><a href="../reference/predict.html">predict</a></span><span class="op">(</span><span class="va">model_pred_augmente</span><span class="op">@</span><span class="va">infered_model</span>,
+                <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">data_test_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="op">]</span><span class="op">)</span><span class="op">)</span>,
+                type <span class="op">=</span> <span class="st">"response"</span>
+              <span class="op">)</span>
+            <span class="op">)</span>
 
           <span class="co">## Parcelling ##</span>
-          <span class="no">model_pred_parcelling</span> <span class="kw">&lt;-</span>
-            <span class="fu"><a href="../reference/parcelling.html">parcelling</a></span>(
-              <span class="kw">xf</span> <span class="kw">=</span> <span class="no">learn_pred_part</span>[, -<span class="fl">1</span>],
-              <span class="kw">xnf</span> <span class="kw">=</span> <span class="no">learn_pred</span>[<span class="no">rejete</span>, -<span class="fl">1</span>],
-              <span class="kw">yf</span> <span class="kw">=</span> <span class="no">learn_pred_part</span>[, <span class="fl">1</span>]
-            )
+          <span class="va">model_pred_parcelling</span> <span class="op">&lt;-</span>
+            <span class="fu"><a href="../reference/parcelling.html">parcelling</a></span><span class="op">(</span>
+              xf <span class="op">=</span> <span class="va">learn_pred_part</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span>,
+              xnf <span class="op">=</span> <span class="va">learn_pred</span><span class="op">[</span><span class="va">rejete</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span>,
+              yf <span class="op">=</span> <span class="va">learn_pred_part</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>
+            <span class="op">)</span>
 
-          <span class="no">model_pred_parcelling.pred</span> <span class="kw">&lt;-</span>
-            <span class="fu"><a href="../reference/predict.html">predict</a></span>(<span class="no">model_pred_parcelling</span>@<span class="kw">infered_model</span>,
-              <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">data_test_pred</span>[<span class="no">j</span>, , ])),
-              <span class="kw">type</span> <span class="kw">=</span> <span class="st">"response"</span>
-            ) <span class="kw">&gt;=</span> <span class="fl">0.5</span>
-          <span class="no">model_pred_parcelling.erreur</span> <span class="kw">&lt;-</span>
-            <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(<span class="no">data_test_pred</span>[<span class="no">j</span>, , <span class="fl">1</span>] - <span class="no">model_pred_parcelling.pred</span>)) / <span class="no">m_test</span>
-          <span class="no">model_pred_parcelling.gini</span> <span class="kw">&lt;-</span>
-            <span class="fu"><a href="../reference/normalizedGini.html">normalizedGini</a></span>(
-              <span class="no">data_test_pred</span>[<span class="no">j</span>, , <span class="fl">1</span>],
-              <span class="fu"><a href="../reference/predict.html">predict</a></span>(<span class="no">model_pred_parcelling</span>@<span class="kw">infered_model</span>,
-                <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">data_test_pred</span>[<span class="no">j</span>, , ])),
-                <span class="kw">type</span> <span class="kw">=</span> <span class="st">"response"</span>
-              )
-            )
+          <span class="va">model_pred_parcelling.pred</span> <span class="op">&lt;-</span>
+            <span class="fu"><a href="../reference/predict.html">predict</a></span><span class="op">(</span><span class="va">model_pred_parcelling</span><span class="op">@</span><span class="va">infered_model</span>,
+              <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">data_test_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="op">]</span><span class="op">)</span><span class="op">)</span>,
+              type <span class="op">=</span> <span class="st">"response"</span>
+            <span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">0.5</span>
+          <span class="va">model_pred_parcelling.erreur</span> <span class="op">&lt;-</span>
+            <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">data_test_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="fl">1</span><span class="op">]</span> <span class="op">-</span> <span class="va">model_pred_parcelling.pred</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="va">m_test</span>
+          <span class="va">model_pred_parcelling.gini</span> <span class="op">&lt;-</span>
+            <span class="fu"><a href="../reference/normalizedGini.html">normalizedGini</a></span><span class="op">(</span>
+              <span class="va">data_test_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="fl">1</span><span class="op">]</span>,
+              <span class="fu"><a href="../reference/predict.html">predict</a></span><span class="op">(</span><span class="va">model_pred_parcelling</span><span class="op">@</span><span class="va">infered_model</span>,
+                <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">data_test_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="op">]</span><span class="op">)</span><span class="op">)</span>,
+                type <span class="op">=</span> <span class="st">"response"</span>
+              <span class="op">)</span>
+            <span class="op">)</span>
 
           <span class="co">## Reclassification ##</span>
-          <span class="no">model_pred_reclassification</span> <span class="kw">&lt;-</span>
-            <span class="fu"><a href="../reference/reclassification.html">reclassification</a></span>(
-              <span class="kw">xf</span> <span class="kw">=</span> <span class="no">learn_pred_part</span>[, -<span class="fl">1</span>],
-              <span class="kw">xnf</span> <span class="kw">=</span> <span class="no">learn_pred</span>[<span class="no">rejete</span>, -<span class="fl">1</span>],
-              <span class="kw">yf</span> <span class="kw">=</span> <span class="no">learn_pred_part</span>[, <span class="fl">1</span>]
-            )
+          <span class="va">model_pred_reclassification</span> <span class="op">&lt;-</span>
+            <span class="fu"><a href="../reference/reclassification.html">reclassification</a></span><span class="op">(</span>
+              xf <span class="op">=</span> <span class="va">learn_pred_part</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span>,
+              xnf <span class="op">=</span> <span class="va">learn_pred</span><span class="op">[</span><span class="va">rejete</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span>,
+              yf <span class="op">=</span> <span class="va">learn_pred_part</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>
+            <span class="op">)</span>
 
-          <span class="no">model_pred_reclassification.pred</span> <span class="kw">&lt;-</span>
-            <span class="fu"><a href="../reference/predict.html">predict</a></span>(
-              <span class="no">model_pred_reclassification</span>@<span class="kw">infered_model</span>,
-              <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">data_test_pred</span>[<span class="no">j</span>, , ])),
-              <span class="kw">type</span> <span class="kw">=</span> <span class="st">"response"</span>
-            ) <span class="kw">&gt;=</span> <span class="fl">0.5</span>
-          <span class="no">model_pred_reclassification.erreur</span> <span class="kw">&lt;-</span>
-            <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(<span class="no">data_test_pred</span>[<span class="no">j</span>, , <span class="fl">1</span>] - <span class="no">model_pred_reclassification.pred</span>)) / <span class="no">m_test</span>
-          <span class="no">model_pred_reclassification.gini</span> <span class="kw">&lt;-</span>
-            <span class="fu"><a href="../reference/normalizedGini.html">normalizedGini</a></span>(
-              <span class="no">data_test_pred</span>[<span class="no">j</span>, , <span class="fl">1</span>],
-              <span class="fu"><a href="../reference/predict.html">predict</a></span>(<span class="no">model_pred_reclassification</span>@<span class="kw">infered_model</span>,
-                <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">data_test_pred</span>[<span class="no">j</span>, , ])),
-                <span class="kw">type</span> <span class="kw">=</span> <span class="st">"response"</span>
-              )
-            )
-        }
+          <span class="va">model_pred_reclassification.pred</span> <span class="op">&lt;-</span>
+            <span class="fu"><a href="../reference/predict.html">predict</a></span><span class="op">(</span>
+              <span class="va">model_pred_reclassification</span><span class="op">@</span><span class="va">infered_model</span>,
+              <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">data_test_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="op">]</span><span class="op">)</span><span class="op">)</span>,
+              type <span class="op">=</span> <span class="st">"response"</span>
+            <span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">0.5</span>
+          <span class="va">model_pred_reclassification.erreur</span> <span class="op">&lt;-</span>
+            <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">data_test_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="fl">1</span><span class="op">]</span> <span class="op">-</span> <span class="va">model_pred_reclassification.pred</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="va">m_test</span>
+          <span class="va">model_pred_reclassification.gini</span> <span class="op">&lt;-</span>
+            <span class="fu"><a href="../reference/normalizedGini.html">normalizedGini</a></span><span class="op">(</span>
+              <span class="va">data_test_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="fl">1</span><span class="op">]</span>,
+              <span class="fu"><a href="../reference/predict.html">predict</a></span><span class="op">(</span><span class="va">model_pred_reclassification</span><span class="op">@</span><span class="va">infered_model</span>,
+                <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">data_test_pred</span><span class="op">[</span><span class="va">j</span>, , <span class="op">]</span><span class="op">)</span><span class="op">)</span>,
+                type <span class="op">=</span> <span class="st">"response"</span>
+              <span class="op">)</span>
+            <span class="op">)</span>
+        <span class="op">}</span>
 
         <span class="co"># On renvoie le taux d'erreur des modeles</span>
-        <span class="kw">if</span> (<span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">rejete</span>) <span class="kw">&gt;</span> <span class="fl">0</span>) {
-          <span class="no">tx_erreur</span>[<span class="no">j</span>, <span class="no">i</span>, , <span class="no">random</span>] <span class="kw">&lt;-</span>
-            <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(
-              <span class="no">model_pred_part.erreur</span>,
-              <span class="no">model_pred_augmente.erreur</span>,
-              <span class="no">model_pred_reclassification.erreur</span>,
-              <span class="no">model_pred_parcelling.erreur</span>,
-              <span class="no">model_gen_part.erreur</span>
-            )
-          <span class="no">gini</span>[<span class="no">j</span>, <span class="no">i</span>, , <span class="no">random</span>] <span class="kw">&lt;-</span>
-            <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(
-              <span class="no">model_pred_part.gini</span>,
-              <span class="no">model_pred_augmente.gini</span>,
-              <span class="no">model_pred_reclassification.gini</span>,
-              <span class="no">model_pred_parcelling.gini</span>,
-              <span class="no">model_gen_part.gini</span>
-            )
-        } <span class="kw">else</span> {
-          <span class="no">tx_erreur</span>[<span class="no">j</span>, <span class="no">i</span>, , <span class="no">random</span>] <span class="kw">&lt;-</span>
-            <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(
-              <span class="no">model_pred_part.erreur</span>,
-              <span class="no">model_pred_part.erreur</span>,
-              <span class="no">model_pred_part.erreur</span>,
-              <span class="no">model_pred_part.erreur</span>,
-              <span class="no">model_gen_part.erreur</span>
-            )
-          <span class="no">gini</span>[<span class="no">j</span>, <span class="no">i</span>, , <span class="no">random</span>] <span class="kw">&lt;-</span>
-            <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(
-              <span class="no">model_pred_part.gini</span>,
-              <span class="no">model_pred_part.gini</span>,
-              <span class="no">model_pred_part.gini</span>,
-              <span class="no">model_pred_part.gini</span>,
-              <span class="no">model_gen_part.gini</span>
-            )
-        }
-        <span class="fu"><a href="https://rdrr.io/r/base/gc.html">gc</a></span>()
-      }
-      <span class="fu"><a href="https://rdrr.io/r/base/gc.html">gc</a></span>()
-    }
-  }
-}</pre></body></html></div>
+        <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">rejete</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
+          <span class="va">tx_erreur</span><span class="op">[</span><span class="va">j</span>, <span class="va">i</span>, , <span class="va">random</span><span class="op">]</span> <span class="op">&lt;-</span>
+            <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>
+              <span class="va">model_pred_part.erreur</span>,
+              <span class="va">model_pred_augmente.erreur</span>,
+              <span class="va">model_pred_reclassification.erreur</span>,
+              <span class="va">model_pred_parcelling.erreur</span>,
+              <span class="va">model_gen_part.erreur</span>
+            <span class="op">)</span>
+          <span class="va">gini</span><span class="op">[</span><span class="va">j</span>, <span class="va">i</span>, , <span class="va">random</span><span class="op">]</span> <span class="op">&lt;-</span>
+            <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>
+              <span class="va">model_pred_part.gini</span>,
+              <span class="va">model_pred_augmente.gini</span>,
+              <span class="va">model_pred_reclassification.gini</span>,
+              <span class="va">model_pred_parcelling.gini</span>,
+              <span class="va">model_gen_part.gini</span>
+            <span class="op">)</span>
+        <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span>
+          <span class="va">tx_erreur</span><span class="op">[</span><span class="va">j</span>, <span class="va">i</span>, , <span class="va">random</span><span class="op">]</span> <span class="op">&lt;-</span>
+            <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>
+              <span class="va">model_pred_part.erreur</span>,
+              <span class="va">model_pred_part.erreur</span>,
+              <span class="va">model_pred_part.erreur</span>,
+              <span class="va">model_pred_part.erreur</span>,
+              <span class="va">model_gen_part.erreur</span>
+            <span class="op">)</span>
+          <span class="va">gini</span><span class="op">[</span><span class="va">j</span>, <span class="va">i</span>, , <span class="va">random</span><span class="op">]</span> <span class="op">&lt;-</span>
+            <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>
+              <span class="va">model_pred_part.gini</span>,
+              <span class="va">model_pred_part.gini</span>,
+              <span class="va">model_pred_part.gini</span>,
+              <span class="va">model_pred_part.gini</span>,
+              <span class="va">model_gen_part.gini</span>
+            <span class="op">)</span>
+        <span class="op">}</span>
+        <span class="fu"><a href="https://rdrr.io/r/base/gc.html">gc</a></span><span class="op">(</span><span class="op">)</span>
+      <span class="op">}</span>
+      <span class="fu"><a href="https://rdrr.io/r/base/gc.html">gc</a></span><span class="op">(</span><span class="op">)</span>
+    <span class="op">}</span>
+  <span class="op">}</span>
+<span class="op">}</span></code></pre></div>
 </div>
 <div id="figures" class="section level1">
 <h1 class="hasAnchor">
 <a href="#figures" class="anchor"></a>Figures</h1>
 <p>Consequently, not run either.</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="co"># path_figure_tx_erreur &lt;-</span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># path_figure_tx_erreur &lt;-</span>
 <span class="co">#   file.path(</span>
 <span class="co">#     dirname(rstudioapi::getActiveDocumentContext()$path),</span>
 <span class="co">#     "../TEX_CODE/reintegration_simu_well_erreur.tex"</span>
@@ -404,115 +411,115 @@
 
 <span class="co">############ Figure error rate ##############################################</span>
 
-<span class="no">tx_erreur_moy</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span>(<span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">cut</span>), <span class="fl">5</span>))
-<span class="no">gini_moy</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span>(<span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">cut</span>), <span class="fl">5</span>))
+<span class="va">tx_erreur_moy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">cut</span><span class="op">)</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span>
+<span class="va">gini_moy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">cut</span><span class="op">)</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span>
 
-<span class="kw">for</span> (<span class="no">methode</span> <span class="kw">in</span> <span class="fl">1</span>:<span class="fl">5</span>) {
-  <span class="kw">for</span> (<span class="no">random</span> <span class="kw">in</span> <span class="fl">1</span>:<span class="fl">20</span>) {
-    <span class="no">tx_erreur_moy</span>[, <span class="no">methode</span>] <span class="kw">&lt;-</span> <span class="no">tx_erreur_moy</span>[, <span class="no">methode</span>] + <span class="no">tx_erreur</span>[<span class="fl">2</span>, , <span class="no">methode</span>, <span class="no">random</span>]
-    <span class="no">gini_moy</span>[, <span class="no">methode</span>] <span class="kw">&lt;-</span> <span class="no">gini_moy</span>[, <span class="no">methode</span>] + <span class="no">gini</span>[<span class="fl">2</span>, , <span class="no">methode</span>, <span class="no">random</span>]
-  }
-  <span class="no">tx_erreur_moy</span>[, <span class="no">methode</span>] <span class="kw">&lt;-</span> <span class="no">tx_erreur_moy</span>[, <span class="no">methode</span>] / <span class="fl">20</span>
-  <span class="no">gini_moy</span>[, <span class="no">methode</span>] <span class="kw">&lt;-</span> <span class="no">gini_moy</span>[, <span class="no">methode</span>] / <span class="fl">20</span>
-}
+<span class="kw">for</span> <span class="op">(</span><span class="va">methode</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span> <span class="op">{</span>
+  <span class="kw">for</span> <span class="op">(</span><span class="va">random</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span> <span class="op">{</span>
+    <span class="va">tx_erreur_moy</span><span class="op">[</span>, <span class="va">methode</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">tx_erreur_moy</span><span class="op">[</span>, <span class="va">methode</span><span class="op">]</span> <span class="op">+</span> <span class="va">tx_erreur</span><span class="op">[</span><span class="fl">2</span>, , <span class="va">methode</span>, <span class="va">random</span><span class="op">]</span>
+    <span class="va">gini_moy</span><span class="op">[</span>, <span class="va">methode</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">gini_moy</span><span class="op">[</span>, <span class="va">methode</span><span class="op">]</span> <span class="op">+</span> <span class="va">gini</span><span class="op">[</span><span class="fl">2</span>, , <span class="va">methode</span>, <span class="va">random</span><span class="op">]</span>
+  <span class="op">}</span>
+  <span class="va">tx_erreur_moy</span><span class="op">[</span>, <span class="va">methode</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">tx_erreur_moy</span><span class="op">[</span>, <span class="va">methode</span><span class="op">]</span> <span class="op">/</span> <span class="fl">20</span>
+  <span class="va">gini_moy</span><span class="op">[</span>, <span class="va">methode</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">gini_moy</span><span class="op">[</span>, <span class="va">methode</span><span class="op">]</span> <span class="op">/</span> <span class="fl">20</span>
+<span class="op">}</span>
 
 <span class="co"># tikz(path_figure_tx_erreur,</span>
 <span class="co">#      width = 7,</span>
 <span class="co">#      height = 4.4,</span>
 <span class="co">#      engine = "pdftex")</span>
-<span class="fu"><a href="../reference/plot.html">plot</a></span>(
-  <span class="kw">x</span> <span class="kw">=</span> <span class="no">cut</span>,
-  <span class="kw">y</span> <span class="kw">=</span> <span class="no">tx_erreur_moy</span>[, <span class="fl">1</span>],
-  <span class="kw">xlim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">.9</span>),
-  <span class="kw">ylim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">.15</span>, <span class="fl">.19</span>),
-  <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">"Error rate on test set"</span>,
-  <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">"Cut-off value"</span>,
-  <span class="kw">pch</span> <span class="kw">=</span> <span class="fl">15</span>,
-  <span class="kw">xaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">yaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">type</span> <span class="kw">=</span> <span class="st">"o"</span>
-)
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="kw">new</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
-<span class="fu"><a href="../reference/plot.html">plot</a></span>(
-  <span class="kw">x</span> <span class="kw">=</span> <span class="no">cut</span>,
-  <span class="kw">y</span> <span class="kw">=</span> <span class="no">tx_erreur_moy</span>[, <span class="fl">2</span>],
-  <span class="kw">xlim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">.9</span>),
-  <span class="kw">ylim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">.15</span>, <span class="fl">.19</span>),
-  <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">""</span>,
-  <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">""</span>,
-  <span class="kw">pch</span> <span class="kw">=</span> <span class="fl">17</span>,
-  <span class="kw">col</span> <span class="kw">=</span> <span class="st">"green"</span>,
-  <span class="kw">xaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">yaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">type</span> <span class="kw">=</span> <span class="st">"o"</span>
-)
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="kw">new</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
-<span class="fu"><a href="../reference/plot.html">plot</a></span>(
-  <span class="kw">x</span> <span class="kw">=</span> <span class="no">cut</span>,
-  <span class="kw">y</span> <span class="kw">=</span> <span class="no">tx_erreur_moy</span>[, <span class="fl">3</span>],
-  <span class="kw">xlim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">.9</span>),
-  <span class="kw">ylim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">.15</span>, <span class="fl">.19</span>),
-  <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">""</span>,
-  <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">""</span>,
-  <span class="kw">pch</span> <span class="kw">=</span> <span class="fl">7</span>,
-  <span class="kw">col</span> <span class="kw">=</span> <span class="fl">2</span>,
-  <span class="kw">xaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">yaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">type</span> <span class="kw">=</span> <span class="st">"o"</span>
-)
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="kw">new</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
-<span class="fu"><a href="../reference/plot.html">plot</a></span>(
-  <span class="kw">x</span> <span class="kw">=</span> <span class="no">cut</span>,
-  <span class="kw">y</span> <span class="kw">=</span> <span class="no">tx_erreur_moy</span>[, <span class="fl">4</span>],
-  <span class="kw">xlim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">.9</span>),
-  <span class="kw">ylim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">.15</span>, <span class="fl">.19</span>),
-  <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">""</span>,
-  <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">""</span>,
-  <span class="kw">pch</span> <span class="kw">=</span> <span class="fl">8</span>,
-  <span class="kw">col</span> <span class="kw">=</span> <span class="fl">590</span>,
-  <span class="kw">xaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">yaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">type</span> <span class="kw">=</span> <span class="st">"o"</span>
-)
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="kw">new</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
-<span class="fu"><a href="../reference/plot.html">plot</a></span>(
-  <span class="kw">x</span> <span class="kw">=</span> <span class="no">cut</span>,
-  <span class="kw">y</span> <span class="kw">=</span> <span class="no">tx_erreur_moy</span>[, <span class="fl">5</span>],
-  <span class="kw">xlim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">.9</span>),
-  <span class="kw">ylim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">.15</span>, <span class="fl">.19</span>),
-  <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">""</span>,
-  <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">""</span>,
-  <span class="kw">pch</span> <span class="kw">=</span> <span class="fl">9</span>,
-  <span class="kw">col</span> <span class="kw">=</span> <span class="fl">376</span>,
-  <span class="kw">xaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">yaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">type</span> <span class="kw">=</span> <span class="st">"o"</span>
-)
+<span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span>
+  x <span class="op">=</span> <span class="va">cut</span>,
+  y <span class="op">=</span> <span class="va">tx_erreur_moy</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>,
+  xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">.9</span><span class="op">)</span>,
+  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.15</span>, <span class="fl">.19</span><span class="op">)</span>,
+  ylab <span class="op">=</span> <span class="st">"Error rate on test set"</span>,
+  xlab <span class="op">=</span> <span class="st">"Cut-off value"</span>,
+  pch <span class="op">=</span> <span class="fl">15</span>,
+  xaxt <span class="op">=</span> <span class="st">"n"</span>,
+  yaxt <span class="op">=</span> <span class="st">"n"</span>,
+  type <span class="op">=</span> <span class="st">"o"</span>
+<span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>new <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span>
+  x <span class="op">=</span> <span class="va">cut</span>,
+  y <span class="op">=</span> <span class="va">tx_erreur_moy</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span>,
+  xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">.9</span><span class="op">)</span>,
+  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.15</span>, <span class="fl">.19</span><span class="op">)</span>,
+  ylab <span class="op">=</span> <span class="st">""</span>,
+  xlab <span class="op">=</span> <span class="st">""</span>,
+  pch <span class="op">=</span> <span class="fl">17</span>,
+  col <span class="op">=</span> <span class="st">"green"</span>,
+  xaxt <span class="op">=</span> <span class="st">"n"</span>,
+  yaxt <span class="op">=</span> <span class="st">"n"</span>,
+  type <span class="op">=</span> <span class="st">"o"</span>
+<span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>new <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span>
+  x <span class="op">=</span> <span class="va">cut</span>,
+  y <span class="op">=</span> <span class="va">tx_erreur_moy</span><span class="op">[</span>, <span class="fl">3</span><span class="op">]</span>,
+  xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">.9</span><span class="op">)</span>,
+  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.15</span>, <span class="fl">.19</span><span class="op">)</span>,
+  ylab <span class="op">=</span> <span class="st">""</span>,
+  xlab <span class="op">=</span> <span class="st">""</span>,
+  pch <span class="op">=</span> <span class="fl">7</span>,
+  col <span class="op">=</span> <span class="fl">2</span>,
+  xaxt <span class="op">=</span> <span class="st">"n"</span>,
+  yaxt <span class="op">=</span> <span class="st">"n"</span>,
+  type <span class="op">=</span> <span class="st">"o"</span>
+<span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>new <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span>
+  x <span class="op">=</span> <span class="va">cut</span>,
+  y <span class="op">=</span> <span class="va">tx_erreur_moy</span><span class="op">[</span>, <span class="fl">4</span><span class="op">]</span>,
+  xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">.9</span><span class="op">)</span>,
+  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.15</span>, <span class="fl">.19</span><span class="op">)</span>,
+  ylab <span class="op">=</span> <span class="st">""</span>,
+  xlab <span class="op">=</span> <span class="st">""</span>,
+  pch <span class="op">=</span> <span class="fl">8</span>,
+  col <span class="op">=</span> <span class="fl">590</span>,
+  xaxt <span class="op">=</span> <span class="st">"n"</span>,
+  yaxt <span class="op">=</span> <span class="st">"n"</span>,
+  type <span class="op">=</span> <span class="st">"o"</span>
+<span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>new <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span>
+  x <span class="op">=</span> <span class="va">cut</span>,
+  y <span class="op">=</span> <span class="va">tx_erreur_moy</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span>,
+  xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">.9</span><span class="op">)</span>,
+  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.15</span>, <span class="fl">.19</span><span class="op">)</span>,
+  ylab <span class="op">=</span> <span class="st">""</span>,
+  xlab <span class="op">=</span> <span class="st">""</span>,
+  pch <span class="op">=</span> <span class="fl">9</span>,
+  col <span class="op">=</span> <span class="fl">376</span>,
+  xaxt <span class="op">=</span> <span class="st">"n"</span>,
+  yaxt <span class="op">=</span> <span class="st">"n"</span>,
+  type <span class="op">=</span> <span class="st">"o"</span>
+<span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/graphics/axis.html">axis</a></span>(<span class="fl">1</span>,
-  <span class="kw">at</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/pretty.html">pretty</a></span>(<span class="no">cut</span>),
-  <span class="kw">lab</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/pretty.html">pretty</a></span>(<span class="no">cut</span>),
-  <span class="kw">las</span> <span class="kw">=</span> <span class="fl">TRUE</span>
-)
-<span class="fu"><a href="https://rdrr.io/r/graphics/axis.html">axis</a></span>(<span class="fl">2</span>,
-  <span class="kw">at</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/pretty.html">pretty</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="fl">0.05</span>), <span class="kw">n</span> <span class="kw">=</span> <span class="fl">20</span>),
-  <span class="kw">lab</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/pretty.html">pretty</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="fl">0.05</span>), <span class="kw">n</span> <span class="kw">=</span> <span class="fl">20</span>),
-  <span class="kw">las</span> <span class="kw">=</span> <span class="fl">TRUE</span>
-)
+<span class="fu"><a href="https://rdrr.io/r/graphics/axis.html">axis</a></span><span class="op">(</span><span class="fl">1</span>,
+  at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/pretty.html">pretty</a></span><span class="op">(</span><span class="va">cut</span><span class="op">)</span>,
+  lab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/pretty.html">pretty</a></span><span class="op">(</span><span class="va">cut</span><span class="op">)</span>,
+  las <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/axis.html">axis</a></span><span class="op">(</span><span class="fl">2</span>,
+  at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/pretty.html">pretty</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="fl">0.05</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>,
+  lab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/pretty.html">pretty</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="fl">0.05</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>,
+  las <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/graphics/legend.html">legend</a></span>(
+<span class="fu"><a href="https://rdrr.io/r/graphics/legend.html">legend</a></span><span class="op">(</span>
   <span class="fl">0.23</span>,
   <span class="fl">0.19</span>,
-  <span class="kw">pch</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">15</span>, <span class="fl">17</span>, <span class="fl">7</span>, <span class="fl">8</span>, <span class="fl">9</span>),
-  <span class="kw">col</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="st">"green"</span>, <span class="fl">2</span>, <span class="fl">590</span>, <span class="fl">376</span>),
-  <span class="kw">legend</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(
+  pch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">15</span>, <span class="fl">17</span>, <span class="fl">7</span>, <span class="fl">8</span>, <span class="fl">9</span><span class="op">)</span>,
+  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="st">"green"</span>, <span class="fl">2</span>, <span class="fl">590</span>, <span class="fl">376</span><span class="op">)</span>,
+  legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>
     <span class="st">"Logistic regression"</span>,
     <span class="st">"Augmentation"</span>,
     <span class="st">"Reclassification"</span>,
     <span class="st">"Parcelling"</span>,
     <span class="st">"Gaussian mixture"</span>
-  )
-)
+  <span class="op">)</span>
+<span class="op">)</span>
 <span class="co"># dev.off()</span>
 
 <span class="co">############ Figure gini ##############################################</span>
@@ -521,100 +528,100 @@
 <span class="co">#      width = 7,</span>
 <span class="co">#      height = 4.4,</span>
 <span class="co">#      engine = "pdftex")</span>
-<span class="fu"><a href="../reference/plot.html">plot</a></span>(
-  <span class="kw">x</span> <span class="kw">=</span> <span class="no">cut</span>,
-  <span class="kw">y</span> <span class="kw">=</span> <span class="no">gini_moy</span>[, <span class="fl">1</span>],
-  <span class="kw">xlim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">.9</span>),
-  <span class="kw">ylim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">.77</span>, <span class="fl">.85</span>),
-  <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">"Gini on test set"</span>,
-  <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">"Cut-off value"</span>,
-  <span class="kw">pch</span> <span class="kw">=</span> <span class="fl">15</span>,
-  <span class="kw">xaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">yaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">type</span> <span class="kw">=</span> <span class="st">"o"</span>
-)
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="kw">new</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
-<span class="fu"><a href="../reference/plot.html">plot</a></span>(
-  <span class="kw">x</span> <span class="kw">=</span> <span class="no">cut</span>,
-  <span class="kw">y</span> <span class="kw">=</span> <span class="no">gini_moy</span>[, <span class="fl">2</span>],
-  <span class="kw">xlim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">.9</span>),
-  <span class="kw">ylim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">.77</span>, <span class="fl">.85</span>),
-  <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">""</span>,
-  <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">""</span>,
-  <span class="kw">pch</span> <span class="kw">=</span> <span class="fl">17</span>,
-  <span class="kw">col</span> <span class="kw">=</span> <span class="st">"green"</span>,
-  <span class="kw">xaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">yaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">type</span> <span class="kw">=</span> <span class="st">"o"</span>
-)
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="kw">new</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
-<span class="fu"><a href="../reference/plot.html">plot</a></span>(
-  <span class="kw">x</span> <span class="kw">=</span> <span class="no">cut</span>,
-  <span class="kw">y</span> <span class="kw">=</span> <span class="no">gini_moy</span>[, <span class="fl">3</span>],
-  <span class="kw">xlim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">.9</span>),
-  <span class="kw">ylim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">.77</span>, <span class="fl">.85</span>),
-  <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">""</span>,
-  <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">""</span>,
-  <span class="kw">pch</span> <span class="kw">=</span> <span class="fl">7</span>,
-  <span class="kw">col</span> <span class="kw">=</span> <span class="fl">2</span>,
-  <span class="kw">xaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">yaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">type</span> <span class="kw">=</span> <span class="st">"o"</span>
-)
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="kw">new</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
-<span class="fu"><a href="../reference/plot.html">plot</a></span>(
-  <span class="kw">x</span> <span class="kw">=</span> <span class="no">cut</span>,
-  <span class="kw">y</span> <span class="kw">=</span> <span class="no">gini_moy</span>[, <span class="fl">4</span>],
-  <span class="kw">xlim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">.9</span>),
-  <span class="kw">ylim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">.77</span>, <span class="fl">.85</span>),
-  <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">""</span>,
-  <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">""</span>,
-  <span class="kw">pch</span> <span class="kw">=</span> <span class="fl">8</span>,
-  <span class="kw">col</span> <span class="kw">=</span> <span class="fl">590</span>,
-  <span class="kw">xaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">yaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">type</span> <span class="kw">=</span> <span class="st">"o"</span>
-)
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="kw">new</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
-<span class="fu"><a href="../reference/plot.html">plot</a></span>(
-  <span class="kw">x</span> <span class="kw">=</span> <span class="no">cut</span>,
-  <span class="kw">y</span> <span class="kw">=</span> <span class="no">gini_moy</span>[, <span class="fl">5</span>],
-  <span class="kw">xlim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">.9</span>),
-  <span class="kw">ylim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">.77</span>, <span class="fl">.85</span>),
-  <span class="kw">ylab</span> <span class="kw">=</span> <span class="st">""</span>,
-  <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">""</span>,
-  <span class="kw">pch</span> <span class="kw">=</span> <span class="fl">9</span>,
-  <span class="kw">col</span> <span class="kw">=</span> <span class="fl">376</span>,
-  <span class="kw">xaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">yaxt</span> <span class="kw">=</span> <span class="st">"n"</span>,
-  <span class="kw">type</span> <span class="kw">=</span> <span class="st">"o"</span>
-)
+<span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span>
+  x <span class="op">=</span> <span class="va">cut</span>,
+  y <span class="op">=</span> <span class="va">gini_moy</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>,
+  xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">.9</span><span class="op">)</span>,
+  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.77</span>, <span class="fl">.85</span><span class="op">)</span>,
+  ylab <span class="op">=</span> <span class="st">"Gini on test set"</span>,
+  xlab <span class="op">=</span> <span class="st">"Cut-off value"</span>,
+  pch <span class="op">=</span> <span class="fl">15</span>,
+  xaxt <span class="op">=</span> <span class="st">"n"</span>,
+  yaxt <span class="op">=</span> <span class="st">"n"</span>,
+  type <span class="op">=</span> <span class="st">"o"</span>
+<span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>new <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span>
+  x <span class="op">=</span> <span class="va">cut</span>,
+  y <span class="op">=</span> <span class="va">gini_moy</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span>,
+  xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">.9</span><span class="op">)</span>,
+  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.77</span>, <span class="fl">.85</span><span class="op">)</span>,
+  ylab <span class="op">=</span> <span class="st">""</span>,
+  xlab <span class="op">=</span> <span class="st">""</span>,
+  pch <span class="op">=</span> <span class="fl">17</span>,
+  col <span class="op">=</span> <span class="st">"green"</span>,
+  xaxt <span class="op">=</span> <span class="st">"n"</span>,
+  yaxt <span class="op">=</span> <span class="st">"n"</span>,
+  type <span class="op">=</span> <span class="st">"o"</span>
+<span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>new <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span>
+  x <span class="op">=</span> <span class="va">cut</span>,
+  y <span class="op">=</span> <span class="va">gini_moy</span><span class="op">[</span>, <span class="fl">3</span><span class="op">]</span>,
+  xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">.9</span><span class="op">)</span>,
+  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.77</span>, <span class="fl">.85</span><span class="op">)</span>,
+  ylab <span class="op">=</span> <span class="st">""</span>,
+  xlab <span class="op">=</span> <span class="st">""</span>,
+  pch <span class="op">=</span> <span class="fl">7</span>,
+  col <span class="op">=</span> <span class="fl">2</span>,
+  xaxt <span class="op">=</span> <span class="st">"n"</span>,
+  yaxt <span class="op">=</span> <span class="st">"n"</span>,
+  type <span class="op">=</span> <span class="st">"o"</span>
+<span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>new <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span>
+  x <span class="op">=</span> <span class="va">cut</span>,
+  y <span class="op">=</span> <span class="va">gini_moy</span><span class="op">[</span>, <span class="fl">4</span><span class="op">]</span>,
+  xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">.9</span><span class="op">)</span>,
+  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.77</span>, <span class="fl">.85</span><span class="op">)</span>,
+  ylab <span class="op">=</span> <span class="st">""</span>,
+  xlab <span class="op">=</span> <span class="st">""</span>,
+  pch <span class="op">=</span> <span class="fl">8</span>,
+  col <span class="op">=</span> <span class="fl">590</span>,
+  xaxt <span class="op">=</span> <span class="st">"n"</span>,
+  yaxt <span class="op">=</span> <span class="st">"n"</span>,
+  type <span class="op">=</span> <span class="st">"o"</span>
+<span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>new <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span>
+  x <span class="op">=</span> <span class="va">cut</span>,
+  y <span class="op">=</span> <span class="va">gini_moy</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span>,
+  xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">.9</span><span class="op">)</span>,
+  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">.77</span>, <span class="fl">.85</span><span class="op">)</span>,
+  ylab <span class="op">=</span> <span class="st">""</span>,
+  xlab <span class="op">=</span> <span class="st">""</span>,
+  pch <span class="op">=</span> <span class="fl">9</span>,
+  col <span class="op">=</span> <span class="fl">376</span>,
+  xaxt <span class="op">=</span> <span class="st">"n"</span>,
+  yaxt <span class="op">=</span> <span class="st">"n"</span>,
+  type <span class="op">=</span> <span class="st">"o"</span>
+<span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/graphics/axis.html">axis</a></span>(<span class="fl">1</span>,
-  <span class="kw">at</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/pretty.html">pretty</a></span>(<span class="no">cut</span>),
-  <span class="kw">lab</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/pretty.html">pretty</a></span>(<span class="no">cut</span>),
-  <span class="kw">las</span> <span class="kw">=</span> <span class="fl">TRUE</span>
-)
-<span class="fu"><a href="https://rdrr.io/r/graphics/axis.html">axis</a></span>(<span class="fl">2</span>,
-  <span class="kw">at</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/pretty.html">pretty</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="fl">0.7</span>, <span class="fl">0.9</span>, <span class="fl">0.1</span>), <span class="kw">n</span> <span class="kw">=</span> <span class="fl">20</span>),
-  <span class="kw">lab</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/pretty.html">pretty</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="fl">0.7</span>, <span class="fl">0.9</span>, <span class="fl">0.1</span>), <span class="kw">n</span> <span class="kw">=</span> <span class="fl">20</span>),
-  <span class="kw">las</span> <span class="kw">=</span> <span class="fl">TRUE</span>
-)
+<span class="fu"><a href="https://rdrr.io/r/graphics/axis.html">axis</a></span><span class="op">(</span><span class="fl">1</span>,
+  at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/pretty.html">pretty</a></span><span class="op">(</span><span class="va">cut</span><span class="op">)</span>,
+  lab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/pretty.html">pretty</a></span><span class="op">(</span><span class="va">cut</span><span class="op">)</span>,
+  las <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/axis.html">axis</a></span><span class="op">(</span><span class="fl">2</span>,
+  at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/pretty.html">pretty</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.7</span>, <span class="fl">0.9</span>, <span class="fl">0.1</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>,
+  lab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/pretty.html">pretty</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.7</span>, <span class="fl">0.9</span>, <span class="fl">0.1</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>,
+  las <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/graphics/legend.html">legend</a></span>(
+<span class="fu"><a href="https://rdrr.io/r/graphics/legend.html">legend</a></span><span class="op">(</span>
   <span class="fl">0</span>,
   <span class="fl">0.835</span>,
-  <span class="kw">pch</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">15</span>, <span class="fl">17</span>, <span class="fl">7</span>, <span class="fl">8</span>, <span class="fl">9</span>),
-  <span class="kw">col</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="st">"green"</span>, <span class="fl">2</span>, <span class="fl">590</span>, <span class="fl">376</span>),
-  <span class="kw">legend</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(
+  pch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">15</span>, <span class="fl">17</span>, <span class="fl">7</span>, <span class="fl">8</span>, <span class="fl">9</span><span class="op">)</span>,
+  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="st">"green"</span>, <span class="fl">2</span>, <span class="fl">590</span>, <span class="fl">376</span><span class="op">)</span>,
+  legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>
     <span class="st">"Logistic regression"</span>,
     <span class="st">"Augmentation"</span>,
     <span class="st">"Reclassification"</span>,
     <span class="st">"Parcelling"</span>,
     <span class="st">"Gaussian mixture"</span>
-  )
-)
-<span class="co"># dev.off()</span></pre></body></html></div>
+  <span class="op">)</span>
+<span class="op">)</span>
+<span class="co"># dev.off()</span></code></pre></div>
 </div>
   </div>
 
@@ -633,7 +640,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

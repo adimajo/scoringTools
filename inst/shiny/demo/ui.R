@@ -8,13 +8,86 @@ ui <- shiny::fluidPage(
           "imported_files",
           "Choose CSV File(s)",
           multiple = TRUE,
-          accept = c("text/csv",
-                     "text/comma-separated-values,text/plain",
-                     ".csv")
+          accept = c(
+            "text/csv",
+            "text/comma-separated-values,text/plain",
+            ".csv"
+          )
         ),
-        shiny::checkboxInput("use_lendingClub",
-                             "Use lendingClub dataset?",
-                             TRUE),
+        shiny::checkboxInput(
+          "use_lendingClub",
+          "Use lendingClub dataset?",
+          TRUE
+        ),
+        shiny::checkboxInput(
+          "use_MAR_well_specified",
+          "Generate MAR well-specified data?",
+          FALSE
+        ),
+        shiny::conditionalPanel(
+          "input.use_MAR_well_specified",
+          shiny::numericInput(
+            "n_MAR_well_specified",
+            "Number of samples for MAR well-specified:",
+            min = 100,
+            value = 1000
+          )
+        ),
+        shiny::conditionalPanel(
+          "input.use_MAR_well_specified",
+          shiny::numericInput(
+            "dim_MAR_well_specified",
+            "Dimension of samples for MAR well-specified:",
+            min = 1,
+            value = 3
+          )
+        ),
+        shiny::checkboxInput(
+          "use_MAR_misspecified",
+          "Generate MAR misspecified data?",
+          FALSE
+        ),
+        shiny::conditionalPanel(
+          "input.use_MAR_misspecified",
+          shiny::numericInput(
+            "n_MAR_misspecified",
+            "Number of samples for MAR misspecified:",
+            min = 100,
+            value = 1000
+          )
+        ),
+        shiny::conditionalPanel(
+          "input.use_MAR_misspecified",
+          shiny::numericInput(
+            "dim_MAR_misspecified",
+            "Dimension of samples for MAR misspecified:",
+            min = 1,
+            value = 3
+          )
+        ),
+        shiny::checkboxInput(
+          "use_MNAR",
+          "Generate MNAR data?",
+          FALSE
+        ),
+        shiny::conditionalPanel(
+          "input.use_MNAR",
+          shiny::numericInput(
+            "n_MNAR",
+            "Number of samples for MNAR:",
+            min = 100,
+            value = 1000
+          )
+        ),
+        shiny::conditionalPanel(
+          "input.use_MNAR",
+          shiny::numericInput(
+            "dim_MNAR",
+            "Dimension of samples for MNAR:",
+            min = 1,
+            value = 3
+          )
+        ),
         shiny::uiOutput("data_import_options")
       ),
       shiny::mainPanel(shiny::uiOutput("contents"))
@@ -45,14 +118,18 @@ ui <- shiny::fluidPage(
             list("lendingClub")
           ),
 
-          shiny::selectInput("var_cible",
-                             "Good / bad feature",
-                             list()),
+          shiny::selectInput(
+            "var_cible",
+            "Good / bad feature",
+            list()
+          ),
           "If there are NAs, these observations will count as 'not financed'",
 
-          shiny::selectInput("var_reject",
-                             "Accept / Reject feature",
-                             list()),
+          shiny::selectInput(
+            "var_reject",
+            "Accept / Reject feature",
+            list()
+          ),
           "If a 'score', the fraction defined above will depend on it directly.",
           "If a 0/1 feature, an Accept / Reject model (logistic regression) will be learnt.",
 
@@ -95,18 +172,26 @@ ui <- shiny::fluidPage(
             condition = "input.modelsRejectInference.includes('rforest')",
             tags$hr(),
             "randomForest options",
-            shiny::numericInput("rforestParam_ntree",
-                                "Random Forest: ntree",
-                                100),
-            shiny::numericInput("rforestParam_mtry",
-                                "Random Forest: mtry",
-                                5),
-            shiny::checkboxInput("rforestParam_replace",
-                                 "Random Forest: replace",
-                                 TRUE),
-            shiny::selectInput("rforestParam_maxnodes",
-                               "Random Forest: maxnodes",
-                               10)
+            shiny::numericInput(
+              "rforestParam_ntree",
+              "Random Forest: ntree",
+              100
+            ),
+            shiny::numericInput(
+              "rforestParam_mtry",
+              "Random Forest: mtry",
+              5
+            ),
+            shiny::checkboxInput(
+              "rforestParam_replace",
+              "Random Forest: replace",
+              TRUE
+            ),
+            shiny::selectInput(
+              "rforestParam_maxnodes",
+              "Random Forest: maxnodes",
+              10
+            )
           ),
 
           # Parameters for svm
@@ -117,29 +202,37 @@ ui <- shiny::fluidPage(
             shiny::selectInput(
               "svmParam_kernel",
               "SVM: kernel",
-              list("linear",
-                   "polynomial",
-                   "radial basis",
-                   "sigmoid")
+              list(
+                "linear",
+                "polynomial",
+                "radial basis",
+                "sigmoid"
+              )
             )
           ),
           shiny::conditionalPanel(
             condition = "input.modelsRejectInference.includes('svm') & input.svmParam_kernel == 'polynomial'",
-            shiny::numericInput("svmParam_degree",
-                                "SVM: degree",
-                                3)
+            shiny::numericInput(
+              "svmParam_degree",
+              "SVM: degree",
+              3
+            )
           ),
           shiny::conditionalPanel(
             condition = "input.modelsRejectInference.includes('svm') & input.svmParam_kernel != 'linear'",
-            shiny::numericInput("svmParam_gamma",
-                                "SVM: gamma",
-                                1)
+            shiny::numericInput(
+              "svmParam_gamma",
+              "SVM: gamma",
+              1
+            )
           ),
           shiny::conditionalPanel(
             condition = "input.modelsRejectInference.includes('svm') & (input.svmParam_kernel == 'polynomial' |  input.svmParam_kernel != 'sigmoid')",
-            shiny::selectInput("svmParam_coef0",
-                               "SVM: coef0",
-                               0)
+            shiny::selectInput(
+              "svmParam_coef0",
+              "SVM: coef0",
+              0
+            )
           ),
 
           # Parameters for nnet
@@ -147,15 +240,21 @@ ui <- shiny::fluidPage(
             condition = "input.modelsRejectInference.includes('nnet')",
             tags$hr(),
             "nnet options",
-            shiny::numericInput("nnetParam_nnet",
-                                "Neural network: size",
-                                10),
-            shiny::numericInput("nnetParam_decay",
-                                "Neural network: decay",
-                                0),
-            shiny::numericInput("nnetParam_maxit",
-                                "Neural network: maxit",
-                                100)
+            shiny::numericInput(
+              "nnetParam_nnet",
+              "Neural network: size",
+              10
+            ),
+            shiny::numericInput(
+              "nnetParam_decay",
+              "Neural network: decay",
+              0
+            ),
+            shiny::numericInput(
+              "nnetParam_maxit",
+              "Neural network: maxit",
+              100
+            )
           ),
 
           # Parameters for Parcelling
@@ -194,10 +293,11 @@ ui <- shiny::fluidPage(
 
         # Show a plot of the generated distribution
         shiny::mainPanel(tabsetPanel(
-          shiny::tabPanel("ROC curves",
-                          plotly::plotlyOutput(
-                            "roc_tous_reject_inference"
-                          )
+          shiny::tabPanel(
+            "ROC curves",
+            plotly::plotlyOutput(
+              "roc_tous_reject_inference"
+            )
           ),
           shiny::tabPanel("Gini indices", tableOutput("gini_reject"))
         ))
@@ -238,121 +338,162 @@ ui <- shiny::fluidPage(
             condition = "input.modelsQuantization.includes('glmdisc')",
             tags$hr(),
             "glmdisc options",
-            shiny::checkboxInput("glmdiscParam_interact",
-                                 "glmdisc: interact",
-                                 FALSE),
-            shiny::checkboxInput("glmdiscParam_validation",
-                                 "glmdisc: validation",
-                                 FALSE),
-            shiny::checkboxInput("glmdiscParam_test",
-                                 "glmdisc: test",
-                                 FALSE),
+            shiny::checkboxInput(
+              "glmdiscParam_interact",
+              "glmdisc: interact",
+              FALSE
+            ),
+            shiny::checkboxInput(
+              "glmdiscParam_validation",
+              "glmdisc: validation",
+              FALSE
+            ),
+            shiny::checkboxInput(
+              "glmdiscParam_test",
+              "glmdisc: test",
+              FALSE
+            ),
             shiny::selectInput("glmdiscParam_criterion",
-                               "glmdisc: criterion",
-                               choices = c('gini','aic','bic'),
-                               selected = 'bic'),
-            shiny::numericInput("glmdiscParam_iter",
-                                "glmdisc: number of interations",
-                                100),
-            shiny::numericInput("glmdiscParam_m_start",
-                                "glmdisc: maximum number of levels",
-                                10)
+              "glmdisc: criterion",
+              choices = c("gini", "aic", "bic"),
+              selected = "bic"
+            ),
+            shiny::numericInput(
+              "glmdiscParam_iter",
+              "glmdisc: number of interations",
+              100
+            ),
+            shiny::numericInput(
+              "glmdiscParam_m_start",
+              "glmdisc: maximum number of levels",
+              10
+            )
           ),
 
           shiny::conditionalPanel(
             condition = "input.modelsQuantization.includes('chi2')",
             tags$hr(),
             "chi2 options",
-            shiny::checkboxInput("chi2Param_validation",
-                                 "chi2: validation",
-                                 FALSE),
-            shiny::checkboxInput("chi2Param_test",
-                                 "chi2: test",
-                                 FALSE),
+            shiny::checkboxInput(
+              "chi2Param_validation",
+              "chi2: validation",
+              FALSE
+            ),
+            shiny::checkboxInput(
+              "chi2Param_test",
+              "chi2: test",
+              FALSE
+            ),
             shiny::selectInput("chi2Param_criterion",
-                               "chi2: criterion",
-                               choices = c('gini','aic','bic'),
-                               selected = 'bic'),
+              "chi2: criterion",
+              choices = c("gini", "aic", "bic"),
+              selected = "bic"
+            ),
           ),
 
           shiny::conditionalPanel(
             condition = "input.modelsQuantization.includes('chiM')",
             tags$hr(),
             "chiMerge options",
-            shiny::checkboxInput("chiMParam_validation",
-                                 "chiMerge: validation",
-                                 FALSE),
-            shiny::checkboxInput("chiMParam_test",
-                                 "chiMerge: test",
-                                 FALSE),
+            shiny::checkboxInput(
+              "chiMParam_validation",
+              "chiMerge: validation",
+              FALSE
+            ),
+            shiny::checkboxInput(
+              "chiMParam_test",
+              "chiMerge: test",
+              FALSE
+            ),
             shiny::selectInput("chiMParam_criterion",
-                               "chiMerge: criterion",
-                               choices = c('gini','aic','bic'),
-                               selected = 'bic'),
+              "chiMerge: criterion",
+              choices = c("gini", "aic", "bic"),
+              selected = "bic"
+            ),
           ),
 
           shiny::conditionalPanel(
             condition = "input.modelsQuantization.includes('extended chi2')",
             tags$hr(),
             "extended chi2 options",
-            shiny::checkboxInput("echi2Param_validation",
-                                 "extended chi2: validation",
-                                 FALSE),
-            shiny::checkboxInput("echi2Param_test",
-                                 "extended chi2: test",
-                                 FALSE),
+            shiny::checkboxInput(
+              "echi2Param_validation",
+              "extended chi2: validation",
+              FALSE
+            ),
+            shiny::checkboxInput(
+              "echi2Param_test",
+              "extended chi2: test",
+              FALSE
+            ),
             shiny::selectInput("echi2Param_criterion",
-                               "extended chi2: criterion",
-                               choices = c('gini','aic','bic'),
-                               selected = 'bic'),
+              "extended chi2: criterion",
+              choices = c("gini", "aic", "bic"),
+              selected = "bic"
+            ),
           ),
 
           shiny::conditionalPanel(
             condition = "input.modelsQuantization.includes('modified chi2')",
             tags$hr(),
             "modified chi2 options",
-            shiny::checkboxInput("modchi2Param_validation",
-                                 "modified Chi2: validation",
-                                 FALSE),
-            shiny::checkboxInput("modchi2Param_test",
-                                 "modified Chi2: test",
-                                 FALSE),
+            shiny::checkboxInput(
+              "modchi2Param_validation",
+              "modified Chi2: validation",
+              FALSE
+            ),
+            shiny::checkboxInput(
+              "modchi2Param_test",
+              "modified Chi2: test",
+              FALSE
+            ),
             shiny::selectInput("modchi2Param_criterion",
-                               "modified Chi2: criterion",
-                               choices = c('gini','aic','bic'),
-                               selected = 'bic'),
+              "modified Chi2: criterion",
+              choices = c("gini", "aic", "bic"),
+              selected = "bic"
+            ),
           ),
 
           shiny::conditionalPanel(
             condition = "input.modelsQuantization.includes('mdlp')",
             tags$hr(),
             "mdlp options",
-            shiny::checkboxInput("mdlpParam_validation",
-                                 "mdlp: validation",
-                                 FALSE),
-            shiny::checkboxInput("mdlpParam_test",
-                                 "mdlp: test",
-                                 FALSE),
+            shiny::checkboxInput(
+              "mdlpParam_validation",
+              "mdlp: validation",
+              FALSE
+            ),
+            shiny::checkboxInput(
+              "mdlpParam_test",
+              "mdlp: test",
+              FALSE
+            ),
             shiny::selectInput("mdlpParam_criterion",
-                               "mdlp: criterion",
-                               choices = c('gini','aic','bic'),
-                               selected = 'bic'),
+              "mdlp: criterion",
+              choices = c("gini", "aic", "bic"),
+              selected = "bic"
+            ),
           ),
 
           shiny::conditionalPanel(
             condition = "input.modelsQuantization.includes('topdown')",
             tags$hr(),
             "topdown options",
-            shiny::checkboxInput("topdownParam_validation",
-                                 "topdown: validation",
-                                 FALSE),
-            shiny::checkboxInput("topdownParam_test",
-                                 "mdlp: test",
-                                 FALSE),
+            shiny::checkboxInput(
+              "topdownParam_validation",
+              "topdown: validation",
+              FALSE
+            ),
+            shiny::checkboxInput(
+              "topdownParam_test",
+              "mdlp: test",
+              FALSE
+            ),
             shiny::selectInput("topdownParam_criterion",
-                               "topdown: criterion",
-                               choices = c('gini','aic','bic'),
-                               selected = 'bic'),
+              "topdown: criterion",
+              choices = c("gini", "aic", "bic"),
+              selected = "bic"
+            ),
           ),
         ),
         shiny::mainPanel()

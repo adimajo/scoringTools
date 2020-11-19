@@ -4,7 +4,7 @@ if (!require(styler, quietly = TRUE)) {
 }
 docOrg <- lapply(dir("R", pattern = "*.R", recursive = TRUE, full.names = TRUE), readLines)
 styler::style_pkg(filetype = c("R", "Rmd"))
-styler::style_dir('inst', filetype = c('R', 'Rmd'))
+styler::style_dir("inst", filetype = c("R", "Rmd"))
 docNew <- lapply(dir("R", pattern = "*.R", recursive = TRUE, full.names = TRUE), readLines)
 # Test
 if (!identical(docOrg, docNew)) {

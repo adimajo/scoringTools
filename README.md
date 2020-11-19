@@ -29,7 +29,6 @@ Two other packages were made public during this PhD, which tackle more specifica
 ## TODO: 
 
 * A Shiny app explaining all aspects of this work is also accessible by running `runDemo()`.
-     * add MAR well specified, MAR misspecified, MNAR with nrow as parameter
      * allow custom model + text input for call
      * Gini tab with confidence intervals
      * Quantization

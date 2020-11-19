@@ -144,15 +144,15 @@
     <p>This function discretizes a training set using the chi2 method and the user-provided parameters and chooses the best discretization scheme among them based on a user-provided criterion and eventually a test set.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>chi2_iter</span>(
-  <span class='no'>predictors</span>,
-  <span class='no'>labels</span>,
-  <span class='kw'>test</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>validation</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>proportions</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.3</span>, <span class='fl'>0.3</span>),
-  <span class='kw'>criterion</span> <span class='kw'>=</span> <span class='st'>"gini"</span>,
-  <span class='kw'>param</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>alp</span> <span class='kw'>=</span> <span class='fl'>0.001</span>, <span class='kw'>del</span> <span class='kw'>=</span> <span class='fl'>0.5</span>))
-)</pre>
+    <pre class="usage"><span class='fu'>chi2_iter</span><span class='op'>(</span>
+  <span class='va'>predictors</span>,
+  <span class='va'>labels</span>,
+  test <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  validation <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  proportions <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.3</span>, <span class='fl'>0.3</span><span class='op'>)</span>,
+  criterion <span class='op'>=</span> <span class='st'>"gini"</span>,
+  param <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>alp <span class='op'>=</span> <span class='fl'>0.001</span>, del <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -192,22 +192,26 @@
     <p>Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, <a href='https://CRAN.R-project.org/package=speedglm'>https://CRAN.R-project.org/package=speedglm</a></p>
 <p>HyunJi Kim (2012). discretization: Data preprocessing, discretization for classification. R package version 1.0-1. <a href='https://CRAN.R-project.org/package=discretization'>https://CRAN.R-project.org/package=discretization</a></p>
 <p>Liu, H. and Setiono, R. (1995). Chi2: Feature selection and discretization of numeric attributes, <em>Tools with Artificial Intelligence</em>, 388–391.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Adrien Ehrhardt</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Simulation of a discretized logit model</span>
-<span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span>(<span class='fl'>300</span>), <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='fl'>3</span>)
-<span class='no'>cuts</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0</span>, <span class='fl'>1</span>, <span class='kw'>length.out</span> <span class='kw'>=</span> <span class='fl'>4</span>)
-<span class='no'>xd</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/apply.html'>apply</a></span>(<span class='no'>x</span>, <span class='fl'>2</span>, <span class='kw'>function</span>(<span class='no'>col</span>) <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/cut.html'>cut</a></span>(<span class='no'>col</span>, <span class='no'>cuts</span>)))
-<span class='no'>theta</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/t.html'>t</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>2</span>, <span class='fl'>2</span>, <span class='fl'>2</span>, -<span class='fl'>2</span>, -<span class='fl'>2</span>, -<span class='fl'>2</span>), <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='fl'>3</span>))
-<span class='no'>log_odd</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/colSums.html'>rowSums</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/t.html'>t</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>sapply</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq_along</a></span>(<span class='no'>xd</span>[, <span class='fl'>1</span>]), <span class='kw'>function</span>(<span class='no'>row_id</span>) {
-  <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>sapply</a></span>(
-    <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq_along</a></span>(<span class='no'>xd</span>[<span class='no'>row_id</span>, ]),
-    <span class='kw'>function</span>(<span class='no'>element</span>) <span class='no'>theta</span>[<span class='no'>xd</span>[<span class='no'>row_id</span>, <span class='no'>element</span>], <span class='no'>element</span>]
-  )
-})))
-<span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span>(<span class='fl'>100</span>, <span class='fl'>1</span>, <span class='fl'>1</span> / (<span class='fl'>1</span> + <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(-<span class='no'>log_odd</span>)))
+<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>300</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='fl'>100</span>, ncol <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
+<span class='va'>cuts</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span>, length.out <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span>
+<span class='va'>xd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/apply.html'>apply</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='fl'>2</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>col</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cut.html'>cut</a></span><span class='op'>(</span><span class='va'>col</span>, <span class='va'>cuts</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>theta</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/t.html'>t</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>2</span>, <span class='fl'>2</span>, <span class='fl'>2</span>, <span class='op'>-</span><span class='fl'>2</span>, <span class='op'>-</span><span class='fl'>2</span>, <span class='op'>-</span><span class='fl'>2</span><span class='op'>)</span>, ncol <span class='op'>=</span> <span class='fl'>3</span>, nrow <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>log_odd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/colSums.html'>rowSums</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/t.html'>t</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>sapply</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq_along</a></span><span class='op'>(</span><span class='va'>xd</span><span class='op'>[</span>, <span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>row_id</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>sapply</a></span><span class='op'>(</span>
+    <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq_along</a></span><span class='op'>(</span><span class='va'>xd</span><span class='op'>[</span><span class='va'>row_id</span>, <span class='op'>]</span><span class='op'>)</span>,
+    <span class='kw'>function</span><span class='op'>(</span><span class='va'>element</span><span class='op'>)</span> <span class='va'>theta</span><span class='op'>[</span><span class='va'>xd</span><span class='op'>[</span><span class='va'>row_id</span>, <span class='va'>element</span><span class='op'>]</span>, <span class='va'>element</span><span class='op'>]</span>
+  <span class='op'>)</span>
+<span class='op'>}</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>1</span>, <span class='fl'>1</span> <span class='op'>/</span> <span class='op'>(</span><span class='fl'>1</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>log_odd</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='fu'>chi2_iter</span>(<span class='no'>x</span>, <span class='no'>y</span>)</div><div class='output co'>#&gt; Generalized Linear Model of class 'speedglm':
+<span class='fu'>chi2_iter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Generalized Linear Model of class 'speedglm':
 #&gt; 
 #&gt; Call:  speedglm::speedglm(formula = stats::formula("labels ~ ."), data = Filter(function(x) (length(unique(x)) &gt;      1), data.frame(sapply(disc[[i]]$Disc.data, as.factor), stringsAsFactors = TRUE)),      family = stats::binomial(link = "logit"), weights = NULL,      fitted = TRUE) 
 #&gt; 
@@ -230,7 +234,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
