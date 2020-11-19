@@ -1,32 +1,94 @@
 server <- function(input, output, session) {
-  # Fonction d'import de données
+
+  list_imported_df <- shiny::reactiveValues()
+
   shiny::observe({
-    shiny::req(input$imported_files)
+    if (input$use_lendingClub) {
+      list_imported_df[["lendingClub"]] <- scoringTools::lendingClub
+    } else {
+      tryCatch(.subset2(list_imported_df, "lendingClub")$.values$remove("name"),
+               error = function(e) {})
+    }
+  })
+
+  shiny::observe({
+    if (input$use_MAR_well_specified) {
+      list_imported_df[["MAR_well_specified"]] <- scoringTools::generate_data(
+        n = input$n_MAR_well_specified,
+        d = input$dim_MAR_well_specified,
+        type = "MAR well specified"
+      )
+    } else {
+      tryCatch(.subset2(list_imported_df, "MAR_well_specified")$.values$remove("name"),
+               error = function(e) {})
+    }
+  })
+
+  shiny::observe({
+    if (input$use_MAR_misspecified) {
+      list_imported_df[["MAR_misspecified"]] <- scoringTools::generate_data(
+        n = input$n_MAR_misspecified,
+        d = input$dim_MAR_misspecified,
+        type = "MAR misspecified"
+      )
+    } else {
+      tryCatch(.subset2(list_imported_df, "MAR_misspecified")$.values$remove("name"),
+               error = function(e) {})
+    }
+  })
+
+  shiny::observe({
+    if (input$use_MNAR) {
+      list_imported_df[["MNAR"]] <- scoringTools::generate_data(
+        n = input$n_MNAR,
+        d = input$dim_MNAR,
+        type = "MNAR"
+      )
+    } else {
+      tryCatch(.subset2(list_imported_df, "MNAR")$.values$remove("name"),
+               error = function(e) {})
+    }
+  })
+
+  # Fonction d'import de données
+  shiny::observeEvent(
+    (!is.null(input$imported_files)) | (!is.null(input$use_lendingClub)) |
+      (!is.null(input$use_MNAR)) | (!is.null(input$use_MAR_well_specified)) |
+      (!is.null(input$use_MAR_misspecified)) | unlist(lapply(1:length(input$imported_files[, 1]), function(i) {
+        input[[paste0("good_to_go_", i)]] > 0
+      })),
     shiny::updateSelectInput(
       session = session,
       "selectedDataRejectInference",
-      choices = c("lendingClub", paste(lapply(1:length(input$imported_files[, 1]), function(i) {
-        input$imported_files[[i, "name"]]
-      })))
-    )
-    shiny::updateSelectInput(
+      choices = names(list_imported_df)
+      ))
+    shiny::observeEvent(
+      (!is.null(input$imported_files)) | (!is.null(input$use_lendingClub)) |
+        (!is.null(input$use_MNAR)) | (!is.null(input$use_MAR_well_specified)) |
+        (!is.null(input$use_MAR_misspecified)) | unlist(lapply(1:length(input$imported_files[, 1]), function(i) {
+          input[[paste0("good_to_go_", i)]] > 0
+        })),
+      shiny::updateSelectInput(
       session = session,
       "selectedDataQuantization",
-      choices = c("lendingClub", paste(lapply(1:length(input$imported_files[, 1]), function(i) {
-        input$imported_files[[i, "name"]]
-      })))
-    )
-    shiny::updateSelectInput(
+      choices = names(list_imported_df)
+      ))
+    shiny::observeEvent(
+      (!is.null(input$imported_files)) | (!is.null(input$use_lendingClub)) |
+        (!is.null(input$use_MNAR)) | (!is.null(input$use_MAR_well_specified)) |
+        (!is.null(input$use_MAR_misspecified)) | unlist(lapply(1:length(input$imported_files[, 1]), function(i) {
+          input[[paste0("good_to_go_", i)]] > 0
+        })),
+      shiny::updateSelectInput(
       session = session,
       "selectedDataLogisticRegressionTrees",
-      choices = c("lendingClub", paste(lapply(1:length(input$imported_files[, 1]), function(i) {
-        input$imported_files[[i, "name"]]
-      })))
+      choices = names(list_imported_df)
+      )
     )
-  })
 
-  shiny::observeEvent(
-    (!is.null(colnames(list_imported_df[[input$selectedDataRejectInference]]))),
+  shiny::observeEvent({
+    (!is.null(input$selectedDataRejectInference)) &
+      (!is.null(colnames(list_imported_df[[input$selectedDataRejectInference]])))},
     shiny::updateSelectInput(
       session = session,
       "var_cible",
@@ -34,7 +96,8 @@ server <- function(input, output, session) {
     )
   )
   shiny::observeEvent(
-    (!is.null(colnames(list_imported_df[[input$selectedDataRejectInference]]))),
+    (!is.null(input$selectedDataRejectInference)) &
+      (!is.null(colnames(list_imported_df[[input$selectedDataRejectInference]]))),
     shiny::updateSelectInput(
       session = session,
       "var_reject",
@@ -189,44 +252,6 @@ server <- function(input, output, session) {
     )
   })
 
-  list_imported_df <- shiny::reactiveValues()
-
-  shiny::observe({
-    if (input$use_lendingClub) {
-      list_imported_df[["lendingClub"]] <- scoringTools::lendingClub
-    }
-  })
-
-  shiny::observe({
-    if (input$use_MAR_well_specified) {
-      list_imported_df[["MAR_well_specified"]] <- scoringTools::generate_data(
-        n = input$n_MAR_well_specified,
-        d = input$dim_MAR_well_specified,
-        type = "MAR well specified"
-      )
-    }
-  })
-
-  shiny::observe({
-    if (input$use_MAR_misspecified) {
-      list_imported_df[["MAR_misspecified"]] <- scoringTools::generate_data(
-        n = input$n_MAR_misspecified,
-        d = input$dim_MAR_misspecified,
-        type = "MAR misspecified"
-      )
-    }
-  })
-
-  shiny::observe({
-    if (input$use_MNAR) {
-      list_imported_df[["MNAR"]] <- scoringTools::generate_data(
-        n = input$n_MNAR,
-        d = input$dim_MNAR,
-        type = "MNAR"
-      )
-    }
-  })
-
   shiny::observe({
     lapply(1:length(input$imported_files[, 1]), function(i) {
       shiny::observeEvent(
@@ -266,7 +291,6 @@ server <- function(input, output, session) {
               if (input[[paste0("disp_", tab)]] == "head") {
                 return(head(data))
               } else {
-                print(data)
                 return(data)
               }
             }

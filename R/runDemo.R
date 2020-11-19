@@ -1,4 +1,5 @@
 #' Launch the Shiny demo app.
+# EXCLUDE COVERAGE START
 runDemo <- function() {
   appDir <- system.file("shiny", "demo", package = "scoringTools")
   if (appDir == "") {
@@ -7,3 +8,4 @@ runDemo <- function() {
 
   shiny::runApp(appDir, launch.browser = TRUE, display.mode = "normal")
 }
+# EXCLUDE COVERAGE END

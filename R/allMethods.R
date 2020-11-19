@@ -258,7 +258,7 @@ methods::setMethod("plot", "discretization", plot.discretization)
 #' @param object the S4 discretization object
 #' @param data new data to discretize
 #' @description This defines the generic method "discretize" which will discretize a new input dataset given a discretization scheme of S4 class discretization.
-methods::setGeneric("discretize", function(object, data) attributes(object))
+methods::setGeneric("discretize", function(object, data) attributes(object))  # EXCLUDE COVERAGE
 
 # #' Method for discretizing a new input dataset given a discretization scheme of class "discretization".
 # #'

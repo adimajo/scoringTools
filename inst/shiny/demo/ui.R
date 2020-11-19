@@ -17,7 +17,7 @@ ui <- shiny::fluidPage(
         shiny::checkboxInput(
           "use_lendingClub",
           "Use lendingClub dataset?",
-          TRUE
+          FALSE
         ),
         shiny::checkboxInput(
           "use_MAR_well_specified",
