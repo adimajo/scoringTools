@@ -219,7 +219,26 @@ In the context of Credit Scoring, a logistic regression is fitted between the â€
 <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>1</span>, <span class='fl'>1</span> <span class='op'>/</span> <span class='op'>(</span><span class='fl'>1</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>log_odd</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='fu'>chiM_iter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='error'>Error in solve.default(XTX, XTz, tol = tol.solve): system is computationally singular: reciprocal condition number = 6.97484e-19</span></div></pre>
+</div><div class='output co'>#&gt; Generalized Linear Model of class 'speedglm':
+#&gt; 
+#&gt; Call:  speedglm::speedglm(formula = stats::formula("labels ~ ."), data = Filter(function(x) (length(unique(x)) &gt;      1), data.frame(sapply(disc[[i]]$Disc.data, as.factor), stringsAsFactors = TRUE)),      family = stats::binomial(link = "logit"), weights = NULL,      fitted = TRUE) 
+#&gt; 
+#&gt; Coefficients:
+#&gt; (Intercept)         X110          X12          X13          X14          X15  
+#&gt;       20.94       -42.68        65.52       -21.72        18.20       -22.58  
+#&gt;         X16          X17          X18          X19         X210         X211  
+#&gt;       42.72       -21.93       -20.52       -63.76       -63.66      -108.11  
+#&gt;        X212         X213         X214         X215          X22          X23  
+#&gt;      -66.57       -43.91       -39.08      -133.31       -42.70        45.24  
+#&gt;         X24          X25          X26          X27          X28          X29  
+#&gt;      -24.59       -40.81       -24.08       -41.00       -45.52         3.23  
+#&gt;        X310         X311         X312         X313         X314          X32  
+#&gt;      -83.34        -1.25       -38.10       -87.48       -40.62        27.68  
+#&gt;         X33          X34          X35          X36          X37          X38  
+#&gt;       46.46        43.96        -2.80        24.53       -23.13        21.03  
+#&gt;         X39  
+#&gt;       -0.51  
+#&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

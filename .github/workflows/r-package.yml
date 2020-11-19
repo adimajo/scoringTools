@@ -42,7 +42,8 @@ jobs:
         run: devtools::test()
         shell: Rscript {0}
       - name: Coverage devtools
-        run: print(devtools::test_coverage())
+        run: print(devtools::test_coverage(function_exclusions = "runDemo",
+                                           line_exclusions = list("R/allMethods.R" = 261)))
         shell: Rscript {0}
       - name: Check on Mac OS
         env:

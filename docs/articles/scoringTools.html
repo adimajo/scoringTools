@@ -411,7 +411,7 @@
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
 <pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="scoringTools_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<p><img src="scoringTools_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
 <p>When the missingness mechanism is MNAR, <span class="math inline">\(p(y|\boldsymbol{x},f) \neq p(y|\boldsymbol{x},nf)\)</span> so that there is no way to ‘‘unbias’’ the resulting model without introducing data from the financing mechanism and model <span class="math inline">\(p(f|\boldsymbol{x},y)\)</span>.</p>
 <p>When the model is false, we could make use of not financed clients to estimate <span class="math inline">\(p(f|\boldsymbol{x})\)</span> and consider this as an importance function in the Importance Sampling framework. However, this gives good results when the importance function is known and under probabilistic assumptions not met in our use case. Here it must be evaluated separately and simulations show that this estimation process also introduces bias and variance and subsequently does not improve upon the financed clients’ model.</p>
 </div>

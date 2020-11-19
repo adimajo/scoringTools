@@ -1,0 +1,16 @@
+context("test-topdown")
+
+test_that("generate_data works", {
+  expect_error(generate_data(n = 5))
+  expect_error(generate_data(d = 0))
+  expect_error(generate_data(type = "toto"))
+  data <- generate_data(n = 100, d = 3)
+  expect_length(data, 4)
+  expect_length(data[, 1], 100)
+  data <- generate_data(n = 100, d = 3, type = "MAR misspecified")
+  expect_length(data, 4)
+  expect_length(data[, 1], 100)
+  data <- generate_data(n = 100, d = 3, type = "MNAR")
+  expect_length(data, 5)
+  expect_length(data[, 1], 100)
+})

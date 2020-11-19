@@ -43,5 +43,6 @@ Two other packages were made public during this PhD, which tackle more specifica
           * ROC curve
           * gini
           * tabpanel for each segment of each model?
+     * tests for shiny app
 
 * plot methods for reject_infered class

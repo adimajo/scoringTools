@@ -55,6 +55,6 @@ Collate:
     'parcelling.R'
     'reclassification.R'
     'runDemo.R'
-    'scoring.R'
+    'scoringTools.R'
     'topdown.R'
     'twins.R'

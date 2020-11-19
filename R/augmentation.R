@@ -19,12 +19,11 @@
 #' Ehrhardt, A., Biernacki, C., Vandewalle, V., Heinrich, P. and Beben, S. (2018), Reject Inference Methods in Credit Scoring: a rational review,
 #' @examples
 #' # We simulate data from financed clients
-#' xf <- matrix(runif(100 * 2), nrow = 100, ncol = 2)
-#' theta <- c(2, -2)
-#' log_odd <- apply(xf, 1, function(row) theta %*% row)
-#' yf <- rbinom(100, 1, 1 / (1 + exp(-log_odd)))
+#' df <- generate_data(n = 100, d = 2)
+#' xf <- df[, -ncol(df)]
+#' yf <- df$y
 #' # We simulate data from not financed clients (MCAR mechanism)
-#' xnf <- matrix(runif(100 * 2), nrow = 100, ncol = 2)
+#' xnf <- generate_data(n = 100, d = 2)[, -ncol(df)]
 #' augmentation(xf, xnf, yf)
 augmentation <- function(xf, xnf, yf) {
   check_consistency(xf, xnf, yf)

@@ -103,11 +103,23 @@ ui <- shiny::fluidPage(
           # Input: Select fraction of rejected applications to simulate ----
 
           shiny::sliderInput(
-            "bins",
+            "bins_reject",
             "Fraction of rejected applications:",
             min = 0,
             max = 100,
             value = 30
+          ),
+          shiny::sliderInput(
+            "bins_test",
+            "Fraction of all applications for test:",
+            min = 0,
+            max = 100,
+            value = 30
+          ),
+          shiny::checkboxInput(
+            "deleteSamplesRejectInference",
+            "Remove test samples for which there are unknown factor levels",
+            TRUE
           ),
 
           # Input: Select data ----

@@ -1,5 +1,4 @@
 server <- function(input, output, session) {
-
   list_imported_df <- shiny::reactiveValues()
 
   shiny::observe({
@@ -7,7 +6,8 @@ server <- function(input, output, session) {
       list_imported_df[["lendingClub"]] <- scoringTools::lendingClub
     } else {
       tryCatch(.subset2(list_imported_df, "lendingClub")$.values$remove("name"),
-               error = function(e) {})
+        error = function(e) {}
+      )
     }
   })
 
@@ -20,7 +20,8 @@ server <- function(input, output, session) {
       )
     } else {
       tryCatch(.subset2(list_imported_df, "MAR_well_specified")$.values$remove("name"),
-               error = function(e) {})
+        error = function(e) {}
+      )
     }
   })
 
@@ -33,7 +34,8 @@ server <- function(input, output, session) {
       )
     } else {
       tryCatch(.subset2(list_imported_df, "MAR_misspecified")$.values$remove("name"),
-               error = function(e) {})
+        error = function(e) {}
+      )
     }
   })
 
@@ -46,7 +48,8 @@ server <- function(input, output, session) {
       )
     } else {
       tryCatch(.subset2(list_imported_df, "MNAR")$.values$remove("name"),
-               error = function(e) {})
+        error = function(e) {}
+      )
     }
   })
 
@@ -55,40 +58,44 @@ server <- function(input, output, session) {
     (!is.null(input$imported_files)) | (!is.null(input$use_lendingClub)) |
       (!is.null(input$use_MNAR)) | (!is.null(input$use_MAR_well_specified)) |
       (!is.null(input$use_MAR_misspecified)) | unlist(lapply(1:length(input$imported_files[, 1]), function(i) {
-        input[[paste0("good_to_go_", i)]] > 0
-      })),
+      input[[paste0("good_to_go_", i)]] > 0
+    })),
     shiny::updateSelectInput(
       session = session,
       "selectedDataRejectInference",
       choices = names(list_imported_df)
-      ))
-    shiny::observeEvent(
-      (!is.null(input$imported_files)) | (!is.null(input$use_lendingClub)) |
-        (!is.null(input$use_MNAR)) | (!is.null(input$use_MAR_well_specified)) |
-        (!is.null(input$use_MAR_misspecified)) | unlist(lapply(1:length(input$imported_files[, 1]), function(i) {
-          input[[paste0("good_to_go_", i)]] > 0
-        })),
-      shiny::updateSelectInput(
+    )
+  )
+  shiny::observeEvent(
+    (!is.null(input$imported_files)) | (!is.null(input$use_lendingClub)) |
+      (!is.null(input$use_MNAR)) | (!is.null(input$use_MAR_well_specified)) |
+      (!is.null(input$use_MAR_misspecified)) | unlist(lapply(1:length(input$imported_files[, 1]), function(i) {
+      input[[paste0("good_to_go_", i)]] > 0
+    })),
+    shiny::updateSelectInput(
       session = session,
       "selectedDataQuantization",
       choices = names(list_imported_df)
-      ))
-    shiny::observeEvent(
-      (!is.null(input$imported_files)) | (!is.null(input$use_lendingClub)) |
-        (!is.null(input$use_MNAR)) | (!is.null(input$use_MAR_well_specified)) |
-        (!is.null(input$use_MAR_misspecified)) | unlist(lapply(1:length(input$imported_files[, 1]), function(i) {
-          input[[paste0("good_to_go_", i)]] > 0
-        })),
-      shiny::updateSelectInput(
+    )
+  )
+  shiny::observeEvent(
+    (!is.null(input$imported_files)) | (!is.null(input$use_lendingClub)) |
+      (!is.null(input$use_MNAR)) | (!is.null(input$use_MAR_well_specified)) |
+      (!is.null(input$use_MAR_misspecified)) | unlist(lapply(1:length(input$imported_files[, 1]), function(i) {
+      input[[paste0("good_to_go_", i)]] > 0
+    })),
+    shiny::updateSelectInput(
       session = session,
       "selectedDataLogisticRegressionTrees",
       choices = names(list_imported_df)
-      )
     )
+  )
 
-  shiny::observeEvent({
-    (!is.null(input$selectedDataRejectInference)) &
-      (!is.null(colnames(list_imported_df[[input$selectedDataRejectInference]])))},
+  shiny::observeEvent(
+    {
+      (!is.null(input$selectedDataRejectInference)) &
+        (!is.null(colnames(list_imported_df[[input$selectedDataRejectInference]])))
+    },
     shiny::updateSelectInput(
       session = session,
       "var_cible",
@@ -318,16 +325,72 @@ server <- function(input, output, session) {
 
   # Réintégration des refusés
   ## Courbe ROC avec tout le monde
-  output$roc_tous_reject_inference <- plotly::renderPlotly({
+  data_reject_inference <- reactive({
     data <- list_imported_df[[input$selectedDataRejectInference]]
-    int_f <- sample.int(nrow(data),
-      size = (100 - input$bins) / 100 * nrow(data)
+    int_f <- 1:nrow(data) %in% sample.int(nrow(data),
+      size = (100 - input$bins_reject) / 100 * nrow(data)
     )
-    int_nf <- !int_f %in% 1:nrow(data)
-    x_f <- data[int_f, colnames(data) == input$var_cible]
-    x_nf <- data[int_nf, colnames(data) == input$var_cible]
-    y_f <- data[int_f, input$var_cible]
-    y_nf <- data[int_nf, input$var_cible]
+    int_test <- 1:nrow(data) %in% sample.int(nrow(data),
+      size = (input$bins_test) / 100 * nrow(data)
+    )
+    int_nf <- !int_f
+    int_train <- !int_test
+    x <- data[int_train, colnames(data) == input$var_cible]
+    x_f <- data[int_f & int_train, colnames(data) == input$var_cible]
+    x_nf <- data[int_nf & int_train, colnames(data) == input$var_cible]
+    y <- data[int_train, input$var_cible]
+    y_f <- data[int_f & int_train, input$var_cible]
+    y_nf <- data[int_nf & int_train, input$var_cible]
+    data_train <- data[int_train, ]
+    data_f_train <- data[int_f & int_train, ]
+    x_test <- data[int_test, colnames(data) == input$var_cible]
+    x_f_test <- data[int_f & int_test, colnames(data) == input$var_cible]
+    x_nf_test <- data[int_nf & int_test, colnames(data) == input$var_cible]
+    y_test <- data[int_test, input$var_cible]
+    y_f_test <- data[int_f & int_test, input$var_cible]
+    y_nf_test <- data[int_nf & int_test, input$var_cible]
+    data_test <- data[int_test, ]
+    data_f_test <- data[int_f & int_test, ]
+
+    if (input$deleteSamplesRejectInference) {
+      levels_in_train <- lapply(data_f_train[, sapply(data_f_train, is.factor)], function(fct) levels(factor(fct)))
+      levels_in_test <- lapply(data_test[, sapply(data_test, is.factor)], function(fct) levels(factor(fct)))
+
+      if (length(levels_in_train) > 0) {
+        levels_to_delete <- sapply(1:length(levels_in_train), function(idx) {
+          if (length(which(!(levels_in_test[[idx]] %in% levels_in_train[[idx]]))) > 0) {
+            return(levels_in_test[[idx]][which(!(levels_in_test[[idx]] %in% levels_in_train[[idx]]))])
+          } else {
+            return(NULL)
+          }
+        })
+
+        rows_to_delete <- sapply(
+          1:sum(sapply(data_test, is.factor)),
+          function(idx) {
+            data_test[, sapply(data_test, is.factor)][, idx] %in% levels_to_delete[[idx]]
+          }
+        )
+
+        data_test <- data_test[Matrix::rowSums(rows_to_delete) == 0, ]
+        warning("Deleted samples due to factor levels in test set not in train financed set.")
+      }
+    }
+
+    return(list(
+      data_train = data_train,
+      data_f_train = data_f_train,
+      data_test = data_test,
+      data_f_test = data_f_test
+    ))
+  })
+
+  model_reject_inference <- reactive({
+    list_to_parse <- data_reject_inference()
+    data_train <- list_to_parse[[1]]
+    data_f_train <- list_to_parse[[2]]
+    data_test <- list_to_parse[[3]]
+    data_f_test <- list_to_parse[[4]]
 
     list_models <- list()
     roc_curves <- list()
@@ -335,10 +398,16 @@ server <- function(input, output, session) {
       switch(model,
         log = {
           list_models[[model]] <- stats::glm(as.formula(paste(input$var_cible, "~ .")),
-            data = data[int_f, ],
+            data = data_f_train,
             family = stats::binomial(link = "logit")
           )
-          roc_curves[[model]] <- pROC::roc(list_models[[model]]$y, list_models[[model]]$fitted.values)
+          roc_curves[[model]] <- pROC::roc(
+            data_test[[input$var_cible]],
+            predict(list_models[[model]],
+              data_test,
+              type = "response"
+            )
+          )
         },
         tree = {
           if (!requireNamespace("rpart", quietly = TRUE)) {
@@ -347,10 +416,16 @@ server <- function(input, output, session) {
             ))
           }
           list_models[[model]] <- rpart::rpart(as.formula(paste(input$var_cible, "~ .")),
-            data = data[int_f, ],
+            data = data_f_train,
             method = "class"
           )
-          roc_curves[[model]] <- pROC::roc(list_models[[model]]$y, predict(list_models[[model]], data)[, 1])
+          roc_curves[[model]] <- pROC::roc(
+            data_test[[input$var_cible]],
+            predict(
+              list_models[[model]],
+              data_test
+            )[, 1]
+          )
         },
         rforest = {
           if (!requireNamespace("randomForest", quietly = TRUE)) {
@@ -358,7 +433,24 @@ server <- function(input, output, session) {
               "Package randomForest not installed, please install it to proceed."
             ))
           }
-          list_models[[model]] <- NULL
+          data_temp <- data_f_train
+          data_temp[, input$var_cible] <- factor(data_f_train[, input$var_cible])
+          print(summary(data_temp))
+          list_models[[model]] <- randomForest::randomForest(as.formula(paste(input$var_cible, "~ .")),
+            data = data_temp,
+            ntree = input$rforestParam_ntree,
+            mtry = input$rforestParam_mtry,
+            replace = input$rforestParam_replace,
+            maxnodes = input$rforestParam_maxnodes,
+            type = "classification"
+          )
+          roc_curves[[model]] <- pROC::roc(
+            data_test[[input$var_cible]],
+            predict(list_models[[model]],
+              data_test,
+              type = "prob"
+            )[, 1]
+          )
         },
         svm = {
           if (!requireNamespace("e1071", quietly = TRUE)) {
@@ -366,7 +458,25 @@ server <- function(input, output, session) {
               "Package e1071 not installed, please install it to proceed."
             ))
           }
-          list_models[[model]] <- NULL
+          list_models[[model]] <- e1071::svm(as.formula(paste(input$var_cible, "~ .")),
+            data = data_f_train,
+            kernel = input$svmParam_kernel,
+            degree = input$svmParam_degree,
+            gamma = input$svmParam_gamma,
+            coef0 = input$svmParam_coef0,
+            type = "C-classification",
+            probability = TRUE
+          )
+          roc_curves[[model]] <- pROC::roc(
+            data_test[[input$var_cible]],
+            attr(
+              predict(list_models[[model]],
+                data_test,
+                probability = TRUE
+              ),
+              "probabilities"
+            )[, 1]
+          )
         },
         nnet = {
           if (!requireNamespace("nnet", quietly = TRUE)) {
@@ -374,54 +484,54 @@ server <- function(input, output, session) {
               "Package nnet not installed, please install it to proceed."
             ))
           }
-          list_models[[model]] <- NULL
+          list_models[[model]] <- nnet::nnet(as.formula(paste(input$var_cible, "~ .")),
+            data = data_f_train,
+            size = input$nnetParam_nnet,
+            decay = input$nnetParam_decay,
+            maxit = input$nnetParam_maxit
+          )
+          roc_curves[[model]] <- pROC::roc(
+            data_test[[input$var_cible]],
+            predict(
+              list_models[[model]],
+              data_test
+            )[, 1]
+          )
         },
         print("no model specified yet")
       )
     }
+    return(roc_curves)
+  })
 
-    df_roc_curve <- data.frame(
+  output$roc_tous_reject_inference <- plotly::renderPlotly({
+    roc_curves <- model_reject_inference()
+
+    df_roc_curve_all <- data.frame(
       unlist(unname(lapply(roc_curves, function(roc_curve) roc_curve$specificities))),
       unlist(unname(lapply(roc_curves, function(roc_curve) roc_curve$sensitivities))),
       unlist(unname(lapply(1:length(roc_curves), function(index) rep(names(roc_curves[index]), length(roc_curves[[index]]$specificities)))))
     )
 
-    colnames(df_roc_curve) <- c("Specificity", "Sensitivity", "Model")
+    colnames(df_roc_curve_all) <- c("Specificity", "Sensitivity", "Model")
 
-    plotly_plot <- plotly::plot_ly(df_roc_curve,
+    plotly_plot <- plotly::plot_ly(df_roc_curve_all,
       x = ~ (1 - Specificity),
       y = ~Sensitivity,
-      linetype = ~ as.factor(Model),
-      hoverinfo = "none"
+      linetype = ~ as.factor(Model)
     ) %>%
-      plotly::add_lines(
-        name = ~ as.factor(Model),
-        line = list(shape = "spline", color = "#737373", width = 7),
-        fill = "tozeroy", fillcolor = "#2A3356"
-      ) %>%
       plotly::add_segments(
         x = 0, y = 0, xend = 1, yend = 1,
         line = list(dash = "7px", color = "#F35B25", width = 4),
         name = "Random"
       ) %>%
-      plotly::add_segments(
-        x = 0, y = 0, xend = 0, yend = 1,
-        line = list(dash = "10px", color = "black", width = 4),
-        showlegend = F
-      ) %>%
-      plotly::add_segments(
-        x = 0, y = 1, xend = 1, yend = 1,
-        line = list(dash = "10px", color = "black", width = 4),
-        showlegend = F
-      ) %>%
-      plotly::add_annotations(
-        x = 0, y = 0.98, showarrow = F, xanchor = "left",
-        xref = "paper", yref = "paper",
-        text = paste0("Charts the percentage of correctly identified defaults against the percentage of false alarms."),
-        font = list(family = "serif", size = 14, color = "#999999")
+      plotly::add_lines(
+        name = ~ as.factor(Model),
+        line = list(shape = "spline", color = "#737373", width = 4)
       ) %>%
       plotly::layout(
-        title = "ROC Curve", xaxis = list(
+        title = "ROC Curve on test set all applicants",
+        xaxis = list(
           range = c(0, 1), zeroline = F, showgrid = F,
           title = "1 - Specificity"
         ),
