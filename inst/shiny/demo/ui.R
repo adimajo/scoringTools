@@ -137,13 +137,13 @@ ui <- shiny::fluidPage(
           ),
           "If there are NAs, these observations will count as 'not financed'",
 
-          shiny::selectInput(
-            "var_reject",
-            "Accept / Reject feature",
-            list()
-          ),
-          "If a 'score', the fraction defined above will depend on it directly.",
-          "If a 0/1 feature, an Accept / Reject model (logistic regression) will be learnt.",
+          # shiny::selectInput(
+          #   "var_reject",
+          #   "Accept / Reject feature",
+          #   list()
+          # ),
+          # "If a 'score', the fraction defined above will depend on it directly.",
+          # "If a 0/1 feature, an Accept / Reject model (logistic regression) will be learnt.",
 
           # Input: Select models to compute ----
           shiny::selectInput(

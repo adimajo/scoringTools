@@ -84,7 +84,14 @@ predict.discretization <- function(object, newdata) {
 #' @param newdata The test dataframe to discretize and for which we wish to have predictions.
 #' @param ... Additional parameters to pass on to base predict.
 predict.reject_infered <- function(object, newdata, ...) {
-  predict(object = object@infered_model, newdata = data.frame(x = newdata), ...)
+  if (object@method_name == "twins") {
+    newdata = data.frame(x = newdata)
+    newdata$score_acc <- predict(object@acceptance_model, newdata = newdata)
+    newdata$score_def <- predict(object@financed_model, newdata = newdata)
+    return(predict(object = object@infered_model, newdata = newdata, ...))
+  } else {
+    return(predict(object = object@infered_model, newdata = data.frame(x = newdata), ...))
+  }
 }
 
 #' Prediction on a raw test set of the best logistic regression model on discretized data.

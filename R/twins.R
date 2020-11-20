@@ -42,8 +42,8 @@ twins <- function(xf, xnf, yf) {
   }
   class(model_acc) <- c("glmORlogicalORspeedglm", class(model_acc))
 
-  df$score_acc <- predict(model_acc, df)
-  df$score_def <- predict(model_f, df)
+  df$score_acc <- predict(model_acc, df, type="response")
+  df$score_def <- predict(model_f, df, type="response")
   if (!(is_speedglm_installed() & is_speedglm_predict_installed())) {
     model_twins <- stats::glm(labels ~ score_acc + score_def, family = stats::binomial(link = "logit"), df[df$acc == 1, -which(names(df) %in% c("acc"))])
   } else {

@@ -336,17 +336,17 @@ server <- function(input, output, session) {
     )
     int_nf <- !int_f
     int_train <- !int_test
-    x <- data[int_train, colnames(data) == input$var_cible]
-    x_f <- data[int_f & int_train, colnames(data) == input$var_cible]
-    x_nf <- data[int_nf & int_train, colnames(data) == input$var_cible]
-    y <- data[int_train, input$var_cible]
-    y_f <- data[int_f & int_train, input$var_cible]
-    y_nf <- data[int_nf & int_train, input$var_cible]
+    x_train <- data[int_train, !colnames(data) == input$var_cible, drop = FALSE]
+    x_f_train <- data[int_f & int_train, !colnames(data) == input$var_cible, drop = FALSE]
+    x_nf_train <- data[int_nf & int_train, !colnames(data) == input$var_cible, drop = FALSE]
+    y_train <- data[int_train, input$var_cible]
+    y_f_train <- data[int_f & int_train, input$var_cible]
+    y_nf_train <- data[int_nf & int_train, input$var_cible]
     data_train <- data[int_train, ]
     data_f_train <- data[int_f & int_train, ]
-    x_test <- data[int_test, colnames(data) == input$var_cible]
-    x_f_test <- data[int_f & int_test, colnames(data) == input$var_cible]
-    x_nf_test <- data[int_nf & int_test, colnames(data) == input$var_cible]
+    x_test <- data[int_test, !colnames(data) == input$var_cible, drop = FALSE]
+    x_f_test <- data[int_f & int_test, !colnames(data) == input$var_cible, drop = FALSE]
+    x_nf_test <- data[int_nf & int_test, !colnames(data) == input$var_cible, drop = FALSE]
     y_test <- data[int_test, input$var_cible]
     y_f_test <- data[int_f & int_test, input$var_cible]
     y_nf_test <- data[int_nf & int_test, input$var_cible]
@@ -382,7 +382,15 @@ server <- function(input, output, session) {
       data_train = data_train,
       data_f_train = data_f_train,
       data_test = data_test,
-      data_f_test = data_f_test
+      data_f_test = data_f_test,
+      x_f_test,
+      x_nf_test,
+      y_f_test,
+      y_nf_test,
+      x_f_train,
+      x_nf_train,
+      y_f_train,
+      y_nf_train
     ))
   })
 
@@ -392,153 +400,287 @@ server <- function(input, output, session) {
     data_f_train <- list_to_parse[[2]]
     data_test <- list_to_parse[[3]]
     data_f_test <- list_to_parse[[4]]
+    x_f_test <- list_to_parse[[5]]
+    x_nf_test <- list_to_parse[[6]]
+    y_f_test <- list_to_parse[[7]]
+    y_nf_test <- list_to_parse[[8]]
+    x_f_train <- list_to_parse[[9]]
+    x_nf_train <- list_to_parse[[10]]
+    y_f_train <- list_to_parse[[11]]
+    y_nf_train <- list_to_parse[[12]]
 
     list_models <- list()
     roc_curves <- list()
     roc_curves_financed <- list()
     for (model in (input$modelsRejectInference)) {
       switch(model,
-        log = {
-          list_models[[model]] <- stats::glm(as.formula(paste(input$var_cible, "~ .")),
-            data = data_f_train,
-            family = stats::binomial(link = "logit")
-          )
-          roc_curves[[model]] <- pROC::roc(
-            data_test[[input$var_cible]],
-            predict(list_models[[model]],
-                    data_test,
-                    type = "response"
-            )
-          )
-          roc_curves_financed[[model]] <- pROC::roc(
-            data_f_test[[input$var_cible]],
-            predict(list_models[[model]],
-                    data_f_test,
-                    type = "response"
-            )
-          )
-        },
-        tree = {
-          if (!requireNamespace("rpart", quietly = TRUE)) {
-            print(warning(
-              "Package rpart not installed, please install it to proceed."
-            ))
-          }
-          list_models[[model]] <- rpart::rpart(as.formula(paste(input$var_cible, "~ .")),
-            data = data_f_train,
-            method = "class"
-          )
-          roc_curves[[model]] <- pROC::roc(
-            data_test[[input$var_cible]],
-            predict(
-              list_models[[model]],
-              data_test
-            )[, 1]
-          )
-          roc_curves_financed[[model]] <- pROC::roc(
-            data_f_test[[input$var_cible]],
-            predict(
-              list_models[[model]],
-              data_f_test
-            )[, 1]
-          )
-        },
-        rforest = {
-          if (!requireNamespace("randomForest", quietly = TRUE)) {
-            print(warning(
-              "Package randomForest not installed, please install it to proceed."
-            ))
-          }
-          data_temp <- data_f_train
-          data_temp[, input$var_cible] <- factor(data_f_train[, input$var_cible])
-          print(summary(data_temp))
-          list_models[[model]] <- randomForest::randomForest(
-            as.formula(paste(input$var_cible, "~ .")),
-            data = data_temp,
-            ntree = input$rforestParam_ntree,
-            mtry = input$rforestParam_mtry,
-            replace = input$rforestParam_replace,
-            maxnodes = input$rforestParam_maxnodes
-          )
-          roc_curves[[model]] <- pROC::roc(
-            data_test[[input$var_cible]],
-            predict(list_models[[model]],
-                    data_test,
-                    type = "prob"
-            )[, 1]
-          )
-          roc_curves_financed[[model]] <- pROC::roc(
-            data_f_test[[input$var_cible]],
-            predict(list_models[[model]],
-                    data_f_test,
-                    type = "prob"
-            )[, 1]
-          )
-        },
-        svm = {
-          if (!requireNamespace("e1071", quietly = TRUE)) {
-            print(warning(
-              "Package e1071 not installed, please install it to proceed."
-            ))
-          }
-          list_models[[model]] <- e1071::svm(as.formula(paste(input$var_cible, "~ .")),
-            data = data_f_train,
-            kernel = input$svmParam_kernel,
-            degree = input$svmParam_degree,
-            gamma = input$svmParam_gamma,
-            coef0 = input$svmParam_coef0,
-            type = "C-classification",
-            probability = TRUE
-          )
-          roc_curves[[model]] <- pROC::roc(
-            data_test[[input$var_cible]],
-            attr(
-              predict(list_models[[model]],
-                      data_test,
-                      probability = TRUE
-              ),
-              "probabilities"
-            )[, 1]
-          )
-          roc_curves_financed[[model]] <- pROC::roc(
-            data_f_test[[input$var_cible]],
-            attr(
-              predict(list_models[[model]],
-                      data_f_test,
-                      probability = TRUE
-              ),
-              "probabilities"
-            )[, 1]
-          )
-        },
-        nnet = {
-          if (!requireNamespace("nnet", quietly = TRUE)) {
-            print(warning(
-              "Package nnet not installed, please install it to proceed."
-            ))
-          }
-          list_models[[model]] <- nnet::nnet(as.formula(paste(input$var_cible, "~ .")),
-            data = data_f_train,
-            size = input$nnetParam_nnet,
-            decay = input$nnetParam_decay,
-            maxit = input$nnetParam_maxit
-          )
-          roc_curves[[model]] <- pROC::roc(
-            data_test[[input$var_cible]],
-            predict(
-              list_models[[model]],
-              data_test
-            )[, 1]
-          )
-          roc_curves_financed[[model]] <- pROC::roc(
-            data_f_test[[input$var_cible]],
-            predict(
-              list_models[[model]],
-              data_f_test
-            )[, 1]
-          )
-        },
-        print("no model specified yet")
+             log = {
+               list_models[[model]] <- stats::glm(as.formula(paste(input$var_cible, "~ .")),
+                                                  data = data_f_train,
+                                                  family = stats::binomial(link = "logit")
+               )
+               roc_curves[[model]] <- pROC::roc(
+                 data_test[[input$var_cible]],
+                 predict(list_models[[model]],
+                         data_test,
+                         type = "response"
+                 )
+               )
+               roc_curves_financed[[model]] <- pROC::roc(
+                 data_f_test[[input$var_cible]],
+                 predict(list_models[[model]],
+                         data_f_test,
+                         type = "response"
+                 )
+               )
+             },
+             tree = {
+               if (!requireNamespace("rpart", quietly = TRUE)) {
+                 print(warning(
+                   "Package rpart not installed, please install it to proceed."
+                 ))
+               }
+               list_models[[model]] <- rpart::rpart(as.formula(paste(input$var_cible, "~ .")),
+                                                    data = data_f_train,
+                                                    method = "class"
+               )
+               roc_curves[[model]] <- pROC::roc(
+                 data_test[[input$var_cible]],
+                 predict(
+                   list_models[[model]],
+                   data_test
+                 )[, 1]
+               )
+               roc_curves_financed[[model]] <- pROC::roc(
+                 data_f_test[[input$var_cible]],
+                 predict(
+                   list_models[[model]],
+                   data_f_test
+                 )[, 1]
+               )
+             },
+             rforest = {
+               if (!requireNamespace("randomForest", quietly = TRUE)) {
+                 print(warning(
+                   "Package randomForest not installed, please install it to proceed."
+                 ))
+               }
+               data_temp <- data_f_train
+               data_temp[, input$var_cible] <- factor(data_f_train[, input$var_cible])
+               print(summary(data_temp))
+               list_models[[model]] <- randomForest::randomForest(
+                 as.formula(paste(input$var_cible, "~ .")),
+                 data = data_temp,
+                 ntree = input$rforestParam_ntree,
+                 mtry = input$rforestParam_mtry,
+                 replace = input$rforestParam_replace,
+                 maxnodes = input$rforestParam_maxnodes
+               )
+               roc_curves[[model]] <- pROC::roc(
+                 data_test[[input$var_cible]],
+                 predict(list_models[[model]],
+                         data_test,
+                         type = "prob"
+                 )[, 1]
+               )
+               roc_curves_financed[[model]] <- pROC::roc(
+                 data_f_test[[input$var_cible]],
+                 predict(list_models[[model]],
+                         data_f_test,
+                         type = "prob"
+                 )[, 1]
+               )
+             },
+             svm = {
+               if (!requireNamespace("e1071", quietly = TRUE)) {
+                 print(warning(
+                   "Package e1071 not installed, please install it to proceed."
+                 ))
+               }
+               list_models[[model]] <- e1071::svm(as.formula(paste(input$var_cible, "~ .")),
+                                                  data = data_f_train,
+                                                  kernel = input$svmParam_kernel,
+                                                  degree = input$svmParam_degree,
+                                                  gamma = input$svmParam_gamma,
+                                                  coef0 = input$svmParam_coef0,
+                                                  type = "C-classification",
+                                                  probability = TRUE
+               )
+               roc_curves[[model]] <- pROC::roc(
+                 data_test[[input$var_cible]],
+                 attr(
+                   predict(list_models[[model]],
+                           data_test,
+                           probability = TRUE
+                   ),
+                   "probabilities"
+                 )[, 1]
+               )
+               roc_curves_financed[[model]] <- pROC::roc(
+                 data_f_test[[input$var_cible]],
+                 attr(
+                   predict(list_models[[model]],
+                           data_f_test,
+                           probability = TRUE
+                   ),
+                   "probabilities"
+                 )[, 1]
+               )
+             },
+             nnet = {
+               if (!requireNamespace("nnet", quietly = TRUE)) {
+                 print(warning(
+                   "Package nnet not installed, please install it to proceed."
+                 ))
+               }
+               list_models[[model]] <- nnet::nnet(as.formula(paste(input$var_cible, "~ .")),
+                                                  data = data_f_train,
+                                                  size = input$nnetParam_nnet,
+                                                  decay = input$nnetParam_decay,
+                                                  maxit = input$nnetParam_maxit
+               )
+               roc_curves[[model]] <- pROC::roc(
+                 data_test[[input$var_cible]],
+                 predict(
+                   list_models[[model]],
+                   data_test
+                 )[, 1]
+               )
+               roc_curves_financed[[model]] <- pROC::roc(
+                 data_f_test[[input$var_cible]],
+                 predict(
+                   list_models[[model]],
+                   data_f_test
+                 )[, 1]
+               )
+             },
+             print("no model specified yet")
+      )
+    }
+    for (model in (input$reject)) {
+      switch(model,
+             augmentation = {
+               list_models[[model]] <- scoringTools::augmentation(
+                 x_f_train,
+                 x_nf_train,
+                 y_f_train
+               )
+               roc_curves[[model]] <- pROC::roc(
+                 c(y_f_test, y_nf_test),
+                 predict(list_models[[model]],
+                         rbind(x_f_test, x_nf_test),
+                         type="response"
+                 )
+               )
+               roc_curves_financed[[model]] <- pROC::roc(
+                 y_f_test,
+                 predict(list_models[[model]],
+                         x_f_test,
+                         type="response"
+                 )
+               )
+             },
+             fuzzy = {
+               list_models[[model]] <- scoringTools::fuzzy_augmentation(
+                 x_f_train,
+                 x_nf_train,
+                 y_f_train
+               )
+               roc_curves[[model]] <- pROC::roc(
+                 c(y_f_test, y_nf_test),
+                 predict(list_models[[model]],
+                         rbind(x_f_test, x_nf_test),
+                         type="response"
+                 )
+               )
+               roc_curves_financed[[model]] <- pROC::roc(
+                 y_f_test,
+                 predict(list_models[[model]],
+                         x_f_test,
+                         type="response"
+                 )
+               )
+             },
+             parcelling = {
+               if (!is.null(input$parcellingParam_probs)) {
+                 probs = as.numeric(input$parcellingParam_probs)
+               } else {
+                 probs = seq(0, 1, 0.25)
+               }
+               if (!is.null(input$parcellingParam_alpha)) {
+                 alpha = as.numeric(input$parcellingParam_alpha)
+               } else {
+                 alpha = rep(1, length(probs) - 1)
+               }
+               list_models[[model]] <- scoringTools::parcelling(
+                 x_f_train,
+                 x_nf_train,
+                 y_f_train,
+                 probs = probs,
+                 alpha = alpha
+               )
+               roc_curves[[model]] <- pROC::roc(
+                 c(y_f_test, y_nf_test),
+                 predict(list_models[[model]],
+                         rbind(x_f_test, x_nf_test),
+                         type="response"
+                 )
+               )
+               roc_curves_financed[[model]] <- pROC::roc(
+                 y_f_test,
+                 predict(list_models[[model]],
+                         x_f_test,
+                         type="response"
+                 )
+               )
+             },
+             reclassification = {
+               list_models[[model]] <- scoringTools::reclassification(
+                 x_f_train,
+                 x_nf_train,
+                 y_f_train,
+                 thresh = input$reclassificationParam_thresh
+               )
+               roc_curves[[model]] <- pROC::roc(
+                 c(y_f_test, y_nf_test),
+                 predict(list_models[[model]],
+                         rbind(x_f_test, x_nf_test),
+                         type="response"
+                 )
+               )
+               roc_curves_financed[[model]] <- pROC::roc(
+                 y_f_test,
+                 predict(list_models[[model]],
+                         x_f_test,
+                         type="response"
+                 )
+               )
+             },
+             twins = {
+               list_models[[model]] <- scoringTools::twins(
+                 x_f_train,
+                 x_nf_train,
+                 y_f_train
+               )
+               summary(list_models[[model]]@financed_model)
+               summary(list_models[[model]]@acceptance_model)
+               summary(list_models[[model]]@infered_model)
+               roc_curves[[model]] <- pROC::roc(
+                 c(y_f_test, y_nf_test),
+                 predict(list_models[[model]],
+                         rbind(x_f_test, x_nf_test),
+                         type="response"
+                 )
+               )
+               roc_curves_financed[[model]] <- pROC::roc(
+                 y_f_test,
+                 predict(list_models[[model]],
+                         x_f_test,
+                         type="response"
+                 )
+               )
+             },
+             print("no model specified yet")
       )
     }
     return(list(roc_curves, roc_curves_financed))

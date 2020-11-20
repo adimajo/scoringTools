@@ -26,11 +26,11 @@ We use predictions of both models on the labeled observations to construct a "me
 }
 \examples{
 # We simulate data from financed clients
-df = generate_data(n=100, d=2)
+df <- generate_data(n = 100, d = 2)
 xf <- df[, -ncol(df)]
 yf <- df$y
 # We simulate data from not financed clients (MCAR mechanism)
-xnf <- generate_data(n=100, d=2)[, -ncol(df)]
+xnf <- generate_data(n = 100, d = 2)[, -ncol(df)]
 twins(xf, xnf, yf)
 }
 \references{

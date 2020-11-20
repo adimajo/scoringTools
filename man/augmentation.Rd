@@ -26,11 +26,11 @@ It then refits a logistic regression model \eqn{p_\eta} on the labeled samples.
 }
 \examples{
 # We simulate data from financed clients
-df = generate_data(n=100, d=2)
+df <- generate_data(n = 100, d = 2)
 xf <- df[, -ncol(df)]
 yf <- df$y
 # We simulate data from not financed clients (MCAR mechanism)
-xnf <- generate_data(n=100, d=2)[, -ncol(df)]
+xnf <- generate_data(n = 100, d = 2)[, -ncol(df)]
 augmentation(xf, xnf, yf)
 }
 \references{

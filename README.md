@@ -30,7 +30,7 @@ Two other packages were made public during this PhD, which tackle more specifica
 
 * A Shiny app explaining all aspects of this work is also accessible by running `runDemo()`.
      * all models refit when one is deleted / added in reject inference...
-     * allow custom model + text input for call
+     * why !twins == log?
      * Gini tab with confidence intervals
      * Quantization
           * missing some parameters
