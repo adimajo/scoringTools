@@ -151,13 +151,13 @@ ui <- shiny::fluidPage(
             "Models",
             multiple = TRUE,
             choices = c(
-              Logistique = "log",
-              Arbre = "tree",
+              Logistic = "logistic",
+              DecisionTree = "tree",
               RandomForest = "rforest",
               SVM = "svm",
               Neurones = "nnet"
             ),
-            selected = "log"
+            selected = "logistic"
           ),
 
 
@@ -314,12 +314,22 @@ ui <- shiny::fluidPage(
               "roc_tous_reject_inference_financed"
             )
           ),
-          shiny::tabPanel("Gini indices", tableOutput("gini_reject"))
+          shiny::tabPanel("Gini indices",
+                          shiny::checkboxInput("CI_gini_reject",
+                                               "Display confidence intervals",
+                                               TRUE),
+                          shiny::conditionalPanel("input.CI_gini_reject",
+                                                  shiny::numericInput(
+                                                    "confidence_level_reject",
+                                                    "Confidence level",
+                                                    value=0.95,
+                                                    min=0.1,
+                                                    max=0.9999
+                                                  )),
+                          DT::DTOutput("gini_reject"))
         ))
       )
     ),
-
-
 
     shiny::tabPanel(
       "Quantization",
