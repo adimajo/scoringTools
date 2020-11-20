@@ -1,4 +1,5 @@
 server <- function(input, output, session) {
+  library(dplyr)
   list_imported_df <- shiny::reactiveValues()
 
   shiny::observe({
@@ -394,6 +395,7 @@ server <- function(input, output, session) {
 
     list_models <- list()
     roc_curves <- list()
+    roc_curves_financed <- list()
     for (model in (input$modelsRejectInference)) {
       switch(model,
         log = {
@@ -404,8 +406,15 @@ server <- function(input, output, session) {
           roc_curves[[model]] <- pROC::roc(
             data_test[[input$var_cible]],
             predict(list_models[[model]],
-              data_test,
-              type = "response"
+                    data_test,
+                    type = "response"
+            )
+          )
+          roc_curves_financed[[model]] <- pROC::roc(
+            data_f_test[[input$var_cible]],
+            predict(list_models[[model]],
+                    data_f_test,
+                    type = "response"
             )
           )
         },
@@ -426,6 +435,13 @@ server <- function(input, output, session) {
               data_test
             )[, 1]
           )
+          roc_curves_financed[[model]] <- pROC::roc(
+            data_f_test[[input$var_cible]],
+            predict(
+              list_models[[model]],
+              data_f_test
+            )[, 1]
+          )
         },
         rforest = {
           if (!requireNamespace("randomForest", quietly = TRUE)) {
@@ -436,19 +452,26 @@ server <- function(input, output, session) {
           data_temp <- data_f_train
           data_temp[, input$var_cible] <- factor(data_f_train[, input$var_cible])
           print(summary(data_temp))
-          list_models[[model]] <- randomForest::randomForest(as.formula(paste(input$var_cible, "~ .")),
+          list_models[[model]] <- randomForest::randomForest(
+            as.formula(paste(input$var_cible, "~ .")),
             data = data_temp,
             ntree = input$rforestParam_ntree,
             mtry = input$rforestParam_mtry,
             replace = input$rforestParam_replace,
-            maxnodes = input$rforestParam_maxnodes,
-            type = "classification"
+            maxnodes = input$rforestParam_maxnodes
           )
           roc_curves[[model]] <- pROC::roc(
             data_test[[input$var_cible]],
             predict(list_models[[model]],
-              data_test,
-              type = "prob"
+                    data_test,
+                    type = "prob"
+            )[, 1]
+          )
+          roc_curves_financed[[model]] <- pROC::roc(
+            data_f_test[[input$var_cible]],
+            predict(list_models[[model]],
+                    data_f_test,
+                    type = "prob"
             )[, 1]
           )
         },
@@ -471,8 +494,18 @@ server <- function(input, output, session) {
             data_test[[input$var_cible]],
             attr(
               predict(list_models[[model]],
-                data_test,
-                probability = TRUE
+                      data_test,
+                      probability = TRUE
+              ),
+              "probabilities"
+            )[, 1]
+          )
+          roc_curves_financed[[model]] <- pROC::roc(
+            data_f_test[[input$var_cible]],
+            attr(
+              predict(list_models[[model]],
+                      data_f_test,
+                      probability = TRUE
               ),
               "probabilities"
             )[, 1]
@@ -497,15 +530,22 @@ server <- function(input, output, session) {
               data_test
             )[, 1]
           )
+          roc_curves_financed[[model]] <- pROC::roc(
+            data_f_test[[input$var_cible]],
+            predict(
+              list_models[[model]],
+              data_f_test
+            )[, 1]
+          )
         },
         print("no model specified yet")
       )
     }
-    return(roc_curves)
+    return(list(roc_curves, roc_curves_financed))
   })
 
   output$roc_tous_reject_inference <- plotly::renderPlotly({
-    roc_curves <- model_reject_inference()
+    roc_curves <- model_reject_inference()[[1]]
 
     df_roc_curve_all <- data.frame(
       unlist(unname(lapply(roc_curves, function(roc_curve) roc_curve$specificities))),
@@ -516,21 +556,63 @@ server <- function(input, output, session) {
     colnames(df_roc_curve_all) <- c("Specificity", "Sensitivity", "Model")
 
     plotly_plot <- plotly::plot_ly(df_roc_curve_all,
-      x = ~ (1 - Specificity),
-      y = ~Sensitivity,
-      linetype = ~ as.factor(Model)
+                                   x = ~ (1 - Specificity),
+                                   y = ~Sensitivity,
+                                   linetype = ~ as.factor(Model)
     ) %>%
       plotly::add_segments(
         x = 0, y = 0, xend = 1, yend = 1,
         line = list(dash = "7px", color = "#F35B25", width = 4),
-        name = "Random"
-      ) %>%
+        name = "Random",
+        showlegend = FALSE
+        ) %>%
       plotly::add_lines(
         name = ~ as.factor(Model),
         line = list(shape = "spline", color = "#737373", width = 4)
       ) %>%
       plotly::layout(
         title = "ROC Curve on test set all applicants",
+        xaxis = list(
+          range = c(0, 1), zeroline = F, showgrid = F,
+          title = "1 - Specificity"
+        ),
+        yaxis = list(
+          range = c(0, 1), zeroline = F, showgrid = F,
+          domain = c(0, 0.9),
+          title = "Sensibility"
+        )
+      )
+    plotly_plot
+  })
+
+  output$roc_tous_reject_inference_financed <- plotly::renderPlotly({
+    roc_curves <- model_reject_inference()[[2]]
+
+    df_roc_curve_all <- data.frame(
+      unlist(unname(lapply(roc_curves, function(roc_curve) roc_curve$specificities))),
+      unlist(unname(lapply(roc_curves, function(roc_curve) roc_curve$sensitivities))),
+      unlist(unname(lapply(1:length(roc_curves), function(index) rep(names(roc_curves[index]), length(roc_curves[[index]]$specificities)))))
+    )
+
+    colnames(df_roc_curve_all) <- c("Specificity", "Sensitivity", "Model")
+
+    plotly_plot <- plotly::plot_ly(df_roc_curve_all,
+                                   x = ~ (1 - Specificity),
+                                   y = ~Sensitivity,
+                                   linetype = ~ as.factor(Model)
+    ) %>%
+      plotly::add_segments(
+        x = 0, y = 0, xend = 1, yend = 1,
+        line = list(dash = "7px", color = "#F35B25", width = 4),
+        name = "Random",
+        showlegend = FALSE
+      ) %>%
+      plotly::add_lines(
+        name = ~ as.factor(Model),
+        line = list(shape = "spline", color = "#737373", width = 4)
+      ) %>%
+      plotly::layout(
+        title = "ROC Curve on test set financed applicants",
         xaxis = list(
           range = c(0, 1), zeroline = F, showgrid = F,
           title = "1 - Specificity"

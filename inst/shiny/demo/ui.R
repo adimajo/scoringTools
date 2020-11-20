@@ -192,14 +192,14 @@ ui <- shiny::fluidPage(
             shiny::numericInput(
               "rforestParam_mtry",
               "Random Forest: mtry",
-              5
+              2
             ),
             shiny::checkboxInput(
               "rforestParam_replace",
               "Random Forest: replace",
               TRUE
             ),
-            shiny::selectInput(
+            shiny::numericInput(
               "rforestParam_maxnodes",
               "Random Forest: maxnodes",
               10
@@ -217,7 +217,7 @@ ui <- shiny::fluidPage(
               list(
                 "linear",
                 "polynomial",
-                "radial basis",
+                "radial",
                 "sigmoid"
               )
             )
@@ -240,7 +240,7 @@ ui <- shiny::fluidPage(
           ),
           shiny::conditionalPanel(
             condition = "input.modelsRejectInference.includes('svm') & (input.svmParam_kernel == 'polynomial' |  input.svmParam_kernel != 'sigmoid')",
-            shiny::selectInput(
+            shiny::numericInput(
               "svmParam_coef0",
               "SVM: coef0",
               0
@@ -309,6 +309,9 @@ ui <- shiny::fluidPage(
             "ROC curves",
             plotly::plotlyOutput(
               "roc_tous_reject_inference"
+            ),
+            plotly::plotlyOutput(
+              "roc_tous_reject_inference_financed"
             )
           ),
           shiny::tabPanel("Gini indices", tableOutput("gini_reject"))
