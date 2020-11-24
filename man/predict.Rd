@@ -19,7 +19,7 @@ predict.reject_infered(object, newdata, ...)
 \S4method{predict}{reject_infered}(object, newdata, ...)
 }
 \arguments{
-\item{object}{The S4 discretization object.}
+\item{object}{The S4 reject_infered object.}
 
 \item{...}{Additional parameters to pass on to base predict.}
 

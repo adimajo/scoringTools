@@ -74,13 +74,20 @@ methods::setGeneric("predict")
 #' @param object The S4 discretization object.
 #' @param newdata The test dataframe to discretize and for which we wish to have predictions.
 predict.discretization <- function(object, newdata) {
-  predict(object = object@best.disc[[1]], newdata = data.frame(discretize_cutp(object@parameters[[1]][object@parameters[[6]][[1]], ], object@best.disc[[2]][["Disc.data"]], newdata)) %>%
-    dplyr::mutate_if(is.numeric, as.factor), type = "response")
+  df_to_predict = data.frame(
+    discretize_cutp(
+      cont_test_set = newdata,
+      disc_train_set = object@best.disc[[2]][["Disc.data"]],
+      cont_train_set = object@parameters[[1]][object@parameters[[6]][[1]], ])) %>%
+    dplyr::mutate_if(is.numeric, as.factor)
+  print(summary(df_to_predict))
+  return(predict(object = object@best.disc[[1]],
+          newdata = df_to_predict, type = "response"))
 }
 
 #' Prediction on a raw test set of the logistic regression model after reject inference.
 #' @rdname predict
-#' @param object The S4 discretization object.
+#' @param object The S4 reject_infered object.
 #' @param newdata The test dataframe to discretize and for which we wish to have predictions.
 #' @param ... Additional parameters to pass on to base predict.
 predict.reject_infered <- function(object, newdata, ...) {

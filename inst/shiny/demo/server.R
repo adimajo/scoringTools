@@ -118,6 +118,15 @@ server <- function(input, output, session) {
     "var_cible",
     choices = colnames(list_imported_df[[input$selectedDataRejectInference]])
   ))
+  shiny::observeEvent({
+    (!is.null(input$selectedDataQuantization)) &
+      (!is.null(colnames(list_imported_df[[input$selectedDataQuantization]])))
+  },
+  shiny::updateSelectInput(
+    session = session,
+    "var_cible_quantization",
+    choices = colnames(list_imported_df[[input$selectedDataQuantization]])
+  ))
   shiny::observeEvent(
     (!is.null(input$selectedDataRejectInference)) &
       (!is.null(colnames(
@@ -359,6 +368,8 @@ server <- function(input, output, session) {
     y_nf_test <- data[int_nf & int_test, input$var_cible]
     data_test <- data[int_test,]
     data_f_test <- data[int_f & int_test,]
+    data_nf_test <- data[int_nf & int_test,]
+    data_nf_train <- data[int_nf & int_train,]
 
     if (input$deleteSamplesRejectInference) {
       levels_in_train <-
@@ -366,6 +377,9 @@ server <- function(input, output, session) {
           levels(factor(fct)))
       levels_in_test <-
         lapply(data_test[, sapply(data_test, is.factor)], function(fct)
+          levels(factor(fct)))
+      levels_in_train_nf_f <-
+        lapply(data_train[, sapply(data_train, is.factor)], function(fct)
           levels(factor(fct)))
 
       if (length(levels_in_train) > 0) {
@@ -379,14 +393,60 @@ server <- function(input, output, session) {
               return(NULL)
             }
           })
+        levels_to_delete_train <-
+          sapply(1:length(levels_in_train), function(idx) {
+            if (length(which(!(
+              levels_in_train_nf_f[[idx]] %in% levels_in_train[[idx]]
+            ))) > 0) {
+              return(levels_in_train_nf_f[[idx]][which(!(levels_in_train_nf_f[[idx]] %in% levels_in_train[[idx]]))])
+            } else {
+              return(NULL)
+            }
+          })
 
+        rows_to_delete_train <- sapply(1:sum(sapply(data_train, is.factor)),
+                                 function(idx) {
+                                   data_train[, sapply(data_train, is.factor)][, idx] %in% levels_to_delete_train[[idx]]
+                                 })
         rows_to_delete <- sapply(1:sum(sapply(data_test, is.factor)),
                                  function(idx) {
                                    data_test[, sapply(data_test, is.factor)][, idx] %in% levels_to_delete[[idx]]
                                  })
+        rows_to_delete_f <- sapply(1:sum(sapply(data_f_test, is.factor)),
+                                   function(idx) {
+                                     data_f_test[, sapply(data_f_test, is.factor)][, idx] %in% levels_to_delete[[idx]]
+                                   })
+        rows_to_delete_nf <- sapply(1:sum(sapply(data_nf_test, is.factor)),
+                                    function(idx) {
+                                      data_nf_test[, sapply(data_nf_test, is.factor)][, idx] %in% levels_to_delete[[idx]]
+                                    })
+        rows_to_delete_nf_train <- sapply(1:sum(sapply(data_nf_train, is.factor)),
+                                    function(idx) {
+                                      data_nf_train[, sapply(data_nf_train, is.factor)][, idx] %in% levels_to_delete_train[[idx]]
+                                    })
 
         data_test <-
           data_test[Matrix::rowSums(rows_to_delete) == 0,]
+        data_train <-
+          data_train[Matrix::rowSums(rows_to_delete_train) == 0,]
+        x_nf_train <-
+          x_nf_train[Matrix::rowSums(rows_to_delete_nf_train) == 0,
+                     ,drop = FALSE]
+        x_test <-
+          x_test[Matrix::rowSums(rows_to_delete) == 0,]
+        # x_train <-
+        #   x_train[Matrix::rowSums(rows_to_delete_train) == 0,]
+        x_f_test <-
+          x_f_test[Matrix::rowSums(rows_to_delete_f) == 0,
+               ,drop = FALSE]
+        x_nf_test <-
+          x_nf_test[Matrix::rowSums(rows_to_delete_nf) == 0,
+               ,drop = FALSE]
+        y_test <- y_test[Matrix::rowSums(rows_to_delete) == 0]
+        y_train <- y_train[Matrix::rowSums(rows_to_delete_train) == 0]
+        y_f_test <- y_f_test[Matrix::rowSums(rows_to_delete_f) == 0]
+        y_nf_test <- y_nf_test[Matrix::rowSums(rows_to_delete_nf) == 0]
+        data_f_test <- data_f_test[Matrix::rowSums(rows_to_delete_f) == 0, ]
         warning("Deleted samples due to factor levels in test set not in train financed set.")
       }
     }
@@ -427,8 +487,10 @@ server <- function(input, output, session) {
     list_models <- list()
     roc_curves <- list()
     roc_curves_financed <- list()
-    list_gini <- list()
-    list_gini_financed <- list()
+    list_gini_test <- list()
+    list_gini_test_financed <- list()
+    list_gini_train <- list()
+    list_gini_train_financed <- list()
     for (model in (input$modelsRejectInference)) {
       switch(
         model,
@@ -447,18 +509,26 @@ server <- function(input, output, session) {
                                                     predict(list_models[[model]],
                                                             data_f_test,
                                                             type = "response"))
-          # list_gini[[model]] <- scoringTools::normalizedGini(
-          list_gini[[model]] <- pROC::ci.auc(data_test[[input$var_cible]],
-                                             predict(list_models[[model]],
-                                                     data_test,
-                                                     type = "response"),
-                                             conf.level=input$confidence_level_reject)
-          # list_gini_financed[[model]] <- scoringTools::normalizedGini(
-          list_gini_financed[[model]] <- pROC::ci.auc(data_f_test[[input$var_cible]],
-                                                      predict(list_models[[model]],
-                                                              data_f_test,
-                                                              type = "response"),
-                                                      conf.level=input$confidence_level_reject)
+          list_gini_test[[model]] <- pROC::ci.auc(data_test[[input$var_cible]],
+                                                  predict(list_models[[model]],
+                                                          data_test,
+                                                          type = "response"),
+                                                  conf.level=input$confidence_level_reject)
+          list_gini_test_financed[[model]] <- pROC::ci.auc(data_f_test[[input$var_cible]],
+                                                           predict(list_models[[model]],
+                                                                   data_f_test,
+                                                                   type = "response"),
+                                                           conf.level=input$confidence_level_reject)
+          list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible]],
+                                                  predict(list_models[[model]],
+                                                          data_train,
+                                                          type = "response"),
+                                                  conf.level=input$confidence_level_reject)
+          list_gini_train_financed[[model]] <- pROC::ci.auc(data_f_train[[input$var_cible]],
+                                                           predict(list_models[[model]],
+                                                                   data_f_train,
+                                                                   type = "response"),
+                                                           conf.level=input$confidence_level_reject)
         },
         tree = {
           if (!requireNamespace("rpart", quietly = TRUE)) {
@@ -476,16 +546,22 @@ server <- function(input, output, session) {
           roc_curves_financed[[model]] <- pROC::roc(data_f_test[[input$var_cible]],
                                                     predict(list_models[[model]],
                                                             data_f_test)[, 2])
-          # list_gini[[model]] <- scoringTools::normalizedGini(
-          list_gini[[model]] <- pROC::ci.auc(data_test[[input$var_cible]],
-                                             predict(list_models[[model]],
-                                                     data_test)[, 2],
-                                             conf.level=input$confidence_level_reject)
-          # list_gini_financed[[model]] <- scoringTools::normalizedGini(
-          list_gini_financed[[model]] <- pROC::ci.auc(data_f_test[[input$var_cible]],
-                                                      predict(list_models[[model]],
-                                                              data_f_test)[, 2],
-                                                      conf.level=input$confidence_level_reject)
+          list_gini_test[[model]] <- pROC::ci.auc(data_test[[input$var_cible]],
+                                                  predict(list_models[[model]],
+                                                          data_test)[, 2],
+                                                  conf.level=input$confidence_level_reject)
+          list_gini_test_financed[[model]] <- pROC::ci.auc(data_f_test[[input$var_cible]],
+                                                           predict(list_models[[model]],
+                                                                   data_f_test)[, 2],
+                                                           conf.level=input$confidence_level_reject)
+          list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible]],
+                                                  predict(list_models[[model]],
+                                                          data_train)[, 2],
+                                                  conf.level=input$confidence_level_reject)
+          list_gini_train_financed[[model]] <- pROC::ci.auc(data_f_train[[input$var_cible]],
+                                                           predict(list_models[[model]],
+                                                                   data_f_train)[, 2],
+                                                           conf.level=input$confidence_level_reject)
         },
         rforest = {
           if (!requireNamespace("randomForest", quietly = TRUE)) {
@@ -512,18 +588,26 @@ server <- function(input, output, session) {
                                                     predict(list_models[[model]],
                                                             data_f_test,
                                                             type = "prob")[, 2])
-          # list_gini[[model]] <- scoringTools::normalizedGini(
-          list_gini[[model]] <- pROC::ci.auc(data_test[[input$var_cible]],
-                                             predict(list_models[[model]],
-                                                     data_test,
-                                                     type = "prob")[, 2],
-                                             conf.level=input$confidence_level_reject)
-          # list_gini_financed[[model]] <- scoringTools::normalizedGini(
-          list_gini_financed[[model]] <- pROC::ci.auc(data_f_test[[input$var_cible]],
-                                                      predict(list_models[[model]],
-                                                              data_f_test,
-                                                              type = "prob")[, 2],
-                                                      conf.level=input$confidence_level_reject)
+          list_gini_test[[model]] <- pROC::ci.auc(data_test[[input$var_cible]],
+                                                  predict(list_models[[model]],
+                                                          data_test,
+                                                          type = "prob")[, 2],
+                                                  conf.level=input$confidence_level_reject)
+          list_gini_test_financed[[model]] <- pROC::ci.auc(data_f_test[[input$var_cible]],
+                                                           predict(list_models[[model]],
+                                                                   data_f_test,
+                                                                   type = "prob")[, 2],
+                                                           conf.level=input$confidence_level_reject)
+          list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible]],
+                                                  predict(list_models[[model]],
+                                                          data_train,
+                                                          type = "prob")[, 2],
+                                                  conf.level=input$confidence_level_reject)
+          list_gini_train_financed[[model]] <- pROC::ci.auc(data_f_train[[input$var_cible]],
+                                                           predict(list_models[[model]],
+                                                                   data_f_train,
+                                                                   type = "prob")[, 2],
+                                                           conf.level=input$confidence_level_reject)
         },
         svm = {
           if (!requireNamespace("e1071", quietly = TRUE)) {
@@ -556,8 +640,7 @@ server <- function(input, output, session) {
                                                               probability = TRUE),
                                                       "probabilities"
                                                     )[, 1])
-          # list_gini[[model]] <- scoringTools::normalizedGini(
-          list_gini[[model]] <- pROC::ci.auc(data_test[[input$var_cible]],
+          list_gini_test[[model]] <- pROC::ci.auc(data_test[[input$var_cible]],
                                              attr(
                                                predict(list_models[[model]],
                                                        data_test,
@@ -565,8 +648,7 @@ server <- function(input, output, session) {
                                                "probabilities"
                                              )[, 1],
                                              conf.level=input$confidence_level_reject)
-          # list_gini_financed[[model]] <- scoringTools::normalizedGini(
-          list_gini_financed[[model]] <- pROC::ci.auc(data_f_test[[input$var_cible]],
+          list_gini_test_financed[[model]] <- pROC::ci.auc(data_f_test[[input$var_cible]],
                                                       attr(
                                                         predict(list_models[[model]],
                                                                 data_f_test,
@@ -574,6 +656,22 @@ server <- function(input, output, session) {
                                                         "probabilities"
                                                       )[, 1],
                                                       conf.level=input$confidence_level_reject)
+          list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible]],
+                                                   attr(
+                                                     predict(list_models[[model]],
+                                                             data_train,
+                                                             probability = TRUE),
+                                                     "probabilities"
+                                                   )[, 1],
+                                                   conf.level=input$confidence_level_reject)
+          list_gini_train_financed[[model]] <- pROC::ci.auc(data_f_train[[input$var_cible]],
+                                                            attr(
+                                                              predict(list_models[[model]],
+                                                                      data_f_train,
+                                                                      probability = TRUE),
+                                                              "probabilities"
+                                                            )[, 1],
+                                                            conf.level=input$confidence_level_reject)
         },
         nnet = {
           if (!requireNamespace("nnet", quietly = TRUE)) {
@@ -595,16 +693,22 @@ server <- function(input, output, session) {
           roc_curves_financed[[model]] <- pROC::roc(data_f_test[[input$var_cible]],
                                                     predict(list_models[[model]],
                                                             data_f_test)[, 1])
-          # list_gini[[model]] <- scoringTools::normalizedGini(
-          list_gini[[model]] <- pROC::ci.auc(data_test[[input$var_cible]],
+          list_gini_test[[model]] <- pROC::ci.auc(data_test[[input$var_cible]],
                                              predict(list_models[[model]],
                                                      data_test)[, 1],
                                              conf.level=input$confidence_level_reject)
-          # list_gini_financed[[model]] <- scoringTools::normalizedGini(
-          list_gini_financed[[model]] <- pROC::ci.auc(data_f_test[[input$var_cible]],
+          list_gini_test_financed[[model]] <- pROC::ci.auc(data_f_test[[input$var_cible]],
                                                       predict(list_models[[model]],
                                                               data_f_test)[, 1],
                                                       conf.level=input$confidence_level_reject)
+          list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible]],
+                                                   predict(list_models[[model]],
+                                                           data_train)[, 1],
+                                                   conf.level=input$confidence_level_reject)
+          list_gini_train_financed[[model]] <- pROC::ci.auc(data_f_train[[input$var_cible]],
+                                                            predict(list_models[[model]],
+                                                                    data_f_train)[, 1],
+                                                            conf.level=input$confidence_level_reject)
         },
         print("no model specified yet")
       )
@@ -624,18 +728,26 @@ server <- function(input, output, session) {
                                                     predict(list_models[[model]],
                                                             x_f_test,
                                                             type = "response"))
-          # list_gini[[model]] <- scoringTools::normalizedGini(
-          list_gini[[model]] <- pROC::ci.auc(c(y_f_test, y_nf_test),
+          list_gini_test[[model]] <- pROC::ci.auc(c(y_f_test, y_nf_test),
                                              predict(list_models[[model]],
                                                      rbind(x_f_test, x_nf_test),
                                                      type = "response"),
                                              conf.level=input$confidence_level_reject)
-          # list_gini_financed[[model]] <- scoringTools::normalizedGini(
-          list_gini_financed[[model]] <- pROC::ci.auc(y_f_test,
+          list_gini_test_financed[[model]] <- pROC::ci.auc(y_f_test,
                                                       predict(list_models[[model]],
                                                               x_f_test,
                                                               type = "response"),
                                                       conf.level=input$confidence_level_reject)
+          list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible]],
+                                                   predict(list_models[[model]],
+                                                           data_train,
+                                                           type = "response"),
+                                                   conf.level=input$confidence_level_reject)
+          list_gini_train_financed[[model]] <- pROC::ci.auc(data_f_train[[input$var_cible]],
+                                                            predict(list_models[[model]],
+                                                                    x_f_train,
+                                                                    type = "response"),
+                                                            conf.level=input$confidence_level_reject)
         },
         fuzzy = {
           list_models[[model]] <- scoringTools::fuzzy_augmentation(x_f_train,
@@ -649,19 +761,27 @@ server <- function(input, output, session) {
                                                     predict(list_models[[model]],
                                                             x_f_test,
                                                             type = "response"))
-          # list_gini[[model]] <- scoringTools::normalizedGini(
-          list_gini[[model]] <- pROC::ci.auc(c(y_f_test, y_nf_test),
+          list_gini_test[[model]] <- pROC::ci.auc(c(y_f_test, y_nf_test),
                                              predict(list_models[[model]],
                                                      rbind(x_f_test, x_nf_test),
                                                      type = "response"),
                                              conf.level=input$confidence_level_reject)
-          # list_gini_financed[[model]] <- scoringTools::normalizedGini(
-          list_gini_financed[[model]] <- pROC::ci.auc(y_f_test,
+          list_gini_test_financed[[model]] <- pROC::ci.auc(y_f_test,
                                                       predict(list_models[[model]],
                                                               x_f_test,
                                                               type = "response"),
                                                       conf.level=input$confidence_level_reject)
 
+          list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible]],
+                                                   predict(list_models[[model]],
+                                                           data_train,
+                                                           type = "response"),
+                                                   conf.level=input$confidence_level_reject)
+          list_gini_train_financed[[model]] <- pROC::ci.auc(data_f_train[[input$var_cible]],
+                                                            predict(list_models[[model]],
+                                                                    x_f_train,
+                                                                    type = "response"),
+                                                            conf.level=input$confidence_level_reject)
         },
         parcelling = {
           if (!is.null(input$parcellingParam_probs)) {
@@ -687,18 +807,26 @@ server <- function(input, output, session) {
                                                     predict(list_models[[model]],
                                                             x_f_test,
                                                             type = "response"))
-          # list_gini[[model]] <- scoringTools::normalizedGini(
-          list_gini[[model]] <- pROC::ci.auc(c(y_f_test, y_nf_test),
+          list_gini_test[[model]] <- pROC::ci.auc(c(y_f_test, y_nf_test),
                                              predict(list_models[[model]],
                                                      rbind(x_f_test, x_nf_test),
                                                      type = "response"),
                                              conf.level=input$confidence_level_reject)
-          # list_gini_financed[[model]] <- scoringTools::normalizedGini(
-          list_gini_financed[[model]] <- pROC::ci.auc(y_f_test,
+          list_gini_test_financed[[model]] <- pROC::ci.auc(y_f_test,
                                                       predict(list_models[[model]],
                                                               x_f_test,
                                                               type = "response"),
                                                       conf.level=input$confidence_level_reject)
+          list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible]],
+                                                   predict(list_models[[model]],
+                                                           data_train,
+                                                           type = "response"),
+                                                   conf.level=input$confidence_level_reject)
+          list_gini_train_financed[[model]] <- pROC::ci.auc(data_f_train[[input$var_cible]],
+                                                            predict(list_models[[model]],
+                                                                    x_f_train,
+                                                                    type = "response"),
+                                                            conf.level=input$confidence_level_reject)
         },
         reclassification = {
           list_models[[model]] <- scoringTools::reclassification(x_f_train,
@@ -713,18 +841,26 @@ server <- function(input, output, session) {
                                                     predict(list_models[[model]],
                                                             x_f_test,
                                                             type = "response"))
-          # list_gini[[model]] <- scoringTools::normalizedGini(
-          list_gini[[model]] <- pROC::ci.auc(c(y_f_test, y_nf_test),
+          list_gini_test[[model]] <- pROC::ci.auc(c(y_f_test, y_nf_test),
                                              predict(list_models[[model]],
                                                      rbind(x_f_test, x_nf_test),
                                                      type = "response"),
                                              conf.level=input$confidence_level_reject)
-          # list_gini_financed[[model]] <- scoringTools::normalizedGini(
-          list_gini_financed[[model]] <- pROC::ci.auc(y_f_test,
+          list_gini_test_financed[[model]] <- pROC::ci.auc(y_f_test,
                                                       predict(list_models[[model]],
                                                               x_f_test,
                                                               type = "response"),
                                                       conf.level=input$confidence_level_reject)
+          list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible]],
+                                                   predict(list_models[[model]],
+                                                           data_train,
+                                                           type = "response"),
+                                                   conf.level=input$confidence_level_reject)
+          list_gini_train_financed[[model]] <- pROC::ci.auc(data_f_train[[input$var_cible]],
+                                                            predict(list_models[[model]],
+                                                                    x_f_train,
+                                                                    type = "response"),
+                                                            conf.level=input$confidence_level_reject)
         },
         twins = {
           list_models[[model]] <- scoringTools::twins(x_f_train,
@@ -738,18 +874,26 @@ server <- function(input, output, session) {
                                                     predict(list_models[[model]],
                                                             x_f_test,
                                                             type = "response"))
-          # list_gini[[model]] <- scoringTools::normalizedGini(
-          list_gini[[model]] <- pROC::ci.auc(c(y_f_test, y_nf_test),
+          list_gini_test[[model]] <- pROC::ci.auc(c(y_f_test, y_nf_test),
                                              predict(list_models[[model]],
                                                      rbind(x_f_test, x_nf_test),
                                                      type = "response"),
                                              conf.level=input$confidence_level_reject)
-          # list_gini_financed[[model]] <- scoringTools::normalizedGini(
-          list_gini_financed[[model]] <- pROC::ci.auc(y_f_test,
+          list_gini_test_financed[[model]] <- pROC::ci.auc(y_f_test,
                                                       predict(list_models[[model]],
                                                               x_f_test,
                                                               type = "response"),
                                                       conf.level=input$confidence_level_reject)
+          list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible]],
+                                                   predict(list_models[[model]],
+                                                           data_train,
+                                                           type = "response"),
+                                                   conf.level=input$confidence_level_reject)
+          list_gini_train_financed[[model]] <- pROC::ci.auc(data_f_train[[input$var_cible]],
+                                                            predict(list_models[[model]],
+                                                                    x_f_train,
+                                                                    type = "response"),
+                                                            conf.level=input$confidence_level_reject)
         },
         print("no model specified yet")
       )
@@ -757,8 +901,10 @@ server <- function(input, output, session) {
     return(list(
       roc_curves,
       roc_curves_financed,
-      list_gini,
-      list_gini_financed
+      list_gini_test,
+      list_gini_test_financed,
+      list_gini_train,
+      list_gini_train_financed
     ))
   })
 
@@ -891,73 +1037,467 @@ server <- function(input, output, session) {
 
   output$gini_reject <- DT::renderDT({
 
-    list_gini <- model_reject_inference()[[3]]
-    list_gini_financed <- model_reject_inference()[[4]]
+    list_gini_test <- model_reject_inference()[[3]]
+    list_gini_test_financed <- model_reject_inference()[[4]]
+    list_gini_train <- model_reject_inference()[[5]]
+    list_gini_train_financed <- model_reject_inference()[[6]]
 
-    if (input$CI_gini_reject) {
-      df = data.frame(
-        '95 % low' = unlist(lapply(list_gini, function(auc) {
-          (2 * auc[1] - 1) * 100
-        })),
-        'mean' = unlist(lapply(list_gini, function(auc) {
-          (2 * auc[2] - 1) * 100
-        })),
-        '95 % high' = unlist(lapply(list_gini, function(auc) {
-          (2 * auc[3] - 1) * 100
-        })),
-        '95 % low' = unlist(lapply(list_gini_financed, function(auc) {
-          (2 * auc[1] - 1) * 100
-        })),
-        'mean' = unlist(lapply(list_gini_financed, function(auc) {
-          (2 * auc[2] - 1) * 100
-        })),
-        '95 % high' = unlist(lapply(list_gini_financed, function(auc) {
-          (2 * auc[3] - 1) * 100
-        })),
-        check.names	= FALSE
-      )
+    if (input$report_train_reject) {
+      if (input$CI_gini_reject) {
+        df = data.frame(
+          '95 % low' = unlist(lapply(list_gini_train, function(auc) {
+            (2 * auc[1] - 1) * 100
+          })),
+          'mean' = unlist(lapply(list_gini_train, function(auc) {
+            (2 * auc[2] - 1) * 100
+          })),
+          '95 % high' = unlist(lapply(list_gini_train, function(auc) {
+            (2 * auc[3] - 1) * 100
+          })),
+          '95 % low' = unlist(lapply(list_gini_train_financed, function(auc) {
+            (2 * auc[1] - 1) * 100
+          })),
+          'mean' = unlist(lapply(list_gini_train_financed, function(auc) {
+            (2 * auc[2] - 1) * 100
+          })),
+          '95 % high' = unlist(lapply(list_gini_train_financed, function(auc) {
+            (2 * auc[3] - 1) * 100
+          })),
+          '95 % low' = unlist(lapply(list_gini_test, function(auc) {
+            (2 * auc[1] - 1) * 100
+          })),
+          'mean' = unlist(lapply(list_gini_test, function(auc) {
+            (2 * auc[2] - 1) * 100
+          })),
+          '95 % high' = unlist(lapply(list_gini_test, function(auc) {
+            (2 * auc[3] - 1) * 100
+          })),
+          '95 % low' = unlist(lapply(list_gini_test_financed, function(auc) {
+            (2 * auc[1] - 1) * 100
+          })),
+          'mean' = unlist(lapply(list_gini_test_financed, function(auc) {
+            (2 * auc[2] - 1) * 100
+          })),
+          '95 % high' = unlist(lapply(list_gini_test_financed, function(auc) {
+            (2 * auc[3] - 1) * 100
+          })),
+          check.names	= FALSE
+        )
+        low_value = paste0(input$confidence_level_reject * 100, ' % low')
+        high_value = paste0(input$confidence_level_reject * 100, ' % high')
 
-      low_value = paste0(input$confidence_level_reject * 100, ' % low')
-      high_value = paste0(input$confidence_level_reject * 100, ' % high')
-
-      sketch = htmltools::withTags(table(class = 'display',
-                                         thead(tr(
-                                           th(rowspan = 2, style="text-align:center", 'Model'),
-                                           th(colspan = 3, style="text-align:center", 'Test set - Through-the-Door'),
-                                           th(colspan = 3, style="text-align:center", 'Test-set - Financed')
-                                         ),
-                                         tr(
-                                           lapply(rep(c(
-                                             low_value,
-                                             'mean',
-                                             high_value
-                                           ), 2), th)
-                                         ))))
+        sketch = htmltools::withTags(table(class = 'display',
+                                           thead(tr(
+                                             th(rowspan = 3, style="text-align:center", 'Model'),
+                                             th(colspan = 6, style="text-align:center", 'Train set'),
+                                             th(colspan = 6, style="text-align:center", 'Test set'),
+                                           ),
+                                           tr(th(colspan = 3, style="text-align:center", 'Through-the-Door'),
+                                              th(colspan = 3, style="text-align:center", 'Financed'),
+                                              th(colspan = 3, style="text-align:center", 'Through-the-Door'),
+                                              th(colspan = 3, style="text-align:center", 'Financed')
+                                           ),
+                                           tr(
+                                             lapply(rep(c(
+                                               low_value,
+                                               'mean',
+                                               high_value
+                                             ), 4), th)
+                                           ))))
+      } else {
+        df = data.frame(
+          'mean train' = unlist(lapply(list_gini_train, function(auc) {
+            (2 * auc[2] - 1) * 100
+          })),
+          'mean train financed' = unlist(lapply(list_gini_train_financed, function(auc) {
+            (2 * auc[2] - 1) * 100
+          })),
+          'mean test' = unlist(lapply(list_gini_test, function(auc) {
+            (2 * auc[2] - 1) * 100
+          })),
+          'mean test financed' = unlist(lapply(list_gini_test_financed, function(auc) {
+            (2 * auc[2] - 1) * 100
+          })),
+          check.names	= FALSE
+        )
+        sketch = htmltools::withTags(table(class = 'display',
+                                           thead(tr(
+                                             th(style="text-align:center", 'Model'),
+                                             th(style="text-align:center", 'Train set - Through-the-Door'),
+                                             th(style="text-align:center", 'Train set - Financed'),
+                                             th(style="text-align:center", 'Test set - Through-the-Door'),
+                                             th(style="text-align:center", 'Test set - Financed')
+                                           ))))
+      }
     } else {
-      df = data.frame(
-        'mean test' = unlist(lapply(list_gini, function(auc) {
-          (2 * auc[2] - 1) * 100
-        })),
-        'mean test financed' = unlist(lapply(list_gini_financed, function(auc) {
-          (2 * auc[2] - 1) * 100
-        })),
-        check.names	= FALSE
-      )
-      sketch = htmltools::withTags(table(class = 'display',
-                                         thead(tr(
-                                           th(style="text-align:center", 'Model'),
-                                           th(style="text-align:center", 'Test set - Through-the-Door'),
-                                           th(style="text-align:center", 'Test-set - Financed')
-                                         ))))
+      if (input$CI_gini_reject) {
+        df = data.frame(
+          '95 % low' = unlist(lapply(list_gini_test, function(auc) {
+            (2 * auc[1] - 1) * 100
+          })),
+          'mean' = unlist(lapply(list_gini_test, function(auc) {
+            (2 * auc[2] - 1) * 100
+          })),
+          '95 % high' = unlist(lapply(list_gini_test, function(auc) {
+            (2 * auc[3] - 1) * 100
+          })),
+          '95 % low' = unlist(lapply(list_gini_test_financed, function(auc) {
+            (2 * auc[1] - 1) * 100
+          })),
+          'mean' = unlist(lapply(list_gini_test_financed, function(auc) {
+            (2 * auc[2] - 1) * 100
+          })),
+          '95 % high' = unlist(lapply(list_gini_test_financed, function(auc) {
+            (2 * auc[3] - 1) * 100
+          })),
+          check.names	= FALSE
+        )
+
+        low_value = paste0(input$confidence_level_reject * 100, ' % low')
+        high_value = paste0(input$confidence_level_reject * 100, ' % high')
+
+        sketch = htmltools::withTags(table(class = 'display',
+                                           thead(tr(
+                                             th(rowspan = 2, style="text-align:center", 'Model'),
+                                             th(colspan = 3, style="text-align:center", 'Test set - Through-the-Door'),
+                                             th(colspan = 3, style="text-align:center", 'Test set - Financed')
+                                           ),
+                                           tr(
+                                             lapply(rep(c(
+                                               low_value,
+                                               'mean',
+                                               high_value
+                                             ), 2), th)
+                                           ))))
+      } else {
+        df = data.frame(
+          'mean test' = unlist(lapply(list_gini_test, function(auc) {
+            (2 * auc[2] - 1) * 100
+          })),
+          'mean test financed' = unlist(lapply(list_gini_test_financed, function(auc) {
+            (2 * auc[2] - 1) * 100
+          })),
+          check.names	= FALSE
+        )
+        sketch = htmltools::withTags(table(class = 'display',
+                                           thead(tr(
+                                             th(style="text-align:center", 'Model'),
+                                             th(style="text-align:center", 'Test set - Through-the-Door'),
+                                             th(style="text-align:center", 'Test set - Financed')
+                                           ))))
+      }
     }
-    print(rownames(df))
     DT::datatable(df,
                   rownames = TRUE,
                   container = sketch) %>%
-      formatRound(columns=c(1:ncol(df)), digits=2)
-      # formatRound(columns=sapply(df, is.numeric), digits=2)
+      DT::formatRound(columns=c(1:ncol(df)), digits=2)
   })
 
+
+  # Quantization
+  data_quantization <- reactive({
+    data <- list_imported_df[[input$selectedDataQuantization]]
+    int_test <- 1:nrow(data) %in% sample.int(nrow(data),
+                                             size = (input$bins_test) / 100 * nrow(data))
+    int_train <- !int_test
+    x_train <-
+      data[int_train,!colnames(data) == input$var_cible, drop = FALSE]
+    y_train <- data[int_train, input$var_cible]
+    data_train <- data[int_train,]
+    x_test <-
+      data[int_test,!colnames(data) == input$var_cible, drop = FALSE]
+    y_test <- data[int_test, input$var_cible]
+    data_test <- data[int_test,]
+
+    if (input$deleteSamplesQuantization) {
+      levels_in_train <-
+        lapply(data_train[, sapply(data_train, is.factor)], function(fct)
+          levels(factor(fct)))
+      levels_in_test <-
+        lapply(data_test[, sapply(data_test, is.factor)], function(fct)
+          levels(factor(fct)))
+
+      if (length(levels_in_train) > 0) {
+        levels_to_delete <-
+          sapply(1:length(levels_in_train), function(idx) {
+            if (length(which(!(
+              levels_in_test[[idx]] %in% levels_in_train[[idx]]
+            ))) > 0) {
+              return(levels_in_test[[idx]][which(!(levels_in_test[[idx]] %in% levels_in_train[[idx]]))])
+            } else {
+              return(NULL)
+            }
+          })
+
+        rows_to_delete <- sapply(1:sum(sapply(data_test, is.factor)),
+                                 function(idx) {
+                                   data_test[, sapply(data_test, is.factor)][, idx] %in% levels_to_delete[[idx]]
+                                 })
+
+        data_test <-
+          data_test[Matrix::rowSums(rows_to_delete) == 0,]
+        warning("Deleted samples due to factor levels in test set not in train financed set.")
+      }
+    }
+
+    return(
+      list(
+        data_train = data_train,
+        data_test = data_test
+      )
+    )
+  })
+
+  model_quantization <- reactive({
+    list_to_parse <- data_quantization()
+    data_train <- list_to_parse[[1]]
+    data_test <- list_to_parse[[2]]
+
+    list_models <- list()
+    roc_curves <- list()
+    list_gini_test <- list()
+    list_gini_train <- list()
+    for (model in (input$modelsQuantization)) {
+      switch(
+        model,
+        linear = {
+          list_models[[model]] <- stats::glm(
+            as.formula(paste(input$var_cible_quantization, "~ .")),
+            data = data_train,
+            family = stats::binomial(link = "logit")
+          )
+          roc_curves[[model]] <- pROC::roc(data_test[[input$var_cible_quantization]],
+                                           predict(list_models[[model]],
+                                                   data_test,
+                                                   type = "response"))
+          list_gini_test[[model]] <- pROC::ci.auc(data_test[[input$var_cible_quantization]],
+                                                  predict(list_models[[model]],
+                                                          data_test,
+                                                          type = "response"),
+                                                  conf.level=input$confidence_level_quantization)
+          list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible_quantization]],
+                                                   predict(list_models[[model]],
+                                                           data_train,
+                                                           type = "response"),
+                                                   conf.level=input$confidence_level_quantization)
+        },
+        glmdisc = {
+          list_models[[model]] <-
+          glmdisc::glmdisc(
+            data_train[, !colnames(data_train) == input$var_cible_quantization],
+            data_train[[input$var_cible_quantization]],
+            interact = input$glmdiscParam_interact,
+            validation = input$glmdiscParam_validation,
+            test = input$glmdiscParam_test,
+            criterion = input$glmdiscParam_criterion,
+            iter = input$glmdiscParam_iter,
+            m_start = input$glmdiscParam_m_start)
+        roc_curves[[model]] <- pROC::roc(data_test[[input$var_cible_quantization]],
+                                         predict(list_models[[model]],
+                                                 data_test[, !colnames(data_test) == input$var_cible_quantization]))
+        list_gini_test[[model]] <- pROC::ci.auc(data_test[[input$var_cible_quantization]],
+                                                predict(list_models[[model]],
+                                                        data_test[, !colnames(data_test) == input$var_cible_quantization]),
+                                                conf.level=input$confidence_level_quantization)
+        list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible_quantization]],
+                                                 predict(list_models[[model]],
+                                                         data_train[, !colnames(data_train) == input$var_cible_quantization]),
+                                                 conf.level=input$confidence_level_quantization)
+      },
+        chi2 = {
+          list_models[[model]] <-
+            scoringTools::chi2_iter(
+              data_train[, !colnames(data_train) == input$var_cible_quantization],
+              data_train[[input$var_cible_quantization]],
+              validation = input$chi2Param_validation,
+              test = input$chi2Param_test,
+              criterion = input$chi2Param_criterion)
+          roc_curves[[model]] <- pROC::roc(data_test[[input$var_cible]],
+                                           predict(list_models[[model]],
+                                                   data_test[, !colnames(data_test) == input$var_cible_quantization]))
+          list_gini_test[[model]] <- pROC::ci.auc(data_test[[input$var_cible]],
+                                                  predict(list_models[[model]],
+                                                          data_test[, !colnames(data_test) == input$var_cible_quantization]),
+                                                  conf.level=input$confidence_level_reject)
+          list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible]],
+                                                   predict(list_models[[model]],
+                                                           data_train[, !colnames(data_train) == input$var_cible_quantization]),
+                                                   conf.level=input$confidence_level_reject)
+        },
+        chiM = {
+          list_models[[model]] <-
+            scoringTools::chiM_iter(
+              data_train[, !colnames(data_train) == input$var_cible_quantization],
+              data_train[[input$var_cible_quantization]],
+              validation = input$chiMParam_validation,
+              test = input$chiMParam_test,
+              criterion = input$chiMParam_criterion)
+          roc_curves[[model]] <- pROC::roc(data_test[[input$var_cible]],
+                                           predict(list_models[[model]],
+                                                   data_test[, !colnames(data_test) == input$var_cible_quantization]))
+          list_gini_test[[model]] <- pROC::ci.auc(data_test[[input$var_cible]],
+                                                  predict(list_models[[model]],
+                                                          data_test[, !colnames(data_test) == input$var_cible_quantization]),
+                                                  conf.level=input$confidence_level_reject)
+          list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible]],
+                                                   predict(list_models[[model]],
+                                                           data_train[, !colnames(data_train) == input$var_cible_quantization]),
+                                                   conf.level=input$confidence_level_reject)
+        },
+        echi2 = {
+          list_models[[model]] <-
+            scoringTools::echi2_iter(
+              data_train[, !colnames(data_train) == input$var_cible_quantization],
+              data_train[[input$var_cible_quantization]],
+              validation = input$echi2Param_validation,
+              test = input$echi2Param_test,
+              criterion = input$echi2Param_criterion)
+          roc_curves[[model]] <- pROC::roc(data_test[[input$var_cible]],
+                                           predict(list_models[[model]],
+                                                   data_test[, !colnames(data_test) == input$var_cible_quantization]))
+          list_gini_test[[model]] <- pROC::ci.auc(data_test[[input$var_cible]],
+                                                  predict(list_models[[model]],
+                                                          data_test[, !colnames(data_test) == input$var_cible_quantization]),
+                                                  conf.level=input$confidence_level_reject)
+          list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible]],
+                                                   predict(list_models[[model]],
+                                                           data_train[, !colnames(data_train) == input$var_cible_quantization]),
+                                                   conf.level=input$confidence_level_reject)
+        },
+        modchi2 = {
+          list_models[[model]] <-
+            scoringTools::modchi2_iter(
+              data_train[, !colnames(data_train) == input$var_cible_quantization],
+              data_train[[input$var_cible_quantization]],
+              validation = input$modchi2Param_validation,
+              test = input$modchi2Param_test,
+              criterion = input$modchi2Param_criterion)
+          roc_curves[[model]] <- pROC::roc(data_test[[input$var_cible]],
+                                           predict(list_models[[model]],
+                                                   data_test[, !colnames(data_test) == input$var_cible_quantization]))
+          list_gini_test[[model]] <- pROC::ci.auc(data_test[[input$var_cible]],
+                                                  predict(list_models[[model]],
+                                                          data_test[, !colnames(data_test) == input$var_cible_quantization]),
+                                                  conf.level=input$confidence_level_reject)
+          list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible]],
+                                                   predict(list_models[[model]],
+                                                           data_train[, !colnames(data_train) == input$var_cible_quantization]),
+                                                   conf.level=input$confidence_level_reject)
+        },
+        mdlp = {
+          list_models[[model]] <-
+            scoringTools::mdlp_iter(
+              data_train[, !colnames(data_train) == input$var_cible_quantization],
+              data_train[[input$var_cible_quantization]],
+              validation = input$mdlpParam_validation,
+              test = input$mdlpParam_test,
+              criterion = input$mdlpParam_criterion)
+          roc_curves[[model]] <- pROC::roc(data_test[[input$var_cible]],
+                                           predict(list_models[[model]],
+                                                   data_test[, !colnames(data_test) == input$var_cible_quantization]))
+          list_gini_test[[model]] <- pROC::ci.auc(data_test[[input$var_cible]],
+                                                  predict(list_models[[model]],
+                                                          data_test[, !colnames(data_test) == input$var_cible_quantization]),
+                                                  conf.level=input$confidence_level_reject)
+          list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible]],
+                                                   predict(list_models[[model]],
+                                                           data_train[, !colnames(data_train) == input$var_cible_quantization]),
+                                                   conf.level=input$confidence_level_reject)
+        },
+        topdown = {
+          list_models[[model]] <-
+            scoringTools::topdown(
+              data_train[, !colnames(data_train) == input$var_cible_quantization],
+              data_train[[input$var_cible_quantization]],
+              validation = input$topdownParam_validation,
+              test = input$topdownParam_test,
+              criterion = input$topdownParam_criterion)
+          roc_curves[[model]] <- pROC::roc(data_test[[input$var_cible]],
+                                           predict(list_models[[model]],
+                                                   data_test[, !colnames(data_test) == input$var_cible_quantization]))
+          list_gini_test[[model]] <- pROC::ci.auc(data_test[[input$var_cible]],
+                                                  predict(list_models[[model]],
+                                                          data_test[, !colnames(data_test) == input$var_cible_quantization]),
+                                                  conf.level=input$confidence_level_reject)
+          list_gini_train[[model]] <- pROC::ci.auc(data_train[[input$var_cible]],
+                                                   predict(list_models[[model]],
+                                                           data_train[, !colnames(data_train) == input$var_cible_quantization]),
+                                                   conf.level=input$confidence_level_reject)
+        },
+        print("no model specified yet")
+      )
+    }
+    return(list(
+      roc_curves,
+      list_gini_test,
+      list_gini_train
+    ))
+  })
+
+  output$roc_tous_quantization <- plotly::renderPlotly({
+    roc_curves <- model_quantization()[[1]]
+
+    df_roc_curve_all <- data.frame(unlist(unname(
+      lapply(roc_curves, function(roc_curve)
+        roc_curve$specificities)
+    )),
+    unlist(unname(
+      lapply(roc_curves, function(roc_curve)
+        roc_curve$sensitivities)
+    )),
+    unlist(unname(lapply(1:length(roc_curves), function(index) {
+      rep(names(roc_curves[index]), length(roc_curves[[index]]$specificities))}))))
+
+    colnames(df_roc_curve_all) <-
+      c("Specificity", "Sensitivity", "Model")
+
+    plotly_plot <- plotly::plot_ly(
+      df_roc_curve_all,
+      x = ~ (1 - Specificity),
+      y = ~ Sensitivity,
+      linetype = ~ as.factor(Model)
+    ) %>%
+      plotly::add_segments(
+        x = 0,
+        y = 0,
+        xend = 1,
+        yend = 1,
+        line = list(
+          dash = "7px",
+          color = "#F35B25",
+          width = 4
+        ),
+        name = "Random",
+        showlegend = FALSE
+      ) %>%
+      plotly::add_lines(
+        name = ~ as.factor(Model),
+        line = list(
+          shape = "spline",
+          color = "#737373",
+          width = 4
+        )
+      ) %>%
+      plotly::layout(
+        title = "ROC Curve on test set all applicants",
+        xaxis = list(
+          range = c(0, 1),
+          zeroline = F,
+          showgrid = F,
+          title = "1 - Specificity"
+        ),
+        yaxis = list(
+          range = c(0, 1),
+          zeroline = F,
+          showgrid = F,
+          domain = c(0, 0.9),
+          title = "Sensibility"
+        )
+      )
+    plotly_plot
+  })
+
+  # Logistic regression trees
   output$roc_tous_logistic_regression_trees <- shiny::renderPlot({
     for (model in (input$modelsLogisticRegressionTrees)) {
       switch(model,

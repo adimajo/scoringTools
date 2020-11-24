@@ -12,7 +12,7 @@
 # #'
 # #' # Recovering the cutpoints and discretizing the test
 # #' # sets based exclusively on the training dataset.
-# #' discretize_cutp(cont_test_set,disc_train_set,cont_train_set)
+# #' discretize_cutp(cont_test_set, disc_train_set, cont_train_set)
 
 discretize_cutp <- function(cont_test_set, disc_train_set, cont_train_set) {
   d <- ncol(cont_train_set)

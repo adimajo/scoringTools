@@ -315,6 +315,9 @@ ui <- shiny::fluidPage(
             )
           ),
           shiny::tabPanel("Gini indices",
+                          shiny::checkboxInput("report_train_reject",
+                                               "Report train metrics",
+                                               FALSE),
                           shiny::checkboxInput("CI_gini_reject",
                                                "Display confidence intervals",
                                                TRUE),
@@ -337,17 +340,37 @@ ui <- shiny::fluidPage(
       shiny::sidebarLayout(
         shiny::sidebarPanel(
           # Input: Select data ----
+          shiny::sliderInput(
+            "bins_test_quantization",
+            "Fraction of all applications for test:",
+            min = 0,
+            max = 100,
+            value = 30
+          ),
+          shiny::checkboxInput(
+            "deleteSamplesQuantization",
+            "Remove test samples for which there are unknown factor levels",
+            TRUE
+          ),
 
           shiny::selectInput(
             "selectedDataQuantization",
             "Data selection",
             list("lendingClub")
           ),
+
+          shiny::selectInput(
+            "var_cible_quantization",
+            "Good / bad feature",
+            list()
+          ),
+
           shiny::selectInput(
             "modelsQuantization",
             "Models",
             multiple = TRUE,
             choices = c(
+              linear = "linear",
               glmdisc = "glmdisc",
               chi2 = "chi2",
               chiMerge = "chiM",
@@ -521,10 +544,33 @@ ui <- shiny::fluidPage(
             ),
           ),
         ),
-        shiny::mainPanel()
-      )
-    ),
-
+        shiny::mainPanel(shiny::tabsetPanel(
+          shiny::tabPanel(
+            "ROC curves",
+            plotly::plotlyOutput(
+              "roc_tous_quantization"
+            )
+          ),
+          shiny::tabPanel("Gini indices",
+                          shiny::checkboxInput("report_train_quantization",
+                                               "Report train metrics",
+                                               FALSE),
+                          shiny::checkboxInput("CI_gini_quantization",
+                                               "Display confidence intervals",
+                                               TRUE),
+                          shiny::conditionalPanel("input.CI_gini_quantization",
+                                                  shiny::numericInput(
+                                                    "confidence_level_quantization",
+                                                    "Confidence level",
+                                                    value=0.95,
+                                                    min=0.1,
+                                                    max=0.9999
+                                                  )),
+                          DT::DTOutput("gini_quantization"))
+        )
+        )
+    )
+  ),
 
 
     shiny::tabPanel(
