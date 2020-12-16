@@ -211,14 +211,21 @@
 <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>1</span>, <span class='fl'>1</span> <span class='op'>/</span> <span class='op'>(</span><span class='fl'>1</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>log_odd</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='fu'>chi2_iter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Generalized Linear Model of class 'speedglm':
+</div><div class='output co'>#&gt; <span class='warning'>Warning: `as_data_frame()` is deprecated as of tibble 2.0.0.</span>
+#&gt; <span class='warning'>Please use `as_tibble()` instead.</span>
+#&gt; <span class='warning'>The signature and semantics have changed, see `?as_tibble`.</span>
+#&gt; <span class='warning'><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
+#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt; <span class='warning'>Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if `.name_repair` is omitted as of tibble 2.0.0.</span>
+#&gt; <span class='warning'>Using compatibility `.name_repair`.</span>
+#&gt; <span class='warning'></span><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
+#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt; Generalized Linear Model of class 'speedglm':
 #&gt; 
-#&gt; Call:  speedglm::speedglm(formula = stats::formula("labels ~ ."), data = Filter(function(x) (length(unique(x)) &gt;      1), data.frame(sapply(disc[[i]]$Disc.data, as.factor), stringsAsFactors = TRUE)),      family = stats::binomial(link = "logit"), weights = NULL,      fitted = TRUE) 
+#&gt; Call:  speedglm::speedglm(formula = stats::formula("labels ~ ."), data = Filter(function(x) (length(unique(x)) &gt;      1), cbind(data.frame(sapply(disc$Disc.data, as.factor), stringsAsFactors = TRUE),      data_train[, sapply(data_train, is.factor), drop = FALSE])),      family = stats::binomial(link = "logit"), weights = NULL,      fitted = TRUE) 
 #&gt; 
 #&gt; Coefficients:
 #&gt; (Intercept)          X12          X13          X22  
 #&gt;        1.18        18.96        -1.34        -3.67  
-#&gt; </div></pre>
+#&gt; </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

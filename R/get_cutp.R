@@ -28,9 +28,9 @@ get_cutp <- function(disc_train_set, cont_train_set) {
 
       min_max <- min_max[order(min_max[, "min(cont)"]), ]
       min_cutoff <- min_max[2:nrow(min_max), "min(cont)", drop = FALSE]
-      min_cutoff <- min_cutoff[order(min_cutoff), ]
+      min_cutoff <- min_cutoff[order(min_cutoff[, "min(cont)"]), "min(cont)", drop = FALSE]
       max_cutoff <- min_max[1:(nrow(min_max) - 1), "max(cont)", drop = FALSE]
-      max_cutoff <- max_cutoff[order(max_cutoff), ]
+      max_cutoff <- max_cutoff[order(max_cutoff[, "max(cont)"]), "max(cont)", drop = FALSE]
       cutoffs <- cbind(min_cutoff, max_cutoff)
       cutoffs <- rowMeans(cutoffs)
       cutoffs[length(cutoffs) + 1] <- -Inf

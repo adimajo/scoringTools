@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Augmentation — augmentation • scoringTools</title>
+<title>Wrapper function for the modified Chi2 function from the discretization package. — modChi2_iter • scoringTools</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Augmentation — augmentation" />
-<meta property="og:description" content="This function performs Reject Inference using the Augmentation technique. Note that this technique is theoretically better than using the financed clients scorecard in the MAR and misspecified model case." />
+<meta property="og:title" content="Wrapper function for the modified Chi2 function from the discretization package. — modChi2_iter" />
+<meta property="og:description" content="This function discretizes a training set using the modified Chi2 method and the user-provided parameters and chooses the best discretization scheme among them based on a user-provided criterion and eventually a test set." />
 
 
 
@@ -135,69 +135,85 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Augmentation</h1>
-    <small class="dont-index">Source: <a href='https://github.com/adimajo/scoringTools/blob/master/R/augmentation.R'><code>R/augmentation.R</code></a></small>
-    <div class="hidden name"><code>augmentation.Rd</code></div>
+    <h1>Wrapper function for the modified Chi2 function from the discretization package.</h1>
+    <small class="dont-index">Source: <a href='https://github.com/adimajo/scoringTools/blob/master/R/modChi2.R'><code>R/modChi2.R</code></a></small>
+    <div class="hidden name"><code>modChi2_iter.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function performs Reject Inference using the Augmentation technique. Note that this technique is theoretically better than using the financed clients scorecard in the MAR and misspecified model case.</p>
+    <p>This function discretizes a training set using the modified Chi2 method and the user-provided parameters and chooses the best discretization scheme among them based on a user-provided criterion and eventually a test set.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>augmentation</span><span class='op'>(</span><span class='va'>xf</span>, <span class='va'>xnf</span>, <span class='va'>yf</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>modChi2_iter</span><span class='op'>(</span>
+  <span class='va'>predictors</span>,
+  <span class='va'>labels</span>,
+  test <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  validation <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  proportions <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.3</span>, <span class='fl'>0.3</span><span class='op'>)</span>,
+  criterion <span class='op'>=</span> <span class='st'>"gini"</span>,
+  param <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>alp <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>xf</th>
-      <td><p>The matrix of financed clients' characteristics to be used in the scorecard.</p></td>
+      <th>predictors</th>
+      <td><p>The matrix array containing the numeric attributes to discretize.</p></td>
     </tr>
     <tr>
-      <th>xnf</th>
-      <td><p>The matrix of not financed clients' characteristics to be used in the scorecard (must be the same features in the same order as xf!).</p></td>
+      <th>labels</th>
+      <td><p>The actual labels of the provided predictors (0/1).</p></td>
     </tr>
     <tr>
-      <th>yf</th>
-      <td><p>The matrix of financed clients' labels</p></td>
+      <th>test</th>
+      <td><p>Boolean : True if the algorithm should use predictors to construct a test set on which to search for the best discretization scheme using the provided criterion (default: TRUE).</p></td>
+    </tr>
+    <tr>
+      <th>validation</th>
+      <td><p>Boolean : True if the algorithm should use predictors to construct a validation set on which to calculate the provided criterion using the best discretization scheme (chosen thanks to the provided criterion on either the test set (if true) or the training set (otherwise)) (default: TRUE).</p></td>
+    </tr>
+    <tr>
+      <th>proportions</th>
+      <td><p>The list of the (2) proportions wanted for test and validation set. Only the first is used when there is only one of either test or validation that is set to TRUE. Produces an error when the sum is greater to one. Useless if both test and validation are set to FALSE. Default: list(0.2,0.2).</p></td>
+    </tr>
+    <tr>
+      <th>criterion</th>
+      <td><p>The criterion ('gini','aic','bic') to use to choose the best discretization scheme among the generated ones (default: 'gini'). Nota Bene: it is best to use 'gini' only when test is set to TRUE and 'aic' or 'bic' when it is not. When using 'aic' or 'bic' with a test set, the likelihood is returned as there is no need to penalize for generalization purposes.</p></td>
+    </tr>
+    <tr>
+      <th>param</th>
+      <td><p>List providing the parameters to test (see ?discretization::modChi2, default=list(alp = 0.5)).</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>List containing the model using financed clients only and the model produced using the Augmentation method.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>This function performs the Augmentation method on the data. When provided with labeled observations \((x^\ell,y)\), it first fits the logistic regression model \(p_\theta\) of
-\(x^\ell\) on \(y\), then reweighs labeled observations according to their probability of being sampled, i.e. calculates the predicted probabilities of \(p_\theta\) on all observations, defines score-bands and calculates, in each of these score-bands, the probability of having been accepted as the proportion of labeled samples in that score-band.
-It then refits a logistic regression model \(p_\eta\) on the labeled samples.</p>
+    <p>This function discretizes a dataset containing continuous features \(X\) in a supervised way, i.e. knowing observations of a binomial random variable \(Y\) which we would like to predict based on the discretization of \(X\).
+To do so, the <code>ModifiedChi2</code> alorithm starts by putting each unique values of \(X\) in a separate value of the ‘‘discretized'' categorical feature \(E\). It then tests if two adjacent values of \(E\) are significantly different using the \(\chi^2\)-test.
+In the context of Credit Scoring, a logistic regression is fitted between the ‘‘discretized'' features \(E\) and the response feature \(Y\). As a consequence, the output of this function is the discretized features \(E\), the logistic regression model of \(E\) on \(Y\) and the parameters used to get this fit.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, <a href='https://CRAN.R-project.org/package=speedglm'>https://CRAN.R-project.org/package=speedglm</a>
-Ehrhardt, A., Biernacki, C., Vandewalle, V., Heinrich, P. and Beben, S. (2018), Reject Inference Methods in Credit Scoring: a rational review,</p>
+    <p>Enea, M. (2015), speedglm: Fitting Linear and Generalized Linear Models to Large Data Sets, <a href='https://CRAN.R-project.org/package=speedglm'>https://CRAN.R-project.org/package=speedglm</a></p>
+<p>HyunJi Kim (2012). discretization: Data preprocessing, discretization for classification. R package version 1.0-1. <a href='https://CRAN.R-project.org/package=discretization'>https://CRAN.R-project.org/package=discretization</a></p>
+<p>Tay, F. E. H. and Shen, L. (2002). Modified Chi2 Algorithm for Discretization, <em>IEEE Transactions on knowledge and data engineering</em>, <strong>14</strong>, 666–670.
+#' @examples
+# Simulation of a discretized logit model
+x = matrix(runif(300), nrow = 100, ncol = 3)
+cuts = seq(0,1,length.out= 4)
+xd = apply(x,2, function(col) as.numeric(cut(col,cuts)))
+theta = t(matrix(c(0,0,0,2,2,2,-2,-2,-2),ncol=3,nrow=3))
+log_odd = rowSums(t(sapply(seq_along(xd[,1]), function(row_id) sapply(seq_along(xd[row_id,]),
+function(element) theta[xd[row_id,element],element]))))
+y = stats::rbinom(100,1,1/(1+exp(-log_odd)))</p>
+<p>modchi2_iter(x,y)</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code>glm</code>, <code>speedglm</code></p></div>
+    <div class='dont-index'><p><code>glm</code>, <code>speedglm</code>, <code>discretization</code></p></div>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Adrien Ehrhardt</p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># We simulate data from financed clients</span>
-<span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='generate_data.html'>generate_data</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fl'>100</span>, d <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
-<span class='va'>xf</span> <span class='op'>&lt;-</span> <span class='va'>df</span><span class='op'>[</span>, <span class='op'>-</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>ncol</a></span><span class='op'>(</span><span class='va'>df</span><span class='op'>)</span><span class='op'>]</span>
-<span class='va'>yf</span> <span class='op'>&lt;-</span> <span class='va'>df</span><span class='op'>$</span><span class='va'>y</span>
-<span class='co'># We simulate data from not financed clients (MCAR mechanism)</span>
-<span class='va'>xnf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='generate_data.html'>generate_data</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fl'>100</span>, d <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span><span class='op'>[</span>, <span class='op'>-</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>ncol</a></span><span class='op'>(</span><span class='va'>df</span><span class='op'>)</span><span class='op'>]</span>
-<span class='fu'>augmentation</span><span class='op'>(</span><span class='va'>xf</span>, <span class='va'>xnf</span>, <span class='va'>yf</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; Generalized Linear Model of class 'speedglm':
-#&gt; 
-#&gt; Call:  speedglm::speedglm(formula = labels ~ ., data = df_augmente[,      -which(names(df_augmente) %in% c("poidsfinal", "classe_SCORE"))][!df_augmente$poidsfinal ==      0, ], family = stats::binomial(link = "logit"), weights = df_augmente$poidsfinal[!df_augmente$poidsfinal ==      0]) 
-#&gt; 
-#&gt; Coefficients:
-#&gt; (Intercept)        x.x.1        x.x.2  
-#&gt;     0.76812     -1.71279     -0.00256  
-#&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

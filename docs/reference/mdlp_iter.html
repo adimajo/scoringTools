@@ -216,7 +216,7 @@ In the context of Credit Scoring, a logistic regression is fitted between the â€
 <span class='fu'>mdlp_iter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; Generalized Linear Model of class 'speedglm':
 #&gt; 
-#&gt; Call:  speedglm::speedglm(formula = labels ~ ., data = Filter(function(x) (length(unique(x)) &gt;      1), as.data.frame(sapply(disc$Disc.data, as.factor), stringsAsFactors = TRUE)),      family = stats::binomial(link = "logit"), fitted = TRUE) 
+#&gt; Call:  speedglm::speedglm(formula = stats::formula("labels ~ ."), data = Filter(function(x) (length(unique(x)) &gt;      1), cbind(data.frame(sapply(disc$Disc.data, as.factor), stringsAsFactors = TRUE),      data_train[, sapply(data_train, is.factor), drop = FALSE])),      family = stats::binomial(link = "logit"), weights = NULL,      fitted = TRUE) 
 #&gt; 
 #&gt; Coefficients:
 #&gt; (Intercept)          X22  

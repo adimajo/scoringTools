@@ -49,6 +49,7 @@ Collate:
     'generate_data.R'
     'get_cutp.R'
     'mdlp.R'
+    'methodsDisc.R'
     'modChi2.R'
     'model_f.R'
     'normalizedGini.R'

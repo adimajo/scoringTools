@@ -314,22 +314,30 @@ ui <- shiny::fluidPage(
               "roc_tous_reject_inference_financed"
             )
           ),
-          shiny::tabPanel("Gini indices",
-                          shiny::checkboxInput("report_train_reject",
-                                               "Report train metrics",
-                                               FALSE),
-                          shiny::checkboxInput("CI_gini_reject",
-                                               "Display confidence intervals",
-                                               TRUE),
-                          shiny::conditionalPanel("input.CI_gini_reject",
-                                                  shiny::numericInput(
-                                                    "confidence_level_reject",
-                                                    "Confidence level",
-                                                    value=0.95,
-                                                    min=0.1,
-                                                    max=0.9999
-                                                  )),
-                          DT::DTOutput("gini_reject"))
+          shiny::tabPanel(
+            "Gini indices",
+            shiny::checkboxInput(
+              "report_train_reject",
+              "Report train metrics",
+              FALSE
+            ),
+            shiny::checkboxInput(
+              "CI_gini_reject",
+              "Display confidence intervals",
+              TRUE
+            ),
+            shiny::conditionalPanel(
+              "input.CI_gini_reject",
+              shiny::numericInput(
+                "confidence_level_reject",
+                "Confidence level",
+                value = 0.95,
+                min = 0.1,
+                max = 0.9999
+              )
+            ),
+            DT::DTOutput("gini_reject")
+          )
         ))
       )
     ),
@@ -434,8 +442,8 @@ ui <- shiny::fluidPage(
             ),
             shiny::selectInput("chi2Param_criterion",
               "chi2: criterion",
-              choices = c("gini", "aic", "bic"),
-              selected = "bic"
+              choices = c("gini", "aic"),
+              selected = "aic"
             ),
           ),
 
@@ -455,8 +463,8 @@ ui <- shiny::fluidPage(
             ),
             shiny::selectInput("chiMParam_criterion",
               "chiMerge: criterion",
-              choices = c("gini", "aic", "bic"),
-              selected = "bic"
+              choices = c("gini", "aic"),
+              selected = "aic"
             ),
           ),
 
@@ -476,8 +484,8 @@ ui <- shiny::fluidPage(
             ),
             shiny::selectInput("echi2Param_criterion",
               "extended chi2: criterion",
-              choices = c("gini", "aic", "bic"),
-              selected = "bic"
+              choices = c("gini", "aic"),
+              selected = "aic"
             ),
           ),
 
@@ -497,8 +505,8 @@ ui <- shiny::fluidPage(
             ),
             shiny::selectInput("modchi2Param_criterion",
               "modified Chi2: criterion",
-              choices = c("gini", "aic", "bic"),
-              selected = "bic"
+              choices = c("gini", "aic"),
+              selected = "aic"
             ),
           ),
 
@@ -518,8 +526,8 @@ ui <- shiny::fluidPage(
             ),
             shiny::selectInput("mdlpParam_criterion",
               "mdlp: criterion",
-              choices = c("gini", "aic", "bic"),
-              selected = "bic"
+              choices = c("gini", "aic"),
+              selected = "aic"
             ),
           ),
 
@@ -539,8 +547,8 @@ ui <- shiny::fluidPage(
             ),
             shiny::selectInput("topdownParam_criterion",
               "topdown: criterion",
-              choices = c("gini", "aic", "bic"),
-              selected = "bic"
+              choices = c("gini", "aic"),
+              selected = "aic"
             ),
           ),
         ),
@@ -551,26 +559,33 @@ ui <- shiny::fluidPage(
               "roc_tous_quantization"
             )
           ),
-          shiny::tabPanel("Gini indices",
-                          shiny::checkboxInput("report_train_quantization",
-                                               "Report train metrics",
-                                               FALSE),
-                          shiny::checkboxInput("CI_gini_quantization",
-                                               "Display confidence intervals",
-                                               TRUE),
-                          shiny::conditionalPanel("input.CI_gini_quantization",
-                                                  shiny::numericInput(
-                                                    "confidence_level_quantization",
-                                                    "Confidence level",
-                                                    value=0.95,
-                                                    min=0.1,
-                                                    max=0.9999
-                                                  )),
-                          DT::DTOutput("gini_quantization"))
-        )
-        )
-    )
-  ),
+          shiny::tabPanel(
+            "Gini indices",
+            shiny::checkboxInput(
+              "report_train_quantization",
+              "Report train metrics",
+              FALSE
+            ),
+            shiny::checkboxInput(
+              "CI_gini_quantization",
+              "Display confidence intervals",
+              TRUE
+            ),
+            shiny::conditionalPanel(
+              "input.CI_gini_quantization",
+              shiny::numericInput(
+                "confidence_level_quantization",
+                "Confidence level",
+                value = 0.95,
+                min = 0.1,
+                max = 0.9999
+              )
+            ),
+            DT::DTOutput("gini_quantization")
+          )
+        ))
+      )
+    ),
 
 
     shiny::tabPanel(

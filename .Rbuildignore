@@ -11,3 +11,5 @@ README.md
 ^inst/document.R
 ^inst/lint.R
 ^inst/rhubcheck.R
+^doc$
+^Meta$
