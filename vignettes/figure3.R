@@ -1,0 +1,506 @@
+## ----libraries----------------------------------------------------------------
+library(MASS)
+# library(tikzDevice)
+library(Rmixmod)
+library(mvtnorm)
+library(scoringTools)
+set.seed(123)
+
+## ----mean_vectors-------------------------------------------------------------
+mu0 <- array(0, c(8, 1))
+mu1 <- array(1, c(8, 1))
+
+Posdef <- function(n, ev = runif(n, 0, 3)) {
+  Z <- matrix(ncol = n, rnorm(n^2))
+  decomp <- qr(Z)
+  Q <- qr.Q(decomp)
+  R <- qr.R(decomp)
+  d <- diag(R)
+  ph <- d / abs(d)
+  O <- Q %*% diag(ph)
+  Z <- t(O) %*% diag(ev) %*% O
+  return(Z)
+}
+
+sigma0 <- Posdef(n = 8)
+sigma1 <- Posdef(n = 8)
+
+## ----data_generation----------------------------------------------------------
+m_test <- 100000
+m <- 10000
+nbvar <- c(4, 8, 15, 30)
+p0 <- 0.5
+set.seed(21)
+y <- rbinom(m_test, 1, p0)
+data_test_pred <- array(0, c(4, m_test, 51))
+data_test_gen <- array(0, c(4, m_test, 51))
+data_test_bayes <- array(0, c(4, 3))
+
+for (n in 2:2) {
+  x <- array(0, c(m_test, nbvar[n]))
+  x[y == 0, ] <-
+    mvrnorm(n = sum(y == 0), mu0[1:nbvar[n]], sigma0[1:nbvar[n], 1:nbvar[n]])
+  x[y == 1, ] <-
+    mvrnorm(n = sum(y == 1), mu1[1:nbvar[n]], sigma1[1:nbvar[n], 1:nbvar[n]])
+  data_test_pred[n, , 1:(nbvar[n] + 1)] <-
+    as.matrix(cbind.data.frame(y = y, x = x))
+  data_test_gen[n, , ] <- data_test_pred[n, , ]
+  data_test_gen[n, , 1] <- ifelse(data_test_pred[n, , 1] == 0, 2, 1)
+
+  e0 <-
+    log(p0) + dmvnorm(x[y == 0, ], mu0[1:nbvar[n]], sigma0[1:nbvar[n], 1:nbvar[n]], log = TRUE) < log(1 - p0) + dmvnorm(x[y == 0, ], mu1[1:nbvar[n]], sigma1[1:nbvar[n], 1:nbvar[n]], log = TRUE)
+  e1 <-
+    log(p0) + dmvnorm(x[y == 1, ], mu0[1:nbvar[n]], sigma0[1:nbvar[n], 1:nbvar[n]], log = TRUE) > log(1 - p0) + dmvnorm(x[y == 1, ], mu1[1:nbvar[n]], sigma1[1:nbvar[n], 1:nbvar[n]], log = TRUE)
+  eb <- mean(c(e0, e1))
+  ebconf <- prop.test(sum(c(e0, e1)), m_test)$conf.int[1:2]
+  data_test_bayes[n, ] <- c(eb, ebconf[1], ebconf[2])
+  rm(x)
+}
+
+rm(y)
+
+cut <- seq(0, .9, by = 0.02)
+tx_erreur <- array(NA, c(4, length(cut), 5, 20))
+gini <- array(NA, c(4, length(cut), 5, 20))
+
+rm(ebconf)
+rm(eb)
+rm(e0)
+rm(e1)
+gc()
+
+## ----cutoffvalues, eval=FALSE-------------------------------------------------
+#  for (random in 1:20) {
+#    set.seed(random)
+#    y <- rbinom(m, 1, p0)
+#    data_learn_pred <- array(0, c(4, m, 51))
+#    data_learn_gen <- array(0, c(4, m, 51))
+#  
+#    for (n in 2:2) {
+#      x <- array(0, c(m, nbvar[n]))
+#      x[y == 0, ] <-
+#        mvrnorm(n = sum(y == 0), mu0[1:nbvar[n]], sigma0[1:nbvar[n], 1:nbvar[n]])
+#      x[y == 1, ] <-
+#        mvrnorm(n = sum(y == 1), mu1[1:nbvar[n]], sigma1[1:nbvar[n], 1:nbvar[n]])
+#      data_learn_pred[n, , 1:(nbvar[n] + 1)] <-
+#        as.matrix(cbind.data.frame(y = y, x = x))
+#      data_learn_gen[n, , ] <- data_learn_pred[n, , ]
+#      data_learn_gen[n, , 1] <-
+#        ifelse(data_learn_gen[n, , 1] == 0, 2, 1)
+#      rm(x)
+#    }
+#  
+#    rm(y)
+#    gc()
+#  
+#    #### Eventual loop on number of featuers (frozen to 8) ####
+#  
+#    for (j in 2:2) {
+#      # On convertit l'ensemble d'apprentissage en dataframe
+#      learn_pred <- data.frame(data_learn_pred[j, , 1:(nbvar[j] + 1)])
+#      learn_gen <- data.frame(data_learn_gen[j, , 1:(nbvar[j] + 1)])
+#  
+#      # On construit la formule appliquee a glm (elle depend du nombre de variables dans le modele)
+#      PredictorVariables <- paste("X", 2:(nbvar[j] + 1), sep = "")
+#      Formula <-
+#        formula(paste("X1 ~ ", paste(PredictorVariables, collapse = " + ")))
+#      rm(PredictorVariables)
+#      gc()
+#  
+#      # On entraine un modele glm sur toutes les donnees pour simuler les refuses
+#      model_pred_tot <- glm(Formula, "binomial", learn_pred)
+#  
+#      #### Boucle sur le cut ####
+#  
+#      for (i in 1:length(cut)) {
+#        # On calcule les acceptes et rejetes en fonction du cut et du premier modele
+#        accepte <- (model_pred_tot$fitted.values > cut[i])
+#        rejete <- (model_pred_tot$fitted.values <= cut[i])
+#  
+#        # On controle qu'il reste des acceptes et des mauvais payeurs parmi les acceptes
+#        if (sum(accepte) > 0 &
+#          !(sum(learn_pred[accepte, 1]) == nrow(learn_pred[accepte, ]))) {
+#          # On construit l'ensemble d'apprentissage partiel
+#          learn_pred_part <- learn_pred[accepte, ]
+#          learn_gen_part <- learn_gen
+#          learn_gen_part[rejete, 1] <- NA
+#  
+#          # On entra?ne les modeles
+#          model_pred_part <-
+#            glm(Formula, family = binomial(link = "logit"), learn_pred_part)
+#          model_gen_part <-
+#            mixmodCluster(
+#              data = learn_gen_part[, 2:(nbvar[j] + 1)],
+#              knownLabels = learn_gen_part[, 1],
+#              nbCluster = 2
+#            )
+#  
+#          # On predit leur resultat sur l'ensemble de test et on enregistre le taux d'erreur
+#          model_pred_part.pred <-
+#            predict(model_pred_part, data.frame(data_test_pred[j, , ]), type = "response") >= 0.5
+#          model_pred_part.erreur <-
+#            sum(abs(data_test_pred[j, , 1] - model_pred_part.pred)) / m_test
+#          model_pred_part.gini <-
+#            normalizedGini(
+#              data_test_pred[j, , 1],
+#              predict(model_pred_part, data.frame(data_test_pred[j, , ]), type = "response")
+#            )
+#  
+#          model_gen_res <- mixmodPredict(
+#            data.frame(data_test_gen[j, , 2:(nbvar[j] + 1)]),
+#            model_gen_part@bestResult
+#          )
+#          model_gen_part.pred <-
+#            model_gen_res@partition
+#          model_gen_part.erreur <-
+#            sum(abs(data_test_gen[j, , 1] - model_gen_part.pred)) / m_test
+#          model_gen_part.gini <-
+#            normalizedGini(
+#              data_test_pred[j, , 1],
+#              model_gen_res@proba[, 1]
+#            )
+#  
+#          ## Augmentation ##
+#          if (sum(rejete) > 0) {
+#            model_pred_augmente <- augmentation(
+#              learn_pred_part[, -1],
+#              learn_pred[rejete, -1],
+#              learn_pred_part[, 1]
+#            )
+#  
+#            model_pred_augmente.pred <-
+#              predict(model_pred_augmente@infered_model,
+#                data.frame(x = data.frame(data_test_pred[j, , ])),
+#                type = "response"
+#              ) >= 0.5
+#            model_pred_augmente.erreur <-
+#              sum(abs(data_test_pred[j, , 1] - model_pred_augmente.pred)) / m_test
+#            model_pred_augmente.gini <-
+#              normalizedGini(
+#                data_test_pred[j, , 1],
+#                predict(model_pred_augmente@infered_model,
+#                  data.frame(x = data.frame(data_test_pred[j, , ])),
+#                  type = "response"
+#                )
+#              )
+#  
+#            ## Parcelling ##
+#            model_pred_parcelling <-
+#              parcelling(
+#                xf = learn_pred_part[, -1],
+#                xnf = learn_pred[rejete, -1],
+#                yf = learn_pred_part[, 1]
+#              )
+#  
+#            model_pred_parcelling.pred <-
+#              predict(model_pred_parcelling@infered_model,
+#                data.frame(x = data.frame(data_test_pred[j, , ])),
+#                type = "response"
+#              ) >= 0.5
+#            model_pred_parcelling.erreur <-
+#              sum(abs(data_test_pred[j, , 1] - model_pred_parcelling.pred)) / m_test
+#            model_pred_parcelling.gini <-
+#              normalizedGini(
+#                data_test_pred[j, , 1],
+#                predict(model_pred_parcelling@infered_model,
+#                  data.frame(x = data.frame(data_test_pred[j, , ])),
+#                  type = "response"
+#                )
+#              )
+#  
+#            ## Reclassification ##
+#            model_pred_reclassification <-
+#              reclassification(
+#                xf = learn_pred_part[, -1],
+#                xnf = learn_pred[rejete, -1],
+#                yf = learn_pred_part[, 1]
+#              )
+#  
+#            model_pred_reclassification.pred <-
+#              predict(
+#                model_pred_reclassification@infered_model,
+#                data.frame(x = data.frame(data_test_pred[j, , ])),
+#                type = "response"
+#              ) >= 0.5
+#            model_pred_reclassification.erreur <-
+#              sum(abs(data_test_pred[j, , 1] - model_pred_reclassification.pred)) / m_test
+#            model_pred_reclassification.gini <-
+#              normalizedGini(
+#                data_test_pred[j, , 1],
+#                predict(model_pred_reclassification@infered_model,
+#                  data.frame(x = data.frame(data_test_pred[j, , ])),
+#                  type = "response"
+#                )
+#              )
+#          }
+#  
+#          # On renvoie le taux d'erreur des modeles
+#          if (sum(rejete) > 0) {
+#            tx_erreur[j, i, , random] <-
+#              c(
+#                model_pred_part.erreur,
+#                model_pred_augmente.erreur,
+#                model_pred_reclassification.erreur,
+#                model_pred_parcelling.erreur,
+#                model_gen_part.erreur
+#              )
+#            gini[j, i, , random] <-
+#              c(
+#                model_pred_part.gini,
+#                model_pred_augmente.gini,
+#                model_pred_reclassification.gini,
+#                model_pred_parcelling.gini,
+#                model_gen_part.gini
+#              )
+#          } else {
+#            tx_erreur[j, i, , random] <-
+#              c(
+#                model_pred_part.erreur,
+#                model_pred_part.erreur,
+#                model_pred_part.erreur,
+#                model_pred_part.erreur,
+#                model_gen_part.erreur
+#              )
+#            gini[j, i, , random] <-
+#              c(
+#                model_pred_part.gini,
+#                model_pred_part.gini,
+#                model_pred_part.gini,
+#                model_pred_part.gini,
+#                model_gen_part.gini
+#              )
+#          }
+#          gc()
+#        }
+#        gc()
+#      }
+#    }
+#  }
+
+## ----plot, eval=FALSE---------------------------------------------------------
+#  # path_figure_tx_erreur <-
+#  #   file.path(
+#  #     dirname(rstudioapi::getActiveDocumentContext()$path),
+#  #     "../TEX_CODE/reintegration_simu_miss_erreur.tex"
+#  #   )
+#  #
+#  # path_figure_gini <-
+#  #   file.path(
+#  #     dirname(rstudioapi::getActiveDocumentContext()$path),
+#  #     "../TEX_CODE/reintegration_simu_miss_gini.tex"
+#  #   )
+#  
+#  ############ Figure error rate ##############################################
+#  
+#  tx_erreur_moy <- array(0, c(length(cut), 5))
+#  gini_moy <- array(0, c(length(cut), 5))
+#  
+#  for (methode in 1:5) {
+#    for (random in 1:20) {
+#      tx_erreur_moy[, methode] <- tx_erreur_moy[, methode] + tx_erreur[2, , methode, random]
+#      gini_moy[, methode] <- gini_moy[, methode] + gini[2, , methode, random]
+#    }
+#    tx_erreur_moy[, methode] <- tx_erreur_moy[, methode] / 20
+#    gini_moy[, methode] <- gini_moy[, methode] / 20
+#  }
+#  
+#  # tikz(path_figure_tx_erreur,
+#  #      width = 7,
+#  #      height = 4.4,
+#  #      engine = "pdftex")
+#  plot(
+#    x = cut,
+#    y = tx_erreur_moy[, 1],
+#    xlim = c(0, .9),
+#    ylim = c(.1, .30),
+#    ylab = "Error rate on test set",
+#    xlab = "Cut-off value",
+#    pch = 15,
+#    xaxt = "n",
+#    yaxt = "n",
+#    type = "o"
+#  )
+#  par(new = TRUE)
+#  plot(
+#    x = cut,
+#    y = tx_erreur_moy[, 2],
+#    xlim = c(0, .9),
+#    ylim = c(.1, .30),
+#    ylab = "",
+#    xlab = "",
+#    pch = 17,
+#    col = "green",
+#    xaxt = "n",
+#    yaxt = "n",
+#    type = "o"
+#  )
+#  par(new = TRUE)
+#  plot(
+#    x = cut,
+#    y = tx_erreur_moy[, 3],
+#    xlim = c(0, .9),
+#    ylim = c(.1, .30),
+#    ylab = "",
+#    xlab = "",
+#    pch = 7,
+#    col = 2,
+#    xaxt = "n",
+#    yaxt = "n",
+#    type = "o"
+#  )
+#  par(new = TRUE)
+#  plot(
+#    x = cut,
+#    y = tx_erreur_moy[, 4],
+#    xlim = c(0, .9),
+#    ylim = c(.1, .30),
+#    ylab = "",
+#    xlab = "",
+#    pch = 8,
+#    col = 590,
+#    xaxt = "n",
+#    yaxt = "n",
+#    type = "o"
+#  )
+#  par(new = TRUE)
+#  plot(
+#    x = cut,
+#    y = tx_erreur_moy[, 5],
+#    xlim = c(0, .9),
+#    ylim = c(.1, .30),
+#    ylab = "",
+#    xlab = "",
+#    pch = 9,
+#    col = 376,
+#    xaxt = "n",
+#    yaxt = "n",
+#    type = "o"
+#  )
+#  
+#  axis(1,
+#    at = pretty(cut),
+#    lab = pretty(cut),
+#    las = TRUE
+#  )
+#  axis(2,
+#    at = pretty(seq(0.1, 0.3, 0.05), n = 10),
+#    lab = pretty(seq(0.1, 0.3, 0.05), n = 10),
+#    las = TRUE
+#  )
+#  
+#  legend(
+#    0.35,
+#    0.3,
+#    pch = c(15, 17, 7, 8, 9),
+#    col = c(1, "green", 2, 590, 376),
+#    legend = c(
+#      "Logistic regression",
+#      "Augmentation",
+#      "Reclassification",
+#      "Parcelling",
+#      "Gaussian mixture"
+#    )
+#  )
+#  # dev.off()
+#  
+#  ############ Figure gini ##############################################
+#  
+#  # tikz(path_figure_gini,
+#  #      width = 7,
+#  #      height = 4.4,
+#  #      engine = "pdftex")
+#  plot(
+#    x = cut,
+#    y = gini_moy[, 1],
+#    xlim = c(0, .9),
+#    ylim = c(.74, .93),
+#    ylab = "Gini on test set",
+#    xlab = "Cut-off value",
+#    pch = 15,
+#    xaxt = "n",
+#    yaxt = "n",
+#    type = "o"
+#  )
+#  par(new = TRUE)
+#  plot(
+#    x = cut,
+#    y = gini_moy[, 2],
+#    xlim = c(0, .9),
+#    ylim = c(.74, .93),
+#    ylab = "",
+#    xlab = "",
+#    pch = 17,
+#    col = "green",
+#    xaxt = "n",
+#    yaxt = "n",
+#    type = "o"
+#  )
+#  par(new = TRUE)
+#  plot(
+#    x = cut,
+#    y = gini_moy[, 3],
+#    xlim = c(0, .9),
+#    ylim = c(.74, .93),
+#    ylab = "",
+#    xlab = "",
+#    pch = 7,
+#    col = 2,
+#    xaxt = "n",
+#    yaxt = "n",
+#    type = "o"
+#  )
+#  par(new = TRUE)
+#  plot(
+#    x = cut,
+#    y = gini_moy[, 4],
+#    xlim = c(0, .9),
+#    ylim = c(.74, .93),
+#    ylab = "",
+#    xlab = "",
+#    pch = 8,
+#    col = 590,
+#    xaxt = "n",
+#    yaxt = "n",
+#    type = "o"
+#  )
+#  par(new = TRUE)
+#  plot(
+#    x = cut,
+#    y = gini_moy[, 5],
+#    xlim = c(0, .9),
+#    ylim = c(.74, .93),
+#    ylab = "",
+#    xlab = "",
+#    pch = 9,
+#    col = 376,
+#    xaxt = "n",
+#    yaxt = "n",
+#    type = "o"
+#  )
+#  
+#  axis(1,
+#    at = pretty(cut),
+#    lab = pretty(cut),
+#    las = TRUE
+#  )
+#  axis(2,
+#    at = pretty(seq(0.75, 0.95, 0.1), n = 10),
+#    lab = pretty(seq(0.75, 0.95, 0.1), n = 10),
+#    las = TRUE
+#  )
+#  
+#  legend(
+#    0,
+#    0.835,
+#    pch = c(15, 17, 7, 8, 9),
+#    col = c(1, "green", 2, 590, 376),
+#    legend = c(
+#      "Logistic regression",
+#      "Augmentation",
+#      "Reclassification",
+#      "Parcelling",
+#      "Gaussian mixture"
+#    )
+#  )
+#  # dev.off()
+

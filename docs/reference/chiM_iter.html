@@ -219,7 +219,16 @@ In the context of Credit Scoring, a logistic regression is fitted between the â€
 <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>1</span>, <span class='fl'>1</span> <span class='op'>/</span> <span class='op'>(</span><span class='fl'>1</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>log_odd</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='fu'>chiM_iter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Generalized Linear Model of class 'speedglm':
+</div><div class='output co'>#&gt; <span class='message'>New names:</span>
+#&gt; <span class='message'>* `` -&gt; ...1</span>
+#&gt; <span class='message'>* `` -&gt; ...2</span>
+#&gt; <span class='message'>* `` -&gt; ...3</span></div><div class='output co'>#&gt; <span class='message'>New names:</span>
+#&gt; <span class='message'>* `` -&gt; ...1</span>
+#&gt; <span class='message'>* `` -&gt; ...2</span>
+#&gt; <span class='message'>* `` -&gt; ...3</span></div><div class='output co'>#&gt; <span class='message'>New names:</span>
+#&gt; <span class='message'>* `` -&gt; ...1</span>
+#&gt; <span class='message'>* `` -&gt; ...2</span>
+#&gt; <span class='message'>* `` -&gt; ...3</span></div><div class='output co'>#&gt; Generalized Linear Model of class 'speedglm':
 #&gt; 
 #&gt; Call:  speedglm::speedglm(formula = stats::formula("labels ~ ."), data = Filter(function(x) (length(unique(x)) &gt;      1), cbind(data.frame(sapply(disc$Disc.data, as.factor), stringsAsFactors = TRUE),      data_train[, sapply(data_train, is.factor), drop = FALSE])),      family = stats::binomial(link = "logit"), weights = NULL,      fitted = TRUE) 
 #&gt; 

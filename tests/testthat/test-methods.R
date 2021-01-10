@@ -76,6 +76,20 @@ test_that("predict method for reject inference works", {
   expect_length(prediction, 100)
   expect_true(all(prediction >= 0))
   expect_true(all(prediction <= 1))
+
+  augmented_model <- twins(xf, xnf, yf)
+  prediction <- predict(object = augmented_model, newdata = xf, type = "response")
+  expect_vector(prediction, ptype = double())
+  expect_length(prediction, 100)
+  expect_true(all(prediction >= 0))
+  expect_true(all(prediction <= 1))
+
+  augmented_model <- twins(data.frame(xf), data.frame(xnf), yf)
+  prediction <- predict(object = augmented_model, newdata = data.frame(xf), type = "response")
+  expect_vector(prediction, ptype = double())
+  expect_length(prediction, 100)
+  expect_true(all(prediction >= 0))
+  expect_true(all(prediction <= 1))
 })
 
 test_that("plot method for discretization works", {

@@ -61,12 +61,12 @@ compute_data_val_test <- function(row_subset_val_test, row_subset_train, predict
         sapply(
           data.frame(discretize_cutp(
             predictors[row_subset_val_test, ] %>%
-              dplyr::as_data_frame() %>%
+              dplyr::as_tibble(.name_repair = "unique") %>%
               dplyr::select_if(function(col) !is.factor(col)) %>%
               as.data.frame(),
             disc[["Disc.data"]],
             predictors[row_subset_train, ] %>%
-              dplyr::as_data_frame() %>%
+              dplyr::as_tibble(.name_repair = "unique") %>%
               dplyr::select_if(function(col) !is.factor(col)) %>%
               as.data.frame()
           )),
@@ -75,7 +75,7 @@ compute_data_val_test <- function(row_subset_val_test, row_subset_train, predict
         stringsAsFactors = TRUE
       ),
       predictors[row_subset_val_test, ] %>%
-        dplyr::as_data_frame() %>%
+        dplyr::as_tibble(.name_repair = "unique") %>%
         dplyr::select_if(function(col) is.factor(col)) %>%
         as.data.frame()
     )
@@ -203,12 +203,12 @@ calculate_criterlist <- function(predictors,
         sapply(
           data.frame(discretize_cutp(
             predictors[ensemble[[2]], ] %>%
-              dplyr::as_data_frame() %>%
+              dplyr::as_tibble(.name_repair = "unique") %>%
               dplyr::select_if(function(col) !is.factor(col)) %>%
               as.data.frame(),
             disc[["Disc.data"]],
             predictors[ensemble[[1]], ] %>%
-              dplyr::as_data_frame() %>%
+              dplyr::as_tibble(.name_repair = "unique") %>%
               dplyr::select_if(function(col) !is.factor(col)) %>%
               as.data.frame()
           )),
@@ -217,7 +217,7 @@ calculate_criterlist <- function(predictors,
         stringsAsFactors = TRUE
       ),
       predictors[ensemble[[2]], ] %>%
-        dplyr::as_data_frame() %>%
+        dplyr::as_tibble(.name_repair = "unique") %>%
         dplyr::select_if(function(col) is.factor(col)) %>%
         as.data.frame()
     )

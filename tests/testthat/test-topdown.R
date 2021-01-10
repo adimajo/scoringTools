@@ -37,7 +37,7 @@ test_that("topdown method works with speedglm on matrices", {
 })
 
 test_that("topdown method works with speedglm and glm on dataframes with additional factors", {
-  x <- matrix(runif(200), nrow = 100, ncol = 2)
+  x <- matrix(runif(600), nrow = 300, ncol = 2)
   cuts <- seq(0, 1, length.out = 4)
   xd <- apply(x, 2, function(col) as.numeric(cut(col, cuts)))
   theta <- t(matrix(c(0, 0, 0, 2, 2, 2, -2, -2, -2), ncol = 3, nrow = 3))
@@ -47,7 +47,7 @@ test_that("topdown method works with speedglm and glm on dataframes with additio
       function(element) theta[xd[row_id, element], element]
     )
   })))
-  y <- stats::rbinom(100, 1, 1 / (1 + exp(-log_odd)))
+  y <- stats::rbinom(300, 1, 1 / (1 + exp(-log_odd)))
   for (test in c(TRUE, FALSE)) {
     for (validation in c(TRUE, FALSE)) {
       for (criterion in c("gini", "aic")) {

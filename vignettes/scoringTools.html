@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Adrien Ehrhardt" />
+
+<meta name="date" content="2020-12-16" />
+
+<title>Credit Scoring Tools: the scoringTools package</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+<style type="text/css">
+a.anchor-section {margin-left: 10px; visibility: hidden; color: inherit;}
+a.anchor-section::before {content: '#';}
+.hasAnchor:hover a.anchor-section {visibility: visible;}
+</style>
+<script>// Anchor sections v1.0 written by Atsushi Yasumoto on Oct 3rd, 2020.
+document.addEventListener('DOMContentLoaded', function() {
+  // Do nothing if AnchorJS is used
+  if (typeof window.anchors === 'object' && anchors.hasOwnProperty('hasAnchorJSLink')) {
+    return;
+  }
+
+  const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+
+  // Do nothing if sections are already anchored
+  if (Array.from(h).some(x => x.classList.contains('hasAnchor'))) {
+    return null;
+  }
+
+  // Use section id when pandoc runs with --section-divs
+  const section_id = function(x) {
+    return ((x.classList.contains('section') || (x.tagName === 'SECTION'))
+            ? x.id : '');
+  };
+
+  // Add anchors
+  h.forEach(function(x) {
+    const id = x.id || section_id(x.parentElement);
+    if (id === '') {
+      return null;
+    }
+    let anchor = document.createElement('a');
+    anchor.href = '#' + id;
+    anchor.classList = ['anchor-section'];
+    x.classList.add('hasAnchor');
+    x.appendChild(anchor);
+  });
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Credit Scoring Tools: the <code>scoringTools</code> package</h1>
+<h4 class="author">Adrien Ehrhardt</h4>
+<h4 class="date">2020-12-16</h4>
+
+
+
+<div id="what-is-credit-scoring" class="section level1">
+<h1>What is Credit Scoring?</h1>
+<p>This package has been developed as part of a CIFRE PhD, a special PhD contract in France which is for the most part financed by a company. This company subsequently gets to choose which subject(s) are tackled.</p>
+<p>This research has been financed by Crédit Agricole Consumer Finance (CA CF), subsidiary of the Crédit Agricole Group which provides all kinds of banking and insurance services. CA CF focuses on consumer loans, ranging from luxury cars to small electronics.</p>
+<p>In order to accept / reject loan applications more efficiently (both quicker and to select better applicants), most financial institutions resort to Credit Scoring: given the applicant’s characteristics he/she is given a Credit Score, which has been statistically designed using previously accepted applicants, and which partly decides whether the financial institution will grant the loan or not.</p>
+<div id="context" class="section level2">
+<h2>Context</h2>
+<p>In practice, the statistical modeler has historical data about each customer’s characteristics. For obvious reasons, only data available at the time of inquiry must be used to build a future application scorecard. Those data often take the form of a well-structured table with one line per client alongside their performance (did they pay back their loan or not?) as can be seen in the following table:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Job</th>
+<th align="left">Habitation</th>
+<th align="right">Time_in_job</th>
+<th align="right">Children</th>
+<th align="left">Family_status</th>
+<th align="left">Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Craftsman</td>
+<td align="left">Owner</td>
+<td align="right">10</td>
+<td align="right">0</td>
+<td align="left">Divorced</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">Technician</td>
+<td align="left">Renter</td>
+<td align="right">20</td>
+<td align="right">1</td>
+<td align="left">Widower</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">Executive</td>
+<td align="left">Starter</td>
+<td align="right">5</td>
+<td align="right">2</td>
+<td align="left">Single</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">Office employee</td>
+<td align="left">By family</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="left">Married</td>
+<td align="left">No</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="formulation" class="section level2">
+<h2>Formulation</h2>
+<p>The variable to predict, here denoted by , is an active research field and we will not discuss it here. We suppose we already have a binary random variable <span class="math inline">\(Y\)</span> from which we have <span class="math inline">\(n\)</span> observations <span class="math inline">\(\mathbf{y} = (y_i)_1^n\)</span>.</p>
+<p>The <span class="math inline">\(d\)</span> predictive features, here for example the job, habitation situation, etc., are usually socio-demographic features asked by the financial institutions at the time of application. They are denoted by the random vector <span class="math inline">\(\boldsymbol{X} = (X_j)_1^d\)</span> and as for <span class="math inline">\(Y\)</span> we have <span class="math inline">\(n\)</span> observations <span class="math inline">\(\mathbf{x}=(x_i)_1^n\)</span>.</p>
+<p>We suppose that observations <span class="math inline">\((\mathbf{x},\mathbf{y})\)</span> come from an unknown distribution <span class="math inline">\(p(x,y)\)</span> which is not directly of interest. Our interest lies in the conditional probability of a client with characteristics <span class="math inline">\(\boldsymbol{x}\)</span> of paying back his loan, i.e. <span class="math inline">\(p(y|\boldsymbol{x})\)</span>, also unknown.</p>
+<p>In the context of Credit Scoring, we historically stick to logistic regression, for various reasons out of the scope of this vignette. The logistic regression model assumes the following relation between <span class="math inline">\(\boldsymbol{X}\)</span> (supposed continuous here) and <span class="math inline">\(Y\)</span>: <span class="math display">\[\ln \left( \frac{p_{\boldsymbol{\theta}}(Y=1|\boldsymbol{x})}{p_{\boldsymbol{\theta}}(Y=0|\boldsymbol{x})} \right) = (1, \boldsymbol{x})&#39;{\boldsymbol{\theta}}\]</span></p>
+<p>We would like to have the ‘‘best’’ model compared to the true <span class="math inline">\(p(y|\boldsymbol{x})\)</span> from which we only have samples. Had we access to the true underlying model, we would like to minimize, w.r.t. <span class="math inline">\({\boldsymbol{\theta}}\)</span>, <span class="math inline">\(H_{\boldsymbol{\theta}} = \mathbb(E)_{(X,Y) \sim p}[\ln(p_{\boldsymbol{\theta}}(Y|\boldsymbol{X}))]\)</span>. Since this is not possible, we approximate this criterion by maximizing, w.r.t. <span class="math inline">\(\theta\)</span>, the likelihood <span class="math inline">\(\ell({\boldsymbol{\theta}};\mathbf{x},\mathbf{y}) = \sum_{i=1}^n \ln(p_{\boldsymbol{\theta}}(y_i|\boldsymbol{x}_i))\)</span>.</p>
+<p>In R, this is done by fitting a  model to the data:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(scoringTools)</span>
+<span id="cb1-2"><a href="#cb1-2"></a>scoring_model &lt;-<span class="st"> </span><span class="kw">glm</span>(Default <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> lendingClub, <span class="dt">family =</span> <span class="kw">binomial</span>(<span class="dt">link =</span> <span class="st">&quot;logit&quot;</span>))</span></code></pre></div>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<p>We can now focus on the regression coefficients <span class="math inline">\(\boldsymbol{\theta}\)</span>:</p>
+<pre><code>##                    (Intercept)               Amount_Requested 
+##                   5.446254e-01                   5.198134e-06 
+##        Loan_Purposecredit_card Loan_Purposedebt_consolidation 
+##                  -2.161336e-01                  -4.537949e-01 
+##        Loan_Purposeeducational   Loan_Purposehome_improvement 
+##                   1.858680e-01                  -6.656963e-01 
+##              Loan_Purposehouse     Loan_Purposemajor_purchase 
+##                  -1.278938e+00                  -1.726151e+00 
+##            Loan_Purposemedical             Loan_Purposemoving 
+##                  -7.204768e-01                  -4.125148e-01 
+##              Loan_Purposeother   Loan_Purposerenewable_energy 
+##                  -1.044591e-01                  -1.902471e+01 
+##     Loan_Purposesmall_business           Loan_Purposevacation 
+##                  -7.710864e-01                  -8.271925e-01 
+##            Loan_Purposewedding                    Loan_Length 
+##                  -4.670372e-01                  -8.072343e-03 
+##           Debt_To_Income_Ratio          Home_OwnershipMORTAGE 
+##                   4.673087e-04                  -9.385231e-01 
+##          Home_OwnershipMORTGAE          Home_OwnershipMORTGAG 
+##                  -4.822148e-02                  -1.559521e+00 
+##         Home_OwnershipMORTGAGE          Home_OwnershipMORTGGE 
+##                  -9.395086e-01                  -1.053046e+00 
+##          Home_OwnershipMOTGAGE          Home_OwnershipMRTGAGE 
+##                  -1.320655e-01                   7.277748e-02 
+##          Home_OwnershipORTGAGE            Home_OwnershipOTHER 
+##                  -4.190851e-01                  -2.067367e+01 
+##              Home_OwnershipOWN             Home_OwnershipRENT 
+##                  -1.052071e+00                  -7.275610e-01 
+##              Open_CREDIT_Lines       Revolving_CREDIT_Balance 
+##                  -1.537008e-02                   5.409573e-06 
+## Inquiries_in_the_Last_6_Months                 Monthly_Income 
+##                  -5.478806e-02                   1.679455e-05 
+##              Employment_Length                        StateAL 
+##                   2.190715e-02                  -9.302735e-01 
+##                        StateAR                        StateAZ 
+##                  -2.001419e+01                  -8.498573e-01 
+##                        StateCA                        StateCO 
+##                  -1.324136e+00                  -8.503792e-01 
+##                        StateCT                        StateDC 
+##                  -1.006930e+00                  -8.278092e-01 
+##                        StateDE                        StateFL 
+##                  -1.813406e+01                  -7.749171e-01 
+##                        StateGA                        StateHI 
+##                  -1.658919e+00                  -8.162135e-01 
+##                        StateIA                        StateIL 
+##                  -2.456610e+00                  -8.436800e-01 
+##                        StateIN                        StateKS 
+##                  -1.028000e+00                  -1.184442e+00 
+##                        StateKY                        StateLA 
+##                  -2.489800e+00                  -1.522087e+00 
+##                        StateMA                        StateMD 
+##                  -2.233885e+00                  -6.024556e-01 
+##                        StateMI                        StateMN 
+##                  -4.866130e-02                  -1.755743e+00 
+##                        StateMO                        StateMS 
+##                  -1.490269e+00                  -1.272611e+00 
+##                        StateMT                        StateNC 
+##                  -2.953696e-01                  -1.296718e+00 
+##                        StateNH                        StateNJ 
+##                  -9.519204e-01                  -1.139183e+00 
+##                        StateNM                        StateNV 
+##                  -5.655698e-01                  -1.188136e+00 
+##                        StateNY                        StateOH 
+##                  -6.806718e-01                  -7.549876e-01 
+##                        StateOK                        StateOR 
+##                  -2.235123e+00                  -1.849957e+00 
+##                        StatePA                        StateRI 
+##                  -8.662468e-01                  -1.162867e-01 
+##                        StateSC                        StateSD 
+##                  -1.620496e+00                   1.488559e+01 
+##                        StateTX                        StateUT 
+##                  -1.195268e+00                  -1.546485e+00 
+##                        StateVA                        StateVT 
+##                  -8.237064e-01                   3.419687e-01 
+##                        StateWA                        StateWI 
+##                  -1.026220e+00                  -5.139766e-01 
+##                        StateWV                        StateWY 
+##                  -8.625548e-01                  -1.224568e+00 
+##                  Interest_Rate              FICO_Range645-649 
+##                   3.282162e-02                  -1.933897e+01 
+##              FICO_Range650-654              FICO_Range655-659 
+##                   2.331851e+01                   2.633920e+00 
+##              FICO_Range660-664              FICO_Range665-669 
+##                   9.115198e-01                   5.946684e-01 
+##              FICO_Range670-674              FICO_Range675-679 
+##                   1.004201e+00                   9.227298e-01 
+##              FICO_Range680-684              FICO_Range685-689 
+##                   7.418759e-01                   1.059893e+00 
+##              FICO_Range690-694              FICO_Range695-699 
+##                   6.573794e-01                  -1.914143e+01 
+##              FICO_Range700-704              FICO_Range705-709 
+##                  -1.916224e+01                  -1.916976e+01 
+##              FICO_Range710-714              FICO_Range715-719 
+##                  -1.907579e+01                  -3.016283e+01 
+##              FICO_Range720-724              FICO_Range725-729 
+##                  -1.890553e+01                  -3.031735e+01 
+##              FICO_Range730-734              FICO_Range735-739 
+##                  -1.903904e+01                  -1.898787e+01 
+##              FICO_Range740-744              FICO_Range745-749 
+##                  -1.901698e+01                  -1.899618e+01 
+##              FICO_Range750-754              FICO_Range755-759 
+##                  -1.904364e+01                  -1.898244e+01 
+##              FICO_Range760-764              FICO_Range765-769 
+##                  -1.883702e+01                  -1.871614e+01 
+##              FICO_Range770-774              FICO_Range775-779 
+##                  -1.888484e+01                  -1.870410e+01 
+##              FICO_Range780-784              FICO_Range785-789 
+##                  -1.877299e+01                  -1.889972e+01 
+##              FICO_Range790-794              FICO_Range795-799 
+##                  -1.882304e+01                  -1.947507e+01 
+##              FICO_Range800-804              FICO_Range805-809 
+##                  -1.877842e+01                  -3.202823e+01 
+##              FICO_Range810-814              FICO_Range815-819 
+##                  -1.877796e+01                  -1.899147e+01 
+##              FICO_Range820-824              FICO_Range830-834 
+##                  -1.776919e+01                  -1.902438e+01 
+##                            Age 
+##                  -3.512107e-03</code></pre>
+<p>and the deviance at this estimation of <span class="math inline">\(\boldsymbol{\theta}\)</span>: [1] 1103.43</p>
+<p>From this, it seems that Credit Scoring is pretty straightforward when the data is at hand.</p>
+</div>
+<div id="conceptual-problems-of-current-approaches-to-credit-scoring" class="section level2">
+<h2>Conceptual problems of current approaches to Credit Scoring</h2>
+<p>Nevertheless, there are a few theoretical limitations of the current approach, e.g.:</p>
+<ul>
+<li>We don’t observe rejected applicants’s performance, i.e. we don’t have observations <span class="math inline">\(y_i\)</span> for previously rejected applicants;</li>
+<li>The performance variable <span class="math inline">\(Y\)</span> must be constructed using historical data but we can’t wait for all current contracts to end, that’s why financial institutions usually consider a defaulting client to be someone failing to pay two consecutive installments;</li>
+<li>Credit risk modelers often ‘‘discretize’’ the input data <span class="math inline">\(\boldsymbol{X}\)</span>, that is to say continuous variables are transformed into categorical variables corresponding to intervals of the support of <span class="math inline">\(\boldsymbol{X}\)</span> and categorical variables might see their values regrouped to form a categorical variable with less values (but whose coefficients are ‘‘easier’’ to estimate). Up to now, there was no theoretical grounds to do so and no uniformly better method;</li>
+<li>Credit risk modelers have always sticked to logistic regression without knowing whether it is somewhat ‘‘close’’ to the true underlying model.</li>
+</ul>
+</div>
+<div id="problems-tackled-in-this-package" class="section level2">
+<h2>Problems tackled in this package</h2>
+<p>Two problems have been tackled so far in the Credit Scoring framework:</p>
+<ol style="list-style-type: decimal">
+<li>Reject Inference,</li>
+<li>‘‘Quantization’’ of continuous (discretization) and qualitative (grouping) features,</li>
+</ol>
+</div>
+<div id="other-packages" class="section level2">
+<h2>Other packages</h2>
+<p>We released two other packages:</p>
+<ol style="list-style-type: decimal">
+<li>Package <a href="https://cran.r-project.org/package=glmdisc">glmdisc</a> for ‘‘Quantization’’ of continuous (discretization) and qualitative (grouping) features <strong>and</strong> interactions among covariates,</li>
+<li>Package <a href="https://cran.r-project.org/package=glmtree">glmtree</a> for ‘‘Segmentation’’ of clients into subpopulations with different scorecards: logistic regression trees.</li>
+</ol>
+<p>Other packages focus on Credit Scoring, see e.g. <a href="https://arxiv.org/abs/2006.11835">this review paper</a>.</p>
+</div>
+</div>
+<div id="reject-inference" class="section level1">
+<h1>Reject Inference</h1>
+<div id="context-1" class="section level2">
+<h2>Context</h2>
+<div id="current-acceptance-system" class="section level3">
+<h3>Current acceptance system</h3>
+<p>From all applicants who get a Credit Score, there are three interesting sub-populations: the financed clients, who were granted a loan, the rejected applicants, who were rejected either by business rules (e.g. over-indebtedness) or because of a low Credit Score, and the not-taking up applicants who were offered a loan but decided not to take it (e.g. they don’t need it anymore or they went to a competitor).</p>
+<p>Obviously, the performance variable <span class="math inline">\(Y\)</span> is observed only for financed clients so that we have <span class="math inline">\(n\)</span> observations of financed clients <span class="math inline">\((\boldsymbol{x}_i,y_i)_1^n\)</span> and <span class="math inline">\(n&#39;\)</span> observations of not financed clients for who we only have the characteristics <span class="math inline">\((\boldsymbol{x}_i)_1^{n&#39;}\)</span>.</p>
+</div>
+<div id="mathematical-formulation" class="section level3">
+<h3>Mathematical formulation</h3>
+<p>Strictly speaking, we have observations from <span class="math inline">\(p(\boldsymbol{x},y,Z=f)\)</span> and by fitting a logistic regression to this data, we subsequently estimate <span class="math inline">\(p(y|\boldsymbol{x},Z=f)\)</span> which is quite ‘‘different’’ from <span class="math inline">\(p(y|\boldsymbol{x})\)</span>. Since the Credit Score is to be applied to the whole population to decide whether to accept/reject clients, it seems that this can lead to a biased model, even asymptotically.</p>
+<p>There are three important keys to understand if the resulting model is biased:</p>
+<ul>
+<li>Is the model local or global, i.e. does it compute <span class="math inline">\(p(y|\boldsymbol{x})\)</span> directly or does it have to model <span class="math inline">\(p(\boldsymbol{x},y)\)</span> and then deduce <span class="math inline">\(p(y|\boldsymbol{x})\)</span> in which case it is necessarily biased?</li>
+<li>Is the model ‘‘true’’, i.e. is there any <span class="math inline">\(\boldsymbol{\theta}\)</span> such that <span class="math inline">\(p(y|\boldsymbol{x}) = p_{\boldsymbol{\theta}}(y|\boldsymbol{x})\)</span>?</li>
+<li>What is the missingness mechanism? Following Rubin’s definition it can be MCAR (missingness of <span class="math inline">\(y\)</span> is indepedent of any variable), MAR (missingness of <span class="math inline">\(y\)</span> only depends on <span class="math inline">\(\boldsymbol{x}\)</span>) or MNAR (there are unobserved variables that determine <span class="math inline">\(y\)</span>’s missingness).</li>
+</ul>
+</div>
+</div>
+<div id="theoretical-findings" class="section level2">
+<h2>Theoretical findings</h2>
+<p>Our theoretical findings on this subject is discussed in <a href="https://arxiv.org/abs/1903.10855">Ehrhardt et al. (2017)</a>.</p>
+<p>In short, using only financed clients’ characteristics to learn a logistic regression model is asymptotically correct when the missingness mechanism is MAR and the model is true. We can easily show this by simulating data:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>data_cont_simu &lt;-<span class="st"> </span><span class="cf">function</span>(n, d, k) {</span>
+<span id="cb4-2"><a href="#cb4-2"></a>  <span class="kw">set.seed</span>(k)</span>
+<span id="cb4-3"><a href="#cb4-3"></a>  x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">runif</span>(n <span class="op">*</span><span class="st"> </span>d), <span class="dt">nrow =</span> n, <span class="dt">ncol =</span> d)</span>
+<span id="cb4-4"><a href="#cb4-4"></a>  theta &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">-1</span>)</span>
+<span id="cb4-5"><a href="#cb4-5"></a>  log_odd &lt;-<span class="st"> </span>x <span class="op">%*%</span><span class="st"> </span>theta</span>
+<span id="cb4-6"><a href="#cb4-6"></a></span>
+<span id="cb4-7"><a href="#cb4-7"></a>  y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="dv">1</span> <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(<span class="op">-</span>log_odd)))</span>
+<span id="cb4-8"><a href="#cb4-8"></a></span>
+<span id="cb4-9"><a href="#cb4-9"></a>  <span class="kw">return</span>(<span class="kw">list</span>(x, y))</span>
+<span id="cb4-10"><a href="#cb4-10"></a>}</span>
+<span id="cb4-11"><a href="#cb4-11"></a></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="cf">if</span> (<span class="kw">require</span>(ggplot2, <span class="dt">quietly =</span> <span class="ot">TRUE</span>)) {</span>
+<span id="cb4-13"><a href="#cb4-13"></a>  data &lt;-<span class="st"> </span><span class="kw">data_cont_simu</span>(<span class="dv">100</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span>
+<span id="cb4-14"><a href="#cb4-14"></a>  x &lt;-<span class="st"> </span>data[[<span class="dv">1</span>]]</span>
+<span id="cb4-15"><a href="#cb4-15"></a>  y &lt;-<span class="st"> </span>data[[<span class="dv">2</span>]]</span>
+<span id="cb4-16"><a href="#cb4-16"></a>  df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y)</span>
+<span id="cb4-17"><a href="#cb4-17"></a>  <span class="kw">ggplot</span>(df, <span class="kw">aes</span>(<span class="dt">x =</span> x<span class="fl">.1</span>, <span class="dt">y =</span> x<span class="fl">.2</span>, <span class="dt">colour =</span> <span class="kw">factor</span>(y))) <span class="op">+</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="st">    </span><span class="kw">geom_point</span>()</span>
+<span id="cb4-19"><a href="#cb4-19"></a></span>
+<span id="cb4-20"><a href="#cb4-20"></a>  data &lt;-<span class="st"> </span><span class="kw">data_cont_simu</span>(<span class="dv">1000</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span>
+<span id="cb4-21"><a href="#cb4-21"></a>  x &lt;-<span class="st"> </span>data[[<span class="dv">1</span>]]</span>
+<span id="cb4-22"><a href="#cb4-22"></a>  y &lt;-<span class="st"> </span>data[[<span class="dv">2</span>]]</span>
+<span id="cb4-23"><a href="#cb4-23"></a>  df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y)</span>
+<span id="cb4-24"><a href="#cb4-24"></a>  hat_theta &lt;-<span class="st"> </span><span class="kw">glm</span>(y <span class="op">~</span><span class="st"> </span>. <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> df, <span class="dt">family =</span> <span class="kw">binomial</span>(<span class="dt">link =</span> <span class="st">&quot;logit&quot;</span>))</span>
+<span id="cb4-25"><a href="#cb4-25"></a>  df<span class="op">$</span>decision &lt;-<span class="st"> </span><span class="kw">factor</span>(<span class="kw">ifelse</span>(<span class="kw">predict</span>(hat_theta, df, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>) <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.7</span>, <span class="st">&quot;reject&quot;</span>, <span class="st">&quot;accept&quot;</span>))</span>
+<span id="cb4-26"><a href="#cb4-26"></a>  <span class="kw">ggplot</span>(df, <span class="kw">aes</span>(<span class="dt">x =</span> x<span class="fl">.1</span>, <span class="dt">y =</span> x<span class="fl">.2</span>, <span class="dt">colour =</span> decision)) <span class="op">+</span></span>
+<span id="cb4-27"><a href="#cb4-27"></a><span class="st">    </span><span class="kw">geom_point</span>()</span>
+<span id="cb4-28"><a href="#cb4-28"></a></span>
+<span id="cb4-29"><a href="#cb4-29"></a>  theta_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA</span>, <span class="dt">ncol =</span> <span class="dv">1</span>, <span class="dt">nrow =</span> <span class="dv">1000</span>)</span>
+<span id="cb4-30"><a href="#cb4-30"></a>  theta_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA</span>, <span class="dt">ncol =</span> <span class="dv">1</span>, <span class="dt">nrow =</span> <span class="dv">1000</span>)</span>
+<span id="cb4-31"><a href="#cb4-31"></a>  theta_<span class="dv">1</span>_f &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA</span>, <span class="dt">ncol =</span> <span class="dv">1</span>, <span class="dt">nrow =</span> <span class="dv">1000</span>)</span>
+<span id="cb4-32"><a href="#cb4-32"></a>  theta_<span class="dv">2</span>_f &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA</span>, <span class="dt">ncol =</span> <span class="dv">1</span>, <span class="dt">nrow =</span> <span class="dv">1000</span>)</span>
+<span id="cb4-33"><a href="#cb4-33"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">1000</span>) {</span>
+<span id="cb4-34"><a href="#cb4-34"></a>    data &lt;-<span class="st"> </span><span class="kw">data_cont_simu</span>(<span class="dv">1000</span>, <span class="dv">2</span>, k)</span>
+<span id="cb4-35"><a href="#cb4-35"></a>    x &lt;-<span class="st"> </span>data[[<span class="dv">1</span>]]</span>
+<span id="cb4-36"><a href="#cb4-36"></a>    y &lt;-<span class="st"> </span>data[[<span class="dv">2</span>]]</span>
+<span id="cb4-37"><a href="#cb4-37"></a>    df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y)</span>
+<span id="cb4-38"><a href="#cb4-38"></a>    hat_theta &lt;-<span class="st"> </span><span class="kw">glm</span>(y <span class="op">~</span><span class="st"> </span>. <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> df, <span class="dt">family =</span> <span class="kw">binomial</span>(<span class="dt">link =</span> <span class="st">&quot;logit&quot;</span>))</span>
+<span id="cb4-39"><a href="#cb4-39"></a></span>
+<span id="cb4-40"><a href="#cb4-40"></a>    theta_<span class="dv">1</span>[k] &lt;-<span class="st"> </span>hat_theta<span class="op">$</span>coefficients[<span class="dv">1</span>]</span>
+<span id="cb4-41"><a href="#cb4-41"></a>    theta_<span class="dv">2</span>[k] &lt;-<span class="st"> </span>hat_theta<span class="op">$</span>coefficients[<span class="dv">2</span>]</span>
+<span id="cb4-42"><a href="#cb4-42"></a></span>
+<span id="cb4-43"><a href="#cb4-43"></a>    df<span class="op">$</span>decision &lt;-<span class="st"> </span><span class="kw">factor</span>(<span class="kw">ifelse</span>(<span class="kw">predict</span>(hat_theta, df, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>) <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.6</span>, <span class="st">&quot;reject&quot;</span>, <span class="st">&quot;accept&quot;</span>))</span>
+<span id="cb4-44"><a href="#cb4-44"></a>    hat_theta_f &lt;-<span class="st"> </span><span class="kw">glm</span>(y <span class="op">~</span><span class="st"> </span>. <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> df[df<span class="op">$</span>decision <span class="op">==</span><span class="st"> &quot;accept&quot;</span>, <span class="op">-</span><span class="kw">ncol</span>(df)], <span class="dt">family =</span> <span class="kw">binomial</span>(<span class="dt">link =</span> <span class="st">&quot;logit&quot;</span>))</span>
+<span id="cb4-45"><a href="#cb4-45"></a></span>
+<span id="cb4-46"><a href="#cb4-46"></a>    theta_<span class="dv">1</span>_f[k] &lt;-<span class="st"> </span>hat_theta_f<span class="op">$</span>coefficients[<span class="dv">1</span>]</span>
+<span id="cb4-47"><a href="#cb4-47"></a>    theta_<span class="dv">2</span>_f[k] &lt;-<span class="st"> </span>hat_theta_f<span class="op">$</span>coefficients[<span class="dv">2</span>]</span>
+<span id="cb4-48"><a href="#cb4-48"></a>  }</span>
+<span id="cb4-49"><a href="#cb4-49"></a>  <span class="kw">ggplot</span>(<span class="kw">data.frame</span>(theta_<span class="dv">1</span>), <span class="kw">aes</span>(<span class="dt">x =</span> theta_<span class="dv">1</span>)) <span class="op">+</span></span>
+<span id="cb4-50"><a href="#cb4-50"></a><span class="st">    </span><span class="kw">geom_histogram</span>() <span class="op">+</span></span>
+<span id="cb4-51"><a href="#cb4-51"></a><span class="st">    </span><span class="kw">geom_vline</span>(<span class="dt">xintercept =</span> <span class="dv">1</span>)</span>
+<span id="cb4-52"><a href="#cb4-52"></a>}</span></code></pre></div>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>When the missingness mechanism is MNAR, <span class="math inline">\(p(y|\boldsymbol{x},f) \neq p(y|\boldsymbol{x},nf)\)</span> so that there is no way to ‘‘unbias’’ the resulting model without introducing data from the financing mechanism and model <span class="math inline">\(p(f|\boldsymbol{x},y)\)</span>.</p>
+<p>When the model is false, we could make use of not financed clients to estimate <span class="math inline">\(p(f|\boldsymbol{x})\)</span> and consider this as an importance function in the Importance Sampling framework. However, this gives good results when the importance function is known and under probabilistic assumptions not met in our use case. Here it must be evaluated separately and simulations show that this estimation process also introduces bias and variance and subsequently does not improve upon the financed clients’ model.</p>
+</div>
+<div id="reject-inference-methods" class="section level2">
+<h2>Reject Inference methods</h2>
+<p>To deal with the possible bias of fitting a logistic regression to the financed clients’ data, Reject Inference methods have been proposed in the literature. We showed in that none of them could potentially give any good result. Nevertheless, we implemented them to compare them numerically.</p>
+<div id="functions" class="section level3">
+<h3>Functions</h3>
+<p>In this package, we implemented Reject Inference methods which were described for example in and were supposed to enable credit risk modelers to use not-financed clients’ characteristics in the logistic regression learning process. We demonstrated that these methods are not statistically grounded. We nevertheless implemented these methods to show these results numerically.</p>
+<p>The first method is Fuzzy Augmentation as described in the Appendix of <a href="https://github.com/adimajo/manuscrit_these">my PhD thesis</a>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>xf &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(df[df<span class="op">$</span>decision <span class="op">==</span><span class="st"> &quot;accept&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;x.1&quot;</span>, <span class="st">&quot;x.2&quot;</span>)])</span>
+<span id="cb6-2"><a href="#cb6-2"></a>xnf &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(df[df<span class="op">$</span>decision <span class="op">==</span><span class="st"> &quot;reject&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;x.1&quot;</span>, <span class="st">&quot;x.2&quot;</span>)])</span>
+<span id="cb6-3"><a href="#cb6-3"></a>yf &lt;-<span class="st"> </span>df[df<span class="op">$</span>decision <span class="op">==</span><span class="st"> &quot;accept&quot;</span>, <span class="st">&quot;y&quot;</span>]</span>
+<span id="cb6-4"><a href="#cb6-4"></a>hat_theta_fuzzy &lt;-<span class="st"> </span><span class="kw">fuzzy_augmentation</span>(xf, xnf, yf)</span></code></pre></div>
+<pre><code>## Warning in eval(family$initialize): non-integer #successes in a binomial glm!</code></pre>
+<p>The second method is Reclassification as described in the Appendix of <a href="https://github.com/adimajo/manuscrit_these">my PhD thesis</a>.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>hat_theta_reclassification &lt;-<span class="st"> </span><span class="kw">reclassification</span>(xf, xnf, yf)</span></code></pre></div>
+<p>The third method is Augmentation as described in the Appendix of <a href="https://github.com/adimajo/manuscrit_these">my PhD thesis</a>.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>hat_theta_augmentation &lt;-<span class="st"> </span><span class="kw">augmentation</span>(xf, xnf, yf)</span></code></pre></div>
+<pre><code>## Warning in eval(family$initialize): non-integer #successes in a binomial glm!</code></pre>
+<p>The fourth method is Parcelling as described in the Appendix of <a href="https://github.com/adimajo/manuscrit_these">my PhD thesis</a>.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>hat_theta_parcelling &lt;-<span class="st"> </span><span class="kw">parcelling</span>(xf, xnf, yf)</span></code></pre></div>
+<p>The fifth method is Twins as described in the Appendix of <a href="https://github.com/adimajo/manuscrit_these">my PhD thesis</a>.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>hat_theta_twins &lt;-<span class="st"> </span><span class="kw">twins</span>(xf, xnf, yf)</span></code></pre></div>
+<pre><code>## Warning in speedglm::speedglm(acc ~ ., family = stats::binomial(link =
+## &quot;logit&quot;), : Maximum number of iterations reached without convergence</code></pre>
+<p>Each of these functions output an S4 object named ‘‘reject_infered’’. This object has slots:</p>
+<ul>
+<li>method_name: the Reject Inference method used;</li>
+<li>financed_model: the logistic regression using only financed clients’ characteristics;</li>
+<li>acceptance_model: the logistic regression modeling the financing decision (empty for all methods except Augmentation and Twins);</li>
+<li>infered_model: the logistic regression obtained using a given reject inference technique.</li>
+</ul>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>hat_theta_augmentation<span class="op">@</span>method_name</span></code></pre></div>
+<pre><code>## [1] &quot;augmentation&quot;</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>hat_theta_reclassification<span class="op">@</span>financed_model</span></code></pre></div>
+<pre><code>## Generalized Linear Model of class &#39;speedglm&#39;:
+## 
+## Call:  speedglm::speedglm(formula = labels ~ ., data = df_f, family = stats::binomial(link = &quot;logit&quot;)) 
+## 
+## Coefficients:
+## (Intercept)        x.x.1        x.x.2  
+##   -0.001515     1.493633    -1.570911</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>hat_theta_twins<span class="op">@</span>acceptance_model</span></code></pre></div>
+<pre><code>## Generalized Linear Model of class &#39;speedglm&#39;:
+## 
+## Call:  speedglm::speedglm(formula = acc ~ ., data = df[, -which(names(df) %in%      c(&quot;labels&quot;))], family = stats::binomial(link = &quot;logit&quot;)) 
+## 
+## Coefficients:
+## (Intercept)        x.x.1        x.x.2  
+##        1754        -5037         5753</code></pre>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>hat_theta_fuzzy<span class="op">@</span>infered_model</span></code></pre></div>
+<pre><code>## Generalized Linear Model of class &#39;speedglm&#39;:
+## 
+## Call:  speedglm::speedglm(formula = labels ~ ., data = df[, -which(names(df) %in%      c(&quot;acc&quot;))], family = stats::binomial(link = &quot;logit&quot;)) 
+## 
+## Coefficients:
+## (Intercept)        x.x.1        x.x.2  
+##   -0.001515     1.493633    -1.570911</code></pre>
+</div>
+<div id="methods" class="section level3">
+<h3>Methods</h3>
+<p>To efficiently use the generated S4 objects of class ‘‘reject_infered’’ several methods were implemented which we detail here.</p>
+<div id="print-method" class="section level4">
+<h4>print method</h4>
+<p>The print method shows the method used and the coefficients of infered_model, much like you would get from printing a  object: Generalized Linear Model of class ‘speedglm’:</p>
+<p>Call: speedglm::speedglm(formula = labels ~ ., data = df[, -which(names(df) %in% c(“acc”))], family = stats::binomial(link = “logit”))</p>
+<p>Coefficients: (Intercept) x.x.1 x.x.2<br />
+0.3168 2.5703 -2.7744</p>
+</div>
+<div id="summary-method" class="section level4">
+<h4>summary method</h4>
+<p>The summary method shows the method used alongside the coefficients of the financed model, eventually the acceptance model and the infered model with AIC values, much like you would get from doing a summary on a  object: Length Class Mode 1 reject_infered S4</p>
+</div>
+</div>
+</div>
+</div>
+<div id="quantization" class="section level1">
+<h1>Quantization</h1>
+<div id="context-2" class="section level2">
+<h2>Context</h2>
+<p>Under the term ‘‘quantization’’, we refer to the process of transforming a continuous feature into a categorical feature which values uniquely correspond to intervals of the continuous feature and to the process of regrouping values of categorical feature.</p>
+<p>There are a few advantages to discretizing the input features:</p>
+<ul>
+<li>Interpretability: the logistic regression becomes a simple addition;</li>
+<li>Usability in other areas: we can address subgroups by focusing on one or several values of a given discretized feature;</li>
+<li>Outliers have less influence in model fitting because they are regrouped in the first (or last) value of the discretized feature;</li>
+<li>Non-linearity of the continuous value w.r.t. the log odd ratio: the real log odd ratio of each feature (all else equal) is considered linear in the logistic regression equation which might not be true. By discretizing each feature, we perform stepwise approximation.</li>
+</ul>
+<p>There are a few drawbacks as well:</p>
+<ul>
+<li>Pre-processing task that can be costly in both human and computation time;</li>
+<li>Loss in predictive power if continuous model is closer to the true model;</li>
+<li>Harder to estimate each coefficient as there are more coefficients and subsequently less data to estimate each of them.</li>
+</ul>
+<p>These advantages and drawbacks are explained in-depth in .</p>
+<p>Despite its limitations, CA CF decided to go on developping their scorecards by using logistic regression and discretizing their input features. However, with the growing number of input features in an era of Big Data, the increasing number of products and types of clients addressed and the simultaneous aging of their previous scorecards, they decided to have an automatic tool to generate production-ready scorecards by automizing the discretization process under constraints (which we’ll develop later on) and the logistic regression fitting. They had to be confident on the underlying mechanisms of this tool (mathematically speaking) that is why it became a research project. We first delve into the mathematics of the problem.</p>
+</div>
+<div id="mathematical-reinterpretation" class="section level2">
+<h2>Mathematical reinterpretation</h2>
+<div id="model" class="section level3">
+<h3>Model</h3>
+<p>We consider a random vector <span class="math inline">\(\boldsymbol{X}=(X_1,X_d)\)</span> where <span class="math inline">\(X_j\)</span> can be either continuous or qualitative (with <span class="math inline">\(o_j\)</span> distinct values). We denote by <span class="math inline">\(\boldsymbol{\mathfrak{q}}=(\mathfrak{q}_1,\mathfrak{q}_d)\)</span> the quantized random vector where <span class="math inline">\(\mathfrak{q}_j\)</span> is the quantization of <span class="math inline">\(X_j\)</span>, i.e. qualitative with <span class="math inline">\(m_j\)</span> values corresponding either to unique intervals of <span class="math inline">\(X_j\)</span> (continuous case) or to unique regroupments of <span class="math inline">\(X_j\)</span>’s <span class="math inline">\(o_j\)</span> values (which implies <span class="math inline">\(m_j \leq o_j\)</span>).</p>
+<p>We suppose that by quantizing features <span class="math inline">\(\boldsymbol{X}\)</span>, we preserve all information about the target feature, i.e. <span class="math inline">\(p(y|\boldsymbol{x},\boldsymbol{\mathfrak{q}}) = p(y|\boldsymbol{\mathfrak{q}})\)</span>.</p>
+</div>
+<div id="hard-optimization-problem" class="section level3">
+<h3>Hard optimization problem</h3>
+<p>Although this process seems straightforward, it is a rather complicated optimization problem in terms of combinatorics and estimation (being a discrete problem).</p>
+</div>
+<div id="choosing-the-right-model-which-criterion" class="section level3">
+<h3>Choosing the ‘‘right’’ model: which criterion?</h3>
+<p>The task is to find the optimal logistic regression <span class="math inline">\(p_{\boldsymbol{\theta}}(y|\boldsymbol{\mathfrak{q}})\)</span> where <span class="math inline">\(\boldsymbol{\mathfrak{q}}\)</span> is unknown and must be chosen in a set <span class="math inline">\(\mathbf{\mathfrak{Q}}_{\boldsymbol{m}}\)</span> very large as said in the previous section. So the model selection problem can be expressed in terms of classical criteria, e.g. AIC, BIC, where and <span class="math inline">\(\mathbf{\mathfrak{Q}}_{\boldsymbol{m}}\)</span> have to be scanned:</p>
+<p><span class="math display">\[ (\hat{\boldsymbol{\theta}}, \hat{\boldsymbol{\mathfrak{q}}}) = \arg \max_{(\boldsymbol{\theta},\boldsymbol{\mathfrak{q}})} \text{AIC}(p_{\boldsymbol{\theta}}(\mathbf{y}|\mathbf{\mathfrak{q}})).\]</span></p>
+</div>
+<div id="the-need-for-generating-clever-candidates" class="section level3">
+<h3>The need for generating ‘‘clever’’ candidates</h3>
+<p>The criterion developed in the previous part cannot be optimized directly because the set <span class="math inline">\(\mathbf{\mathfrak{Q}}_{\boldsymbol{m}}\)</span> of candidate discretizations is too large. The idea behind most existing supervised discretization method is to generate potentially ‘‘good’’ candidates (although most methods don’t depend on the predictive algorithm to be applied after discretization).</p>
+<p>By doing so, we reduce elements of <span class="math inline">\(\mathbf{\mathfrak{Q}}_{\boldsymbol{m}}\)</span> to the generated candidates which is a considerably smaller set, with most existing methods outputing only one discretization scheme. We go through a few of them in the next section.</p>
+<p>We proposed a discretization algorithm that meets these criteria and naturally . It was described in &lt;arxiv:&gt;.</p>
+<p>In short, the algorithm considers the discretized features <span class="math inline">\(\boldsymbol{\mathfrak{q}}\)</span> as latent variables which we will generate from its estimated a posteriori density function as part of an SEM-algorithm (see ). The algorithm alternates between:</p>
+<ol style="list-style-type: decimal">
+<li>Fitting a logistic regression between <span class="math inline">\(\boldsymbol{\mathfrak{q}}\)</span> and <span class="math inline">\(y\)</span>;</li>
+<li>Fitting polytomous logistic regression functions between each pair of <span class="math inline">\((x_j,\mathfrak{q}_j)\)</span>;</li>
+<li>Generate new discretized features <span class="math inline">\(E\)</span> by sampling them, as <span class="math inline">\(p(\mathfrak{q}_j|\mathfrak{q}_{-\{j\}},\boldsymbol{x},y) \propto p(\mathfrak{q}_j|x_j) p(y|\boldsymbol{\mathfrak{q}})\)</span>.</li>
+</ol>
+<p>The approach is implemented in the <code>glmdisc</code> package and <strong>is not part of this package</strong>. Please refer to its vignette (by typing <code>vignette(&quot;glmdisc&quot;)</code>).</p>
+</div>
+</div>
+<div id="existing-methods" class="section level2">
+<h2>Existing methods</h2>
+<div id="the-discretization-package" class="section level3">
+<h3>The discretization package</h3>
+<p>In this package, we wrapped functions of the <a href="https://cran.r-project.org/package=discretization">discretization</a> package in a unified S4 class <code>discretization</code>.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">runif</span>(<span class="dv">300</span>), <span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">3</span>)</span>
+<span id="cb22-2"><a href="#cb22-2"></a>cuts &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">length.out =</span> <span class="dv">4</span>)</span>
+<span id="cb22-3"><a href="#cb22-3"></a>xd &lt;-<span class="st"> </span><span class="kw">apply</span>(x, <span class="dv">2</span>, <span class="cf">function</span>(col) <span class="kw">as.numeric</span>(<span class="kw">cut</span>(col, cuts)))</span>
+<span id="cb22-4"><a href="#cb22-4"></a>theta &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">-2</span>, <span class="dv">-2</span>, <span class="dv">-2</span>), <span class="dt">ncol =</span> <span class="dv">3</span>, <span class="dt">nrow =</span> <span class="dv">3</span>))</span>
+<span id="cb22-5"><a href="#cb22-5"></a>log_odd &lt;-<span class="st"> </span><span class="kw">rowSums</span>(<span class="kw">t</span>(<span class="kw">sapply</span>(<span class="kw">seq_along</span>(xd[, <span class="dv">1</span>]), <span class="cf">function</span>(row_id) {</span>
+<span id="cb22-6"><a href="#cb22-6"></a>  <span class="kw">sapply</span>(</span>
+<span id="cb22-7"><a href="#cb22-7"></a>    <span class="kw">seq_along</span>(xd[row_id, ]),</span>
+<span id="cb22-8"><a href="#cb22-8"></a>    <span class="cf">function</span>(element) theta[xd[row_id, element], element]</span>
+<span id="cb22-9"><a href="#cb22-9"></a>  )</span>
+<span id="cb22-10"><a href="#cb22-10"></a>})))</span>
+<span id="cb22-11"><a href="#cb22-11"></a>y &lt;-<span class="st"> </span>stats<span class="op">::</span><span class="kw">rbinom</span>(<span class="dv">100</span>, <span class="dv">1</span>, <span class="dv">1</span> <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(<span class="op">-</span>log_odd)))</span>
+<span id="cb22-12"><a href="#cb22-12"></a></span>
+<span id="cb22-13"><a href="#cb22-13"></a>discrete_modele &lt;-<span class="st"> </span><span class="kw">chi2_iter</span>(x, y)</span></code></pre></div>
+<pre><code>## Warning: `as_data_frame()` is deprecated as of tibble 2.0.0.
+## Please use `as_tibble()` instead.
+## The signature and semantics have changed, see `?as_tibble`.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
+<pre><code>## Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if `.name_repair` is omitted as of tibble 2.0.0.
+## Using compatibility `.name_repair`.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
+</div>
+<div id="methods-1" class="section level3">
+<h3>Methods</h3>
+<div id="print-method-1" class="section level4">
+<h4>print method</h4>
+<p>The print method shows the method used and the coefficients of infered_model, much like you would get from printing a  object: Generalized Linear Model of class ‘speedglm’:</p>
+<p>Call: speedglm::speedglm(formula = stats::formula(“labels ~ .”), data = Filter(function(x) (length(unique(x)) &gt; 1), cbind(data.frame(sapply(disc$Disc.data, as.factor), stringsAsFactors = TRUE), data_train[, sapply(data_train, is.factor), drop = FALSE])), family = stats::binomial(link = “logit”), weights = NULL, fitted = TRUE)</p>
+<p>Coefficients: (Intercept) X12 X13 X32<br />
+0.0399 1.8832 -1.7989 -1.4671</p>
+</div>
+<div id="summary-method-1" class="section level4">
+<h4>summary method</h4>
+<p>The summary method shows the method used alongside the coefficients of the financed model, eventually the acceptance model and the infered model with AIC values, much like you would get from doing a summary on a  object: Generalized Linear Model of class ‘speedglm’:</p>
+<p>Call: speedglm::speedglm(formula = stats::formula(“labels ~ .”), data = Filter(function(x) (length(unique(x)) &gt; 1), cbind(data.frame(sapply(disc$Disc.data, as.factor), stringsAsFactors = TRUE), data_train[, sapply(data_train, is.factor), drop = FALSE])), family = stats::binomial(link = “logit”), weights = NULL, fitted = TRUE)</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">oefficients:</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Estimate Std. Error z value Pr(&gt;|z|)</td>
+</tr>
+<tr class="even">
+<td align="left">Intercept) 0.0399 0.404 0.0988 0.9213</td>
+</tr>
+<tr class="odd">
+<td align="left">12 1.8832 0.621 3.0308 0.0024 **</td>
+</tr>
+<tr class="even">
+<td align="left">13 -1.7989 0.714 -2.5191 0.0118 *</td>
+</tr>
+<tr class="odd">
+<td align="left">32 -1.4671 0.572 -2.5665 0.0103 *</td>
+</tr>
+</tbody>
+</table>
+<table style="width:96%;">
+<colgroup>
+<col width="95%"></col>
+</colgroup>
+<tbody>
+<tr class="odd">
+<td align="left">Signif. codes: 0 ‘<em><strong>’ 0.001 ’</strong>’ 0.01 ’</em>’ 0.05 ‘.’ 0.1 ’ ’ 1</td>
+</tr>
+</tbody>
+</table>
+<p>null df: 99; null deviance: 135; residuals df: 96; residuals deviance: 89.7; # obs.: 100; # non-zero weighted obs.: 100; AIC: 97.7; log Likelihood: -44.8; RSS: 105; dispersion: 1; iterations: 5; rank: 4; max tolerance: 1.56e-13; convergence: TRUE.</p>
+</div>
+<div id="predict-method" class="section level4">
+<h4>predict method</h4>
+<p>The predict method corresponds to the glm predict method for the infered model: 1 2 3 4 5 6 7 8 9 10 11 0.8725 0.5100 0.6121 0.0382 0.5100 0.8725 0.5100 0.5100 0.1935 0.1935 0.8725 12 13 14 15 16 17 18 19 20 21 22 0.1935 0.0382 0.8725 0.0382 0.8725 0.8725 0.5100 0.8725 0.1935 0.5100 0.5100 23 24 25 26 27 28 29 30 31 32 33 0.1935 0.8725 0.8725 0.1469 0.0382 0.0382 0.5100 0.1935 0.1935 0.8725 0.1935 34 35 36 37 38 39 40 41 42 43 44 0.1935 0.1469 0.0382 0.5100 0.1935 0.8725 0.0382 0.5100 0.0382 0.5100 0.1469 45 46 47 48 49 50 51 52 53 54 55 0.5100 0.1935 0.0382 0.1469 0.0382 0.1935 0.8725 0.5100 0.1935 0.5100 0.8725 56 57 58 59 60 61 62 63 64 65 66 0.0382 0.8725 0.8725 0.1469 0.8725 0.1469 0.1469 0.5100 0.8725 0.0382 0.5100 67 68 69 70 71 72 73 74 75 76 77 0.1469 0.1469 0.1469 0.1935 0.5100 0.6121 0.8725 0.8725 0.8725 0.1469 0.8725 78 79 80 81 82 83 84 85 86 87 88 0.6121 0.5100 0.0382 0.0382 0.1469 0.0382 0.5100 0.1469 0.6121 0.8725 0.1935 89 90 91 92 93 94 95 96 97 98 99 0.0382 0.6121 0.1469 0.1935 0.5100 0.5100 0.0382 0.1469 0.8725 0.1935 0.8725 100 0.1469</p>
+</div>
+<div id="plot-method" class="section level4">
+<h4>plot method</h4>
+<p>The plot method corresponds to the glm plot method for the infered model:</p>
+<!-- ## Added constraints -->
+<!-- ### Few values -->
+<!-- ### Interpretability of the intervals -->
+<!-- ### Feature selection -->
+<!-- ### Automatic creation of interaction terms -->
+</div>
+</div>
+</div>
+</div>
+<div id="segmentation-logistic-regression-trees" class="section level1">
+<h1>Segmentation: logistic regression trees</h1>
+<p>Classically, Credit Scoring practioners perform ‘‘segmentation’’ before learning a scorecard, i.e. they try to find homogeneous segments of clients, e.g. ‘‘young clients’‘, ``home owners’’, and combine them. They then perform scoring locally, on the resulting leaves of this decision tree. We thus proposed an algorithm to fit this tree and the logistic regressions at its leaves, which we call glmtree. The resulting model mixes non parametric VS parametric and stepwise VS linear approaches to have the best predictive results, yet maintaining interpretability.</p>
+<p>The approach is implemented in the <code>glmtree</code> package required by this package. Please refer to its vignette (by typing <code>vignette(&quot;glmtree&quot;)</code>).</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
